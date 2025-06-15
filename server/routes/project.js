@@ -12,6 +12,7 @@ const {
   updateProject,
   deleteProject,
 } = require("../controllers/projectController");
+const { protect } = require("../middleware/protect");
 
 // const { protect, authorize } = require('../middleware/auth');
 
@@ -25,13 +26,13 @@ router.get("/:id", getProjectById);
 // Далее - защищенные роуты (в будущем)
 
 // POST /api/projects
-router.post("/", createProject);
+router.post("/", protect, createProject);
 
 // PUT /api/projects/5
-router.put("/:id", updateProject);
+router.put("/:id", protect, updateProject);
 
 // DELETE /api/projects/5
-router.delete("/:id", deleteProject);
+router.delete("/:id", protect, deleteProject);
 
 module.exports = router;
 

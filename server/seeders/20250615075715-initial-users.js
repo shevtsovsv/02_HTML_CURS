@@ -5,16 +5,16 @@
  */
 "use strict";
 const { Op } = require("sequelize");
+const bcrypt = require("bcrypt"); // <--- 1. Импортируем bcrypt
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // 1. Находим ID для ролей 'admin' и 'user'
+    // Находим ID для ролей 'admin' и 'user'
     const roles = await queryInterface.sequelize.query(
       `SELECT id, name FROM roles WHERE name IN ('admin', 'user');`,
       { type: queryInterface.sequelize.QueryTypes.SELECT }
     );
 
-    // Создаем карту для удобного доступа: { admin: 1, user: 2 } (ID могут отличаться)
     const roleMap = roles.reduce((acc, role) => {
       acc[role.name] = role.id;
       return acc;
@@ -26,23 +26,26 @@ module.exports = {
       );
     }
 
-    // 2. Создаем пользователей
+    // 2. Хешируем пароли перед вставкой
+    const salt = await bcrypt.genSalt(10);
+    const hashedPasswordAdmin = await bcrypt.hash("adminpassword123", salt);
+    const hashedPasswordUser = await bcrypt.hash("userpassword123", salt);
+
+    // 3. Создаем пользователей с уже захешированными паролями
     await queryInterface.bulkInsert(
       "users",
       [
         {
           email: "admin@app.com",
-          // ВАЖНО: Мы вводим пароль в открытом виде здесь,
-          // но хук beforeCreate в модели user АВТОМАТИЧЕСКИ захеширует его перед записью в БД.
-          password: "adminpassword123",
-          role_id: roleMap.admin, // Используем найденный ID
+          password: hashedPasswordAdmin, // <--- Используем хеш
+          role_id: roleMap.admin,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           email: "user@app.com",
-          password: "userpassword123",
-          role_id: roleMap.user, // Используем найденный ID
+          password: hashedPasswordUser, // <--- Используем хеш
+          role_id: roleMap.user,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

@@ -12,9 +12,11 @@ app.use(express.json());
 const userRoutes = require("./routes/user");
 const courseRoutes = require("./routes/course");
 const projectRoutes = require("./routes/project");
-app.use("/user", userRoutes); // Все запросы /users будут обрабатываться маршрутом из users.js
-app.use("/course", courseRoutes); // Все запросы /courses будут обрабатываться маршрутом из users.js
-app.use("/project", projectRoutes);
+const authRoutes = require("./routes/auth");
+app.use("/api/user", userRoutes); // Все запросы /users будут обрабатываться маршрутом из users.js
+app.use("/api/course", courseRoutes); // Все запросы /courses будут обрабатываться маршрутом из users.js
+app.use("/api/project", projectRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("API is running"));
 
