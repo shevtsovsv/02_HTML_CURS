@@ -2,13 +2,14 @@
  * @file pages/DashboardPage.jsx
  * @description Страница панели управления, доступная только авторизованным пользователям.
  */
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
+import CourseCard from "../components/CourseCard";
 import { useNavigate } from "react-router-dom"; // Хук для редиректа
 
 const DashboardPage = observer(() => {
-  const { authStore } = useStore();
+  const { authStore, courseStore } = useStore();
   const navigate = useNavigate();
 
   // Проверяем, есть ли данные о пользователе. Если стор еще не загрузил их,
@@ -18,6 +19,11 @@ const DashboardPage = observer(() => {
     // В будущем мы добавим сюда загрузку профиля пользователя.
     return <div>Загрузка данных пользователя...</div>;
   }
+
+  useEffect(() => {
+    // Запускаем загрузку курсов, когда компонент монтируется
+    courseStore.fetchCourses();
+  }, [courseStore]); // [courseStore] - массив зависимостей. Эффект перезапустится, если courseStore изменится (что бывает редко).
 
   // Функция для обработки выхода
   const handleLogout = () => {
@@ -46,6 +52,19 @@ const DashboardPage = observer(() => {
       >
         Выйти
       </button>
+      <hr />
+
+      <h2>Доступные курсы</h2>
+      {courseStore.isLoading ? (
+        <p>Загрузка курсов...</p>
+      ) : (
+        <div>
+          {courseStore.courses.map((course) => (
+            // Используем наш новый красивый компонент
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      )}
     </div>
   );
 });

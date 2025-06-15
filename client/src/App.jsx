@@ -4,24 +4,69 @@
  */
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { observer } from "mobx-react-lite";
+import { useStore } from "./hooks/useStore";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Простой компонент навигации для удобства
-const Navigation = () => {
+// const Navigation = () => {
+//   return (
+//     <nav
+//       style={{ padding: "10px", background: "#f0f0f0", marginBottom: "20px" }}
+//     >
+//       <Link to="/" style={{ marginRight: "15px" }}>
+//         Главная
+//       </Link>
+//       <Link to="/login">Вход</Link>
+//     </nav>
+//   );
+// };
+
+const Navigation = observer(() => {
+  const { authStore } = useStore();
+  // Кнопка выхода теперь будет жить здесь
+  const handleLogout = () => {
+    authStore.logout();
+    // После выхода можно ничего не делать, ProtectedRoute сам сделает редирект,
+    // если пользователь находился на защищенной странице.
+  };
   return (
     <nav
-      style={{ padding: "10px", background: "#f0f0f0", marginBottom: "20px" }}
+      style={{
+        padding: "10px 20px",
+        background: "#f0f0f0",
+        marginBottom: "20px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
     >
-      <Link to="/" style={{ marginRight: "15px" }}>
-        Главная
-      </Link>
-      <Link to="/login">Вход</Link>
+      <div>
+        <Link to="/" style={{ marginRight: "15px" }}>
+          Главная
+        </Link>
+        {authStore.isAuthenticated && (
+          <Link to="/dashboard">Панель управления</Link>
+        )}
+      </div>
+      <div>
+        {authStore.isAuthenticated ? (
+          // Если пользователь авторизован
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span style={{ marginRight: "15px" }}>{authStore.user?.email}</span>
+            <button onClick={handleLogout}>Выйти</button>
+          </div>
+        ) : (
+          // Если пользователь - гость
+          <Link to="/login">Вход</Link>
+        )}
+      </div>
     </nav>
   );
-};
+});
 
 function App() {
   return (

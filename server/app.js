@@ -14,7 +14,7 @@ const courseRoutes = require("./routes/course");
 const projectRoutes = require("./routes/project");
 const authRoutes = require("./routes/auth");
 app.use("/api/user", userRoutes); // Все запросы /users будут обрабатываться маршрутом из users.js
-app.use("/api/course", courseRoutes); // Все запросы /courses будут обрабатываться маршрутом из users.js
+app.use("/api/courses", courseRoutes); // Все запросы /courses будут обрабатываться маршрутом из users.js
 app.use("/api/project", projectRoutes);
 app.use("/api/auth", authRoutes);
 
