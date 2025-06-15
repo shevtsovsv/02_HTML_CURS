@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import CoursePage from "./pages/CoursePage";
+import ProjectPage from "./pages/ProjectPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Простой компонент навигации для удобства
@@ -96,6 +97,15 @@ function App() {
           {/* Он может быть публичным или защищенным. Пока оставим публичным. */}
           {/* :slug - это динамический параметр. React Router передаст его в компонент. */}
           <Route path="/courses/:slug" element={<CoursePage />} />
+
+          <Route
+            path="/projects/:id"
+            element={
+              <ProtectedRoute>
+                <ProjectPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/dashboard"

@@ -1,0 +1,37 @@
+/* client/src/pages/ProjectPage.css */
+
+.split-container,
+.split-editors {
+	display: flex;
+	flex-direction: row;
+}
+
+.gutter {
+	background: #eee;
+	background-repeat: no-repeat;
+	background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+	cursor: col-resize;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+}
+
+.gutter.gutter-vertical {
+	cursor: row-resize;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+}
+
+.task-panel,
+.preview-pane {
+	padding: 10px;
+	overflow-y: auto;
+	height: 100%;
+}
+
+.success {
+	color: green;
+}
+
+.error {
+	color: red; }

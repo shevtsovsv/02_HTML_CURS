@@ -12,6 +12,7 @@ const {
   updateProject,
   deleteProject,
 } = require("../controllers/projectController");
+const { checkProjectStep } = require("../controllers/validationController");
 const { protect } = require("../middleware/protect");
 
 // const { protect, authorize } = require('../middleware/auth');
@@ -33,6 +34,9 @@ router.put("/:id", protect, updateProject);
 
 // DELETE /api/projects/5
 router.delete("/:id", protect, deleteProject);
+
+// POST /api/projects/1/steps/5/check
+router.post("/:projectId/steps/:stepId/check", protect, checkProjectStep);
 
 module.exports = router;
 
