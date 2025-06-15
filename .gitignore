@@ -1,0 +1,65 @@
+# Файл сгенерирован для full-stack проекта (Node.js + React)
+
+### ОБЩИЕ ПРАВИЛА ###
+
+# Логи
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Файлы операционной системы
+.DS_Store
+Thumbs.db
+
+# Файлы IDE
+.idea
+.vscode/            # Игнорировать всю папку .vscode
+!.vscode/settings.json # Но НЕ игнорировать файл настроек, если хотите поделиться им
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Папка с нашей локальной векторной базой данных
+project_db/
+
+### ПРАВИЛА ДЛЯ СЕРВЕРА (SERVER) ###
+
+# Папка с зависимостями сервера
+server/node_modules/
+
+# Файл с переменными окружения сервера
+server/.env
+
+# Директория сборки (если будете использовать TypeScript или бандлеры)
+server/dist/
+server/build/
+
+
+### ПРАВИЛА ДЛЯ КЛИЕНТА (CLIENT) ###
+
+# Папка с зависимостями клиента
+client/node_modules/
+
+# Файл с переменными окружения клиента
+client/.env
+client/.env.local
+client/.env.development
+client/.env.test
+client/.env.production
+
+# Директория сборки клиента (для Vite/CRA)
+client/dist/
+client/build/
+client/.vite/
+
+# Отчеты о покрытии тестами
+coverage
+client/coverage/
+server/coverage/
