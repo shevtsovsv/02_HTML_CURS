@@ -7,6 +7,7 @@ import api from "../api"; // Наш API-клиент
 
 export class CourseStore {
   courses = [];
+  currentCourse = null;
   isLoading = false;
   rootStore;
 
@@ -26,6 +27,25 @@ export class CourseStore {
       });
     } catch (error) {
       console.error("Не удалось загрузить курсы:", error);
+    } finally {
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    }
+  }
+  // --- 2. Добавляем новый action для загрузки одного курса ---
+  async fetchCourseBySlug(slug) {
+    this.isLoading = true;
+    this.currentCourse = null; // Сбрасываем предыдущий курс
+    try {
+      // Запрос на наш бэкенд, который мы создали ранее
+      const response = await api.get(`/courses/${slug}`);
+      runInAction(() => {
+        this.currentCourse = response.data;
+      });
+    } catch (error) {
+      console.error(`Не удалось загрузить курс ${slug}:`, error);
+      // Можно добавить обработку ошибки 404
     } finally {
       runInAction(() => {
         this.isLoading = false;

@@ -9,6 +9,7 @@ import { useStore } from "./hooks/useStore";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
+import CoursePage from "./pages/CoursePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Простой компонент навигации для удобства
@@ -91,7 +92,11 @@ function App() {
           {/* Когда URL равен "/login", будет отрендерен <LoginPage />. */}
           <Route path="/login" element={<LoginPage />} />
 
-          {/* В будущем здесь будут другие роуты: */}
+          {/* --- 2. Добавляем новый роут для конкретного курса --- */}
+          {/* Он может быть публичным или защищенным. Пока оставим публичным. */}
+          {/* :slug - это динамический параметр. React Router передаст его в компонент. */}
+          <Route path="/courses/:slug" element={<CoursePage />} />
+
           <Route
             path="/dashboard"
             element={
