@@ -22,7 +22,7 @@ const { protect } = require("../middleware/protect");
 router.get("/", getAllProjects);
 
 // GET /api/projects/5 - получить проект с ID 5
-router.get("/:id", getProjectById);
+router.get("/:id", protect, getProjectById);
 
 // Далее - защищенные роуты (в будущем)
 

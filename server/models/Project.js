@@ -71,6 +71,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "project_id",
       as: "steps", // Псевдоним для удобного доступа: `project.steps`
     });
+
+    // Связь с кодом пользователя. У одного проекта может быть много записей кода (от разных юзеров).
+    project.hasMany(models.userCode, {
+      foreignKey: "project_id",
+      as: "userCodes", // ВАЖНО: alias должен совпадать с тем, что в `include`
+    });
   };
 
   return project;

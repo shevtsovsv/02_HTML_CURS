@@ -3,7 +3,7 @@
  * @description Контроллер для всех операций, связанных с проектами (заданиями).
  */
 
-const { project, projectStep, course } = require("../models");
+const { project, projectStep, course, userCode } = require("../models");
 
 /**
  * @desc    Получить все проекты. Позволяет фильтрацию по ID курса.
@@ -38,26 +38,46 @@ const getAllProjects = async (req, res) => {
  * @route   GET /api/projects/:id
  * @access  Public
  */
+
 const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id; // req.user приходит из middleware аутентификации
+
     const projectData = await project.findByPk(id, {
-      include: {
-        model: projectStep,
-        as: "steps",
-        // Сортируем шаги по их порядку
-        order: [["order", "ASC"]],
-      },
+      include: [
+        {
+          model: projectStep,
+          as: "steps",
+          order: [["step_number", "ASC"]], // --- ИЗМЕНЕНИЕ: Сортируем по 'step_number', а не 'order' ---
+        },
+        // Если пользователь авторизован, пытаемся подгрузить его код
+        // --- ИЗМЕНЕНИЕ: Теперь мы ищем ВЕСЬ код пользователя для этого проекта, а не один.
+        userId && {
+          model: userCode,
+          as: "userCodes",
+          where: { user_id: userId },
+          required: false, // LEFT JOIN
+        },
+      ].filter(Boolean), // Убираем 'false' из массива, если userId нет
     });
 
     if (projectData) {
+      // --- ИЗМЕНЕНИЕ: Мы больше не вычисляем current_step.
+      // Просто возвращаем все данные как есть. Фронтенд разберется.
       res.json(projectData);
     } else {
       res.status(404).json({ error: "Проект не найден" });
     }
   } catch (error) {
-    console.error(`Ошибка при получении проекта ${req.params.id}:`, error);
-    res.status(500).json({ error: "Ошибка на сервере" });
+    // --- ИЗМЕНЕНИЕ: Добавляем более подробный лог ошибки ---
+    console.error(
+      `КРИТИЧЕСКАЯ ОШИБКА в getProjectById для проекта ${req.params.id}:`,
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Внутренняя ошибка сервера", error: error.message });
   }
 };
 

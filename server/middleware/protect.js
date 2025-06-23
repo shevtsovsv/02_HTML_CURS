@@ -26,7 +26,7 @@ const protect = async (req, res, next) => {
       req.user = await user.findByPk(decoded.id, {
         attributes: { exclude: ["password"] },
       });
-
+      
       if (!req.user) {
         // Если пользователь был удален после выдачи токена
         return res.status(401).json({ error: "Пользователь не найден" });
