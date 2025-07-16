@@ -10,30 +10,6 @@ import Split from "react-split";
 import { useDebounce } from "use-debounce";
 import "./ProjectPage.css";
 
-// --- Компонент Превью ---
-// const PreviewPane = ({ html, css, js }) => {
-//   const documentContent = useMemo(
-//     () => `
-//     <html>
-//       <head><style>${css}</style></head>
-//       <body>${html}</body>
-//       <script>${js}</script>
-//     </html>
-//   `,
-//     [html, css, js]
-//   );
-
-//   return (
-//     <iframe
-//       srcDoc={documentContent}
-//       title="preview"
-//       sandbox="allow-scripts"
-//       width="100%"
-//       height="100%"
-//       style={{ border: "none" }}
-//     />
-//   );
-// };
 
 const PreviewPane = ({ html, css, js }) => {
   const documentContent = useMemo(() => {
@@ -128,168 +104,122 @@ const TaskPanel = observer(
   }
 );
 
-// --- Компонент Рабочей Области ---
-// const Workspace = observer(({ project, currentStep }) => {
-//   const { projectStore } = useStore();
 
-//   const initialCode = useMemo(() => {
-//     if (!currentStep || !project.steps) return { html: "", css: "", js: "" };
-
-//     const userCodeForStep = project.userCodes?.find(
-//       (code) => code.step_id === currentStep.id
-//     );
-
-//     return {
-//       html: userCodeForStep?.html ?? currentStep.html_template ?? "",
-//       css: userCodeForStep?.css ?? currentStep.css_template ?? "",
-//       js: userCodeForStep?.js ?? currentStep.js_template ?? "",
-//     };
-//   }, [project, currentStep]);
-
-//   const [localHtml, setLocalHtml] = useState(initialCode.html);
-//   const [localCss, setLocalCss] = useState(initialCode.css);
-//   const [localJs, setLocalJs] = useState(initialCode.js);
-
-//   const [debouncedHtml] = useDebounce(localHtml, 500);
-//   const [debouncedCss] = useDebounce(localCss, 500);
-//   const [debouncedJs] = useDebounce(localJs, 1000);
-
-//   useEffect(() => {
-//     projectStore.updateCode("html", localHtml);
-//     projectStore.updateCode("css", localCss);
-//     projectStore.updateCode("javascript", localJs);
-//   }, [localHtml, localCss, localJs, projectStore]);
-
-//   useEffect(() => {
-//     setLocalHtml(initialCode.html);
-//     setLocalCss(initialCode.css);
-//     setLocalJs(initialCode.js);
-//   }, [currentStep, initialCode]);
-
-//   return (
-//     <Split
-//       direction="vertical"
-//       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-//       sizes={[50, 50]}
-//     >
-//       <Split className="split-editors" sizes={[33, 33, 34]}>
-//         <Editor
-//           height="100%"
-//           language="html"
-//           value={localHtml}
-//           onChange={setLocalHtml}
-//           theme="vs-dark"
-//         />
-//         <Editor
-//           height="100%"
-//           language="css"
-//           value={localCss}
-//           onChange={setLocalCss}
-//           theme="vs-dark"
-//         />
-//         <Editor
-//           height="100%"
-//           language="javascript"
-//           value={localJs}
-//           onChange={setLocalJs}
-//           theme="vs-dark"
-//         />
-//       </Split>
-//       <div className="preview-pane">
-//         <PreviewPane html={debouncedHtml} css={debouncedCss} js={debouncedJs} />
-//       </div>
-//     </Split>
-//   );
-// });
-
-// --- Компонент Рабочей Области ---
-
-// --- Компонент Рабочей Области ---
 // --- Компонент Рабочей Области (ФИНАЛЬНАЯ ВЕРСИЯ) ---
 const Workspace = observer(({ project, currentStep }) => {
   const { projectStore } = useStore();
+console.log(currentStep, project.steps, !currentStep || !project.steps);
 
   // Эта логика для вычисления стартового кода остается идеальной.
-  const initialCode = useMemo(() => {
-    if (!currentStep || !project.steps) return { html: "", css: "", js: "" };
-	console.log(currentStep.id);
+//   const initialCode = useMemo(() => {
+//     if (!currentStep || !project.steps) return { html: "", css: "", js: "" };
+// 	console.log(currentStep.id);
 	
 
-    // 1. Сначала ищем сохранённый код для текущего шага
-    const userCodeForCurrentStep = project.userCodes?.find(
-      (code) => code.step_id === currentStep.id
+//     // 1. Сначала ищем сохранённый код для текущего шага
+//     const userCodeForCurrentStep = project.userCodes?.find(
+//       (code) => code.step_id === currentStep.id
+//     );
+//     if (userCodeForCurrentStep) {
+//       return {
+//         html: userCodeForCurrentStep.html,
+//         css: userCodeForCurrentStep.css,
+//         js: userCodeForCurrentStep.js,
+//       };
+//     }
+
+//     // 2. Если кода для текущего шага нет, ищем код для ПРЕДЫДУЩЕГО шага
+//     const currentStepIndex = project.steps.findIndex(
+//       (step) => step.id === currentStep.id
+//     );
+//     if (currentStepIndex > 0) {
+//       const prevStep = project.steps[currentStepIndex - 1];
+//       const userCodeForPrevStep = project.userCodes?.find(
+//         (code) => code.step_id === prevStep.id
+//       );
+//       if (userCodeForPrevStep) {
+//         return {
+//           html: userCodeForPrevStep.html,
+//           css: userCodeForPrevStep.css,
+//           js: userCodeForPrevStep.js,
+//         };
+//       }
+//     }
+
+//     // 3. Если ничего не найдено — используем шаблоны проекта
+//     return {
+//       html: project.html_template ?? "",
+//       css: project.css_template ?? "",
+//       js: project.js_template ?? "",
+//     };
+//   }, [project, currentStep]);
+//   console.log(initialCode);
+  
+const initialCode = useMemo(() => {
+  if (!currentStep || !project.steps) {
+    console.log("initialCode: нет currentStep или steps");
+    return { html: "", css: "", js: "" };
+  }
+
+  console.log("initialCode: currentStep.id =", currentStep.id);
+  console.log("initialCode: project.userCodes =", project.userCodes);
+
+  // 1. Сначала ищем сохранённый код для текущего шага
+  const userCodeForCurrentStep = project.userCodes?.find(
+    (code) => code.step_id === currentStep.id
+  );
+  if (
+    userCodeForCurrentStep &&
+    (userCodeForCurrentStep.html ||
+      userCodeForCurrentStep.css ||
+      userCodeForCurrentStep.js)
+  ) {
+    console.log(
+      "initialCode: найден код для текущего шага",
+      userCodeForCurrentStep
     );
-    if (userCodeForCurrentStep) {
+    return {
+      html: userCodeForCurrentStep.html,
+      css: userCodeForCurrentStep.css,
+      js: userCodeForCurrentStep.js,
+    };
+  }
+
+  // 2. Если кода для текущего шага нет, ищем код для ПРЕДЫДУЩЕГО шага
+  const currentStepIndex = project.steps.findIndex(
+    (step) => step.id === currentStep.id
+  );
+  if (currentStepIndex > 0) {
+    const prevStep = project.steps[currentStepIndex - 1];
+    const userCodeForPrevStep = project.userCodes?.find(
+      (code) => code.step_id === prevStep.id
+    );
+    if (userCodeForPrevStep) {
+      console.log(
+        "initialCode: найден код для предыдущего шага",
+        userCodeForPrevStep
+      );
       return {
-        html: userCodeForCurrentStep.html,
-        css: userCodeForCurrentStep.css,
-        js: userCodeForCurrentStep.js,
+        html: userCodeForPrevStep.html,
+        css: userCodeForPrevStep.css,
+        js: userCodeForPrevStep.js,
       };
     }
+  }
 
-    // 2. Если кода для текущего шага нет, ищем код для ПРЕДЫДУЩЕГО шага
-    const currentStepIndex = project.steps.findIndex(
-      (step) => step.id === currentStep.id
-    );
-    if (currentStepIndex > 0) {
-      const prevStep = project.steps[currentStepIndex - 1];
-      const userCodeForPrevStep = project.userCodes?.find(
-        (code) => code.step_id === prevStep.id
-      );
-      if (userCodeForPrevStep) {
-        return {
-          html: userCodeForPrevStep.html,
-          css: userCodeForPrevStep.css,
-          js: userCodeForPrevStep.js,
-        };
-      }
-    }
+  // 3. Если ничего не найдено — используем шаблоны проекта
+  console.log("initialCode: используем шаблоны проекта");
+  return {
+    html: project.html_template ?? "",
+    css: project.css_template ?? "",
+    js: project.js_template ?? "",
+  };
+}, [project, currentStep]);
+console.log("initialCode: итоговое значение", initialCode);
 
-    // 3. Если ничего не найдено — используем шаблоны проекта
-    return {
-      html: project.html_template ?? "",
-      css: project.css_template ?? "",
-      js: project.js_template ?? "",
-    };
-  }, [project, currentStep]);
-  console.log(initialCode);
-  // ...existing code...
-  // const initialCode = useMemo(() => {
-  //   if (!currentStep) return { html: "", css: "", js: "" };
 
-  //   const userCodeForCurrentStep = project.userCodes?.find(
-  // 	(code) => code.step_id === currentStep.id
-  //   );
 
-  //   if (userCodeForCurrentStep) {
-  // 	return {
-  // 	  html: userCodeForCurrentStep.html,
-  // 	  css: userCodeForCurrentStep.css,
-  // 	  js: userCodeForCurrentStep.js,
-  // 	};
-  //   }
 
-  //   const currentStepIndex = project.steps.findIndex(step => step.id === currentStep.id);
-  //   if (currentStepIndex > 0) {
-  // 	const prevStep = project.steps[currentStepIndex - 1];
-  // 	const userCodeForPrevStep = project.userCodes?.find(
-  // 	  (code) => code.step_id === prevStep.id
-  // 	);
-  // 	if (userCodeForPrevStep) {
-  // 	  return {
-  // 		html: userCodeForPrevStep.html,
-  // 		css: userCodeForPrevStep.css,
-  // 		js: userCodeForPrevStep.js,
-  // 	  };
-  // 	}
-  //   }
-
-  //   return {
-  // 	html: project.html_template ?? "",
-  // 	css: project.css_template ?? "",
-  // 	js: project.js_template ?? "",
-  //   };
-  // }, [project, currentStep]);
 
   // Локальное состояние для "мгновенного" отклика редакторов
   const [localHtml, setLocalHtml] = useState(initialCode.html);
@@ -364,123 +294,7 @@ const Workspace = observer(({ project, currentStep }) => {
   );
 });
 
-// const Workspace = observer(({ project, currentStep }) => {
-// 	const { projectStore } = useStore();
-  
-// 	// 1. "УМНЫЙ" useMemo ДЛЯ ОПРЕДЕЛЕНИЯ СТАРТОВОГО КОДА
-// 	// Он будет пересчитываться каждый раз при смене шага (currentStep).
-// 	const initialCode = useMemo(() => {
-// 	  // Защита, если на первом рендере еще нет данных
-// 	  if (!currentStep || !project.steps) {
-// 		return { html: "", css: "", js: "" };
-// 	  }
-  
-// 	  // Сначала ищем сохраненный код для ТЕКУЩЕГО шага
-// 	  const userCodeForCurrentStep = project.userCodes?.find(
-// 		(code) => code.step_id === currentStep.id
-// 	  );
-  
-// 	  // Если нашли - отлично, используем его
-// 	  if (userCodeForCurrentStep) {
-// 		console.log(`Загружен сохраненный код для шага ${currentStep.id}`);
-// 		return {
-// 		  html: userCodeForCurrentStep.html,
-// 		  css: userCodeForCurrentStep.css,
-// 		  js: userCodeForCurrentStep.js,
-// 		};
-// 	  }
-	  
-// 	  // Если кода для текущего шага нет, ищем код для ПРЕДЫДУЩЕГО
-// 	  const currentStepIndex = project.steps.findIndex(step => step.id === currentStep.id);
-// 	  if (currentStepIndex > 0) {
-// 		const prevStep = project.steps[currentStepIndex - 1];
-// 		const userCodeForPrevStep = project.userCodes?.find(
-// 		  (code) => code.step_id === prevStep.id
-// 		);
-// 		// Если у предыдущего шага есть сохраненный код - переносим его на текущий
-// 		if (userCodeForPrevStep) {
-// 		  console.log(`Код для текущего шага не найден. Переносим код с предыдущего шага ${prevStep.id}`);
-// 		  return {
-// 			html: userCodeForPrevStep.html,
-// 			css: userCodeForPrevStep.css,
-// 			js: userCodeForPrevStep.js,
-// 		  };
-// 		}
-// 	  }
-  
-// 	  // В самом крайнем случае (первый шаг, прогресса нет) - используем стартовые шаблоны проекта
-// 	  console.log(`Прогресс не найден. Используются стартовые шаблоны проекта.`);
-// 	  return {
-// 		html: project.html_template ?? "",
-// 		css: project.css_template ?? "",
-// 		js: project.js_template ?? "",
-// 	  };
-  
-// 	}, [project, currentStep]); // Пересчитываем только когда меняется проект или шаг
-  
-// 	// Локальное состояние для редакторов
-// 	const [localHtml, setLocalHtml] = useState(initialCode.html);
-// 	const [localCss, setLocalCss] = useState(initialCode.css);
-// 	const [localJs, setLocalJs] = useState(initialCode.js);
-  
-// 	// 2. useEffect для СИНХРОНИЗАЦИИ редакторов при смене шага
-// 	// Этот хук - ключ к обновлению редакторов при клике на "Вперед"/"Назад".
-// 	useEffect(() => {
-// 	  setLocalHtml(initialCode.html);
-// 	  setLocalCss(initialCode.css);
-// 	  setLocalJs(initialCode.js);
-// 	}, [initialCode]); // Зависимость от initialCode гарантирует, что при его изменении редакторы обновятся
-  
-// 	// 3. Сохраняем debounce, но используем его только для обновления глобального стора.
-// 	// Это снижает количество ре-рендеров других компонентов.
-// 	const [debouncedHtml] = useDebounce(localHtml, 300);
-// 	const [debouncedCss] = useDebounce(localCss, 300);
-// 	const [debouncedJs] = useDebounce(localJs, 300);
-  
-// 	// useEffect'ы, которые обновляют глобальный стор MobX.
-// 	// Это нужно, чтобы `handleCheck` в родительском компоненте имел доступ к свежему коду.
-// 	useEffect(() => { projectStore.updateCode("html", debouncedHtml); }, [debouncedHtml, projectStore]);
-// 	useEffect(() => { projectStore.updateCode("css", debouncedCss); }, [debouncedCss, projectStore]);
-// 	useEffect(() => { projectStore.updateCode("javascript", debouncedJs); }, [debouncedJs, projectStore]);
-  
-// 	// useEffect для АВТОСОХРАНЕНИЯ мы удалили, так как сохранение теперь происходит по кнопке.
-  
-// 	return (
-// 	  <Split
-// 		direction="vertical"
-// 		style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-// 		sizes={[50, 50]}
-// 	  >
-// 		<Split className="split-editors" sizes={[33, 33, 34]}>
-// 		  <Editor
-// 			height="100%"
-// 			language="html"
-// 			value={localHtml}
-// 			onChange={setLocalHtml}
-// 			theme="vs-dark"
-// 		  />
-// 		  <Editor
-// 			height="100%"
-// 			language="css"
-// 			value={localCss}
-// 			onChange={setLocalCss}
-// 			theme="vs-dark"
-// 		  />
-// 		  <Editor
-// 			height="100%"
-// 			language="javascript"
-// 			value={localJs}
-// 			onChange={setLocalJs}
-// 			theme="vs-dark"
-// 		  />
-// 		</Split>
-// 		<div className="preview-pane">
-// 		  {/* 4. ИСПРАВЛЕНИЕ: Превью теперь использует локальные, мгновенные значения */}
-// 		  <PreviewPane html={localHtml} css={localCss} js={localJs} />
-// 		</div>
-// 	  </Split>
-// 	);
-//   });
+
 
 // --- Основной Компонент Страницы ---
 const ProjectPage = observer(() => {
