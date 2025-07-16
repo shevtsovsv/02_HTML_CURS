@@ -14,12 +14,14 @@ const courseRoutes = require("./routes/courses");
 const projectRoutes = require("./routes/project");
 const authRoutes = require("./routes/auth");
 const userCodeRoutes = require("./routes/userCode");
+const userProgressRoutes = require("./routes/userProgress"); 
 
 app.use("/api/user", userRoutes); // Все запросы /users будут обрабатываться маршрутом из users.js
 app.use("/api/courses", courseRoutes); // Все запросы /courses будут обрабатываться маршрутом из users.js
 app.use("/api/projects", projectRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user-code", userCodeRoutes);
+app.use("/api/progress", userProgressRoutes); 
 
 app.get("/", (req, res) => res.send("API is running"));
 

@@ -11,10 +11,9 @@ const ProtectedRoute = observer(({ children }) => {
   const { authStore } = useStore();
   const location = useLocation(); // Получаем текущий URL
 
-  if (authStore.isLoading) {
-    // Если стор еще проверяет аутентификацию (например, при первой загрузке),
-    // показываем заглушку. Это предотвращает "мигание" страницы логина.
-    return <div>Проверка авторизации...</div>;
+  if (authStore.isInitializing) {
+    // Пока идет самая первая проверка токена, показываем глобальный лоадер
+    return <div>Инициализация приложения...</div>;
   }
 
   if (!authStore.isAuthenticated) {

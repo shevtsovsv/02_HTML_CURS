@@ -54,6 +54,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       as: "step",
     });
+
+    // Каждая запись о прогрессе также принадлежит одному проекту (Project).
+    userProgress.belongsTo(models.project, {
+      foreignKey: { name: "project_id", allowNull: false },
+      as: "project",
+    });
   };
 
   return userProgress;

@@ -77,6 +77,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "project_id",
       as: "userCodes", // ВАЖНО: alias должен совпадать с тем, что в `include`
     });
+
+	project.hasMany(models.userProgress, {
+    foreignKey: "project_id", // Убедитесь, что это поле есть в userProgress
+    as: "userProgresses",
+  });
   };
 
   return project;

@@ -3,7 +3,13 @@
  * @description Контроллер для всех операций, связанных с проектами (заданиями).
  */
 
-const { project, projectStep, course, userCode } = require("../models");
+const {
+  project,
+  projectStep,
+  course,
+  userCode,
+  userProgress,
+} = require("../models");
 
 /**
  * @desc    Получить все проекты. Позволяет фильтрацию по ID курса.
@@ -58,6 +64,12 @@ const getProjectById = async (req, res) => {
           as: "userCodes",
           where: { user_id: userId },
           required: false, // LEFT JOIN
+        },
+        userId && {
+          model: userProgress,
+          as: "userProgresses", // Убедитесь, что такой alias есть в модели project
+          where: { user_id: userId },
+          required: false,
         },
       ].filter(Boolean), // Убираем 'false' из массива, если userId нет
     });

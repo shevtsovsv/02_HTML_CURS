@@ -142,10 +142,23 @@ const deleteUser = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Получить данные текущего пользователя (по токену)
+ * @route   GET /api/users/me
+ * @access  Private
+ */
+const getMe = async (req, res) => {
+	// Middleware `protect` уже нашел пользователя и добавил его в req.user
+	// Нам не нужно искать его снова, просто возвращаем то, что есть.
+	// `defaultScope` в модели уже убрал пароль.
+	res.status(200).json(req.user);
+  };
+
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
+  getMe,
 };

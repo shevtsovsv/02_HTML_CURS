@@ -26,6 +26,9 @@ export class AuthStore {
    */
   isLoading = false;
 
+  // Флаг первоначальной загрузки ---
+  isInitializing = true;
+
   /**
    * @property {object} rootStore - Ссылка на корневой стор, если понадобится взаимодействие.
    */
@@ -36,6 +39,7 @@ export class AuthStore {
     // а методы - действиями (actions).
     makeAutoObservable(this);
     this.rootStore = rootStore;
+    this.fetchCurrentUser();
   }
 
   // --- Вычисляемые свойства (Computed Properties) ---
@@ -49,6 +53,29 @@ export class AuthStore {
   }
 
   // --- Действия (Actions) ---
+
+  async fetchCurrentUser() {
+    if (!this.token) {
+      // Если токена нет, просто завершаем инициализацию
+      this.isInitializing = false;
+      return;
+    }
+
+    try {
+      const response = await api.get("/user/me");
+      runInAction(() => {
+        this.user = response.data;
+      });
+    } catch (error) {
+      // Если токен невалидный, сервер вернет 401. Ловим ошибку и выходим.
+      console.error('Ошибка "тихого" входа:', error);
+      this.logout(); // Очищаем плохой токен
+    } finally {
+      runInAction(() => {
+        this.isInitializing = false; // Инициализация завершена в любом случае
+      });
+    }
+  }
 
   /**
    * @action
