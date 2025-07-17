@@ -1,9 +1,11 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useDebounce } from "use-debounce";
-import { useStore } from "../../stores/useStore";
+import { useStore } from "../../hooks/useStore";
+import Split from "react-split";
 // Импортируйте редакторы, если они используются, например:
 import Editor from "@monaco-editor/react";
+import PreviewPane from "./PreviewPane";
 
 const Workspace = observer(({ project, currentStep }) => {
   const { projectStore } = useStore();
