@@ -1,0 +1,20 @@
+/* client/src/pages/CoursePage.css */
+.course-page-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.course-header {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.course-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+.course-header p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+}

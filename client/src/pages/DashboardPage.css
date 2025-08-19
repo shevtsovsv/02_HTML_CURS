@@ -1,0 +1,9 @@
+/* client/src/pages/DashboardPage.css */
+.dashboard-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}

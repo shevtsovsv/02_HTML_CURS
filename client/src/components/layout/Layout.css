@@ -1,0 +1,57 @@
+/* client/src/components/layout/Layout.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.header-links a {
+    margin-right: 1.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+}
+
+.header-user span {
+    margin-right: 1rem;
+    color: var(--text-light);
+}
+
+.header-user .logout-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+}
+
+.app-content {
+    flex-grow: 1;
+    overflow-y: auto; /* Добавляем скролл, если контент не помещается */
+    padding: 2rem;
+}
