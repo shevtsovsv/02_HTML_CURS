@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
 import CourseCard from "../components/CourseCard";
 import "./DashboardPage.css"; // Подключаем стили
+import CreateCourseModal from '../components/modals/CreateCourseModal'; // <-- 1. Импортируем модальное окно
 
 const DashboardPage = observer(() => {
   const { authStore, courseStore } = useStore();
@@ -23,7 +24,12 @@ const DashboardPage = observer(() => {
       {/* --- БЛОК КНОПОК ДЛЯ АДМИНА --- */}
       {authStore.isAdmin && (
         <div className="admin-actions" style={{ marginBottom: "2rem" }}>
-          <button>Создать курс</button>
+          <button
+            onClick={() => courseStore.openCreateModal()}
+            className="btn-primary"
+          >
+            Создать курс
+          </button>
           {/* Кнопки редактирования и удаления лучше размещать на самих карточках */}
         </div>
       )}
@@ -42,6 +48,7 @@ const DashboardPage = observer(() => {
           ))}
         </div>
       )}
+      <CreateCourseModal />
     </div>
   );
 });
