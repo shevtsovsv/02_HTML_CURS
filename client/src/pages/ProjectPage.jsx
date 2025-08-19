@@ -4,7 +4,7 @@
  * Управляет состоянием текущего шага и отображает основной макет.
  */
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
 import Split from "react-split"; // <-- 1. Импортируем Split
@@ -20,9 +20,17 @@ const InterfaceHeader = ({
   onPrev,
   onNext,
   isNextDisabled,
+  courseSlug,
 }) => {
   return (
     <header className="interface-header">
+      <div className="header-course-link">
+        {courseSlug ? (
+          <Link to={`/courses/${courseSlug}`}>&larr; Вернуться к курсу</Link>
+        ) : (
+          <span style={{ color: "var(--text-light)" }}>&larr; Загрузка...</span>
+        )}
+      </div>
       <div className="step-counter">
         Шаг {currentStepIndex + 1} из {totalSteps}
       </div>
@@ -50,40 +58,43 @@ const ProjectPage = observer(() => {
 
   // --- Эффекты (Lifecycle) ---
 
-  // Загрузка данных проекта и инициализация состояния
+  // Эффект №1: ТОЛЬКО для загрузки данных.
+  // Запускается один раз при смене projectId.
   useEffect(() => {
-    const loadData = async () => {
-      if (projectId) {
-        await projectStore.fetchProject(projectId);
+    if (projectId) {
+      projectStore.fetchProject(projectId);
+    }
+  }, [projectId, projectStore]); // projectStore здесь безопасен, т.к. ссылка на него стабильна
 
-        // После загрузки данных, инициализируем пройденные шаги с сервера
-        if (projectStore.currentProject?.userProgresses) {
-          const completedIds = projectStore.currentProject.userProgresses
-            .filter((p) => p.completed)
-            .map((p) => p.step_id);
-          setCompletedSteps(new Set(completedIds));
-        }
+  // Эффект №2: ТОЛЬКО для инициализации состояния ПОСЛЕ загрузки данных.
+  // Запускается один раз, когда currentProject меняется с null на объект.
+  useEffect(() => {
+    if (projectStore.currentProject) {
+      const progresses = projectStore.currentProject.userProgresses || [];
+      const completedIds = progresses
+        .filter((p) => p.completed)
+        .map((p) => p.step_id);
 
-        // Сбрасываем индекс на первый шаг при загрузке нового проекта
-        setCurrentStepIndex(0);
-      }
-    };
-    loadData();
-  }, [projectId, projectStore]); // Перезапускаем только при смене ID проекта
+      setCompletedSteps(new Set(completedIds));
+      setCurrentStepIndex(0); // Всегда начинаем с первого шага
+    }
+  }, [projectStore.currentProject]);
 
-  // Обработка результата проверки и авто-переключение
+  // Эффект №3: ТОЛЬКО для реакции на результат проверки.
   useEffect(() => {
     if (projectStore.validationResult?.success) {
-      const currentStepId =
-        projectStore.currentProject?.steps[currentStepIndex]?.id;
+      const project = projectStore.currentProject;
+      if (!project) return;
 
-      if (currentStepId && projectId) {
+      const currentStepId = project.steps[currentStepIndex]?.id;
+
+      if (currentStepId) {
         setCompletedSteps((prev) => new Set(prev).add(currentStepId));
         projectStore.markStepAsCompleted(projectId, currentStepId);
       }
 
       const timer = setTimeout(() => {
-        if (currentStepIndex < projectStore.currentProject.steps.length - 1) {
+        if (currentStepIndex < project.steps.length - 1) {
           goToNextStep();
         } else {
           alert("Поздравляем! Проект завершен!");
@@ -91,7 +102,8 @@ const ProjectPage = observer(() => {
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [projectStore.validationResult]); // Зависимость только от результата
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectStore.validationResult]);
 
   // --- Рендеринг Заглушек ---
   if (projectStore.isLoading || !projectStore.currentProject) {
@@ -136,6 +148,7 @@ const ProjectPage = observer(() => {
   // --- Вычисляемые значения для рендера ---
   const isCurrentStepCompleted = completedSteps.has(currentStep?.id);
   const isLastStep = currentStepIndex === project.steps.length - 1;
+  const courseSlug = project.course?.slug;
 
   // --- JSX ---
   return (
@@ -146,6 +159,7 @@ const ProjectPage = observer(() => {
         onPrev={goToPrevStep}
         onNext={goToNextStep}
         isNextDisabled={!isCurrentStepCompleted && !isLastStep}
+        courseSlug={courseSlug}
       />
       <Split
         className="main-content"

@@ -81,6 +81,38 @@ const Workspace = observer(({ project, currentStep }) => {
     projectStore.updateCode("javascript", localJs);
   }, [localHtml, localCss, localJs, projectStore]);
 
+
+
+    const handleOpenPreview = () => {
+      const newWindow = window.open(); // Открываем пустую вкладку
+      if (newWindow) {
+        // Собираем полный HTML-документ
+        const documentContent = `
+        <html>
+          <head>
+            <title>Превью: ${project.title || "Проект"}</title>
+            <style>${localCss}</style>
+          </head>
+          <body>
+            ${localHtml}
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                try { ${localJs} } catch (e) { console.error(e); }
+              });
+            </script>
+          </body>
+        </html>
+      `;
+        // Записываем контент в новую вкладку
+        newWindow.document.write(documentContent);
+        newWindow.document.close(); // Завершаем запись, чтобы браузер отрендерил страницу
+      } else {
+        alert(
+          "Не удалось открыть новую вкладку. Возможно, она была заблокирована вашим браузером."
+        );
+      }
+    };
+
   return (
     <Split
       className="right-panel"
@@ -89,44 +121,45 @@ const Workspace = observer(({ project, currentStep }) => {
       minSize={100}
       gutterSize={10}
     >
-     
-        <div className="editor-area">
-          {/* Вкладки для переключения */}
-          <div className="editor-tabs">
-            <button
-              className={`tab-button ${activeTab === "html" ? "active" : ""}`}
-              onClick={() => setActiveTab("html")}
-            >
-              HTML
-            </button>
-            <button
-              className={`tab-button ${activeTab === "css" ? "active" : ""}`}
-              onClick={() => setActiveTab("css")}
-            >
-              CSS
-            </button>
-            <button
-              className={`tab-button ${activeTab === "js" ? "active" : ""}`}
-              onClick={() => setActiveTab("js")}
-            >
-              JS
-            </button>
-          </div>
-
-          {/* Панель с одним активным редактором */}
-          <div className="editor-panes">
-            <Editor
-              height="100%" // Редактор займет всю высоту панели
-              language={editorMapping[activeTab].language}
-              value={editorMapping[activeTab].value}
-              onChange={editorMapping[activeTab].setter}
-              theme="vs-dark"
-            />
-          </div>
+      <div className="editor-area">
+        {/* Вкладки для переключения */}
+        <div className="editor-tabs">
+          <button
+            className={`tab-button ${activeTab === "html" ? "active" : ""}`}
+            onClick={() => setActiveTab("html")}
+          >
+            HTML
+          </button>
+          <button
+            className={`tab-button ${activeTab === "css" ? "active" : ""}`}
+            onClick={() => setActiveTab("css")}
+          >
+            CSS
+          </button>
+          <button
+            className={`tab-button ${activeTab === "js" ? "active" : ""}`}
+            onClick={() => setActiveTab("js")}
+          >
+            JS
+          </button>
         </div>
 
+        {/* Панель с одним активным редактором */}
+        <div className="editor-panes">
+          <Editor
+            height="100%" // Редактор займет всю высоту панели
+            language={editorMapping[activeTab].language}
+            value={editorMapping[activeTab].value}
+            onChange={editorMapping[activeTab].setter}
+            theme="vs-dark"
+          />
+        </div>
+      </div>
+
       <div className="preview-panel">
-        <h3>Превью</h3>
+        <button onClick={handleOpenPreview} className="open-preview-btn">
+          Открыть в новой вкладке
+        </button>
         <PreviewPane html={localHtml} css={localCss} js={localJs} />
       </div>
     </Split>

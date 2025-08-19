@@ -53,6 +53,10 @@ const getProjectById = async (req, res) => {
     const projectData = await project.findByPk(id, {
       include: [
         {
+          model: course,
+          as: "course", // Используем alias из модели project
+        },
+        {
           model: projectStep,
           as: "steps",
           order: [["step_number", "ASC"]], // --- ИЗМЕНЕНИЕ: Сортируем по 'step_number', а не 'order' ---
