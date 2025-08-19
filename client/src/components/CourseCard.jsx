@@ -20,30 +20,43 @@ const cardHoverStyle = {
   transform: "translateY(-5px)",
 };
 
-const CourseCard = ({ course }) => {
+const CourseCard = ({ course, isAdmin }) => {
   // Состояние для отслеживания наведения мыши для добавления hover-эффекта
   const [isHovered, setIsHovered] = React.useState(false);
-
+	console.log(isAdmin);
+	
   return (
-    // Оборачиваем карточку в Link, чтобы по клику переходить на страницу проекта.
-    // Пока у нас нет страницы для одного курса, ссылка ведет на #.
-    <Link
-      to={`/courses/${course.slug}`}
-      style={{ textDecoration: "none", color: "inherit" }}
-    >
-      <div
-        style={{ ...cardStyle, ...(isHovered ? cardHoverStyle : {}) }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+    <div style={{ position: "relative" }}>
+     
+      <Link
+        to={`/courses/${course.slug}`}
+        style={{ textDecoration: "none", color: "inherit" }}
       >
-        <h3>{course.title}</h3>
-        <p>{course.description}</p>
-        <p>
-          <strong>Проектов в курсе:</strong>{" "}
-          {course.projects ? course.projects.length : 0}
-        </p>
-      </div>
-    </Link>
+        <div
+          style={{ ...cardStyle, ...(isHovered ? cardHoverStyle : {}) }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <h3>{course.title}</h3>
+          <p>{course.description}</p>
+          <p>
+            <strong>Проектов в курсе:</strong>{" "}
+            {course.projects ? course.projects.length : 0}
+          </p>
+        </div>
+      </Link>
+      {/* --- КНОПКИ ДЛЯ АДМИНА ВНУТРИ КАРТОЧКИ --- */}
+      {isAdmin && (
+        <div
+          className="card-admin-actions"
+          style={{ position: "absolute", top: "15px", right: "15px" }}
+        >
+          <button style={{ marginRight: "5px" }}>✏️</button>
+          <button>🗑️</button>
+        </div>
+      )}
+      {/* -------------------------------------- */}
+    </div>
   );
 };
 

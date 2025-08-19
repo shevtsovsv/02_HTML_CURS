@@ -30,7 +30,7 @@ const orderStyle = {
   marginRight: "20px",
 };
 
-const ProjectListItem = ({ project }) => {
+const ProjectListItem = ({ project, isAdmin }) => {
   const [isHovered, setIsHovered] = React.useState(false);
 
   // В будущем мы будем переходить на страницу вроде /projects/5
@@ -38,21 +38,32 @@ const ProjectListItem = ({ project }) => {
   const projectUrl = `/projects/${project.id}`;
 
   return (
-    <Link
-      to={projectUrl}
-      style={itemStyle}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div style={isHovered ? { ...itemStyle, ...itemHoverStyle } : itemStyle}>
-        <div style={orderStyle}>{project.order}</div>
-        <div>
-          <h4 style={{ margin: "0 0 5px 0" }}>{project.title}</h4>
-          {/* Можно добавить краткое описание, если оно есть */}
-          {/* <p style={{ margin: 0, color: '#666' }}>{project.description}</p> */}
+    <div style={{ position: "relative" }}>
+      <Link
+        to={projectUrl}
+        style={itemStyle}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div
+          style={isHovered ? { ...itemStyle, ...itemHoverStyle } : itemStyle}
+        >
+          <div style={orderStyle}>{project.order}</div>
+          <div>
+            <h4 style={{ margin: "0 0 5px 0" }}>{project.title}</h4>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+      {isAdmin && (
+        <div
+          className="item-admin-actions"
+          style={{ position: "absolute", top: "15px", right: "15px" }}
+        >
+          <button style={{ marginRight: "5px" }}>✏️</button>
+          <button>🗑️</button>
+        </div>
+      )}
+    </div>
   );
 };
 

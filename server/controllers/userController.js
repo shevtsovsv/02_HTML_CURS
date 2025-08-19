@@ -4,7 +4,7 @@
  * Включает регистрацию, получение данных, обновление и удаление.
  */
 
-const { user } = require("../models");
+const { user, role } = require("../models");
 // Библиотека для валидации входящих данных. Установите ее: npm install express-validator
 const { validationResult } = require("express-validator");
 
@@ -148,10 +148,14 @@ const deleteUser = async (req, res) => {
  * @access  Private
  */
 const getMe = async (req, res) => {
-	// Middleware `protect` уже нашел пользователя и добавил его в req.user
-	// Нам не нужно искать его снова, просто возвращаем то, что есть.
-	// `defaultScope` в модели уже убрал пароль.
-	res.status(200).json(req.user);
+	const userData = await user.findByPk(req.user.id, {
+    include: {
+      model: role,
+      as: "role",
+      attributes: ["name"],
+    },
+  });
+  res.status(200).json(userData);
   };
 
 module.exports = {

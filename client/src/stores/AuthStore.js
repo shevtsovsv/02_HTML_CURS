@@ -52,6 +52,10 @@ export class AuthStore {
     return !!this.token;
   }
 
+  get isAdmin() {
+    return this.user?.role?.name === "admin";
+  }
+
   // --- Действия (Actions) ---
 
   async fetchCurrentUser() {

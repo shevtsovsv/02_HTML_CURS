@@ -5,7 +5,7 @@ import CourseCard from "../components/CourseCard";
 import "./DashboardPage.css"; // Подключаем стили
 
 const DashboardPage = observer(() => {
-  const { courseStore } = useStore();
+  const { authStore, courseStore } = useStore();
 
   useEffect(() => {
     courseStore.fetchCourses();
@@ -20,12 +20,25 @@ const DashboardPage = observer(() => {
         </p>
       </div>
 
+      {/* --- БЛОК КНОПОК ДЛЯ АДМИНА --- */}
+      {authStore.isAdmin && (
+        <div className="admin-actions" style={{ marginBottom: "2rem" }}>
+          <button>Создать курс</button>
+          {/* Кнопки редактирования и удаления лучше размещать на самих карточках */}
+        </div>
+      )}
+      {/* ------------------------------- */}
+
       {courseStore.isLoading ? (
         <p>Загрузка курсов...</p>
       ) : (
         <div>
           {courseStore.courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard
+              key={course.id}
+              course={course}
+              isAdmin={authStore.isAdmin}
+            />
           ))}
         </div>
       )}

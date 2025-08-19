@@ -3,7 +3,7 @@
  * @description Контроллер для аутентификации пользователей (логин).
  */
 
-const { user } = require("../models");
+const { user, role } = require("../models");
 const jwt = require("jsonwebtoken");
 
 /**
@@ -23,9 +23,14 @@ const login = async (req, res) => {
 
   try {
     // 2. Ищем пользователя и ВАЖНО: запрашиваем хеш пароля с помощью scope 'withPassword'
-    const userData = await user
-      .scope("withPassword")
-      .findOne({ where: { email } });
+    const userData = await user.scope("withPassword").findOne({
+      where: { email },
+      include: {
+        model: role,
+        as: "role",
+        attributes: ["name"], // Нам нужно только имя роли
+      },
+    });
 
     // 3. Проверяем, найден ли пользователь и совпадает ли пароль
     // Метод isValidPassword мы создали ранее в модели user
@@ -42,10 +47,7 @@ const login = async (req, res) => {
       message: "Логин успешен!",
       token,
       // Можно также отправить данные пользователя (без пароля)
-      user: {
-        id: userData.id,
-        email: userData.email,
-      },
+      user:  userData
     });
   } catch (error) {
     console.error("Ошибка при логине:", error);
