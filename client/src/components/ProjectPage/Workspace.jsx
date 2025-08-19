@@ -5,6 +5,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../hooks/useStore";
+import Split from "react-split"; // <-- 1. Импортируем Split
 import Editor from "@monaco-editor/react";
 import PreviewPane from "./PreviewPane";
 
@@ -81,47 +82,54 @@ const Workspace = observer(({ project, currentStep }) => {
   }, [localHtml, localCss, localJs, projectStore]);
 
   return (
-    <div className="right-panel">
-      <div className="editor-area">
-        {/* Вкладки для переключения */}
-        <div className="editor-tabs">
-          <button
-            className={`tab-button ${activeTab === "html" ? "active" : ""}`}
-            onClick={() => setActiveTab("html")}
-          >
-            HTML
-          </button>
-          <button
-            className={`tab-button ${activeTab === "css" ? "active" : ""}`}
-            onClick={() => setActiveTab("css")}
-          >
-            CSS
-          </button>
-          <button
-            className={`tab-button ${activeTab === "js" ? "active" : ""}`}
-            onClick={() => setActiveTab("js")}
-          >
-            JS
-          </button>
-        </div>
+    <Split
+      className="right-panel"
+      direction="vertical"
+      sizes={[60, 40]} // Редакторы занимают 60%, превью - 40%
+      minSize={100}
+      gutterSize={10}
+    >
+     
+        <div className="editor-area">
+          {/* Вкладки для переключения */}
+          <div className="editor-tabs">
+            <button
+              className={`tab-button ${activeTab === "html" ? "active" : ""}`}
+              onClick={() => setActiveTab("html")}
+            >
+              HTML
+            </button>
+            <button
+              className={`tab-button ${activeTab === "css" ? "active" : ""}`}
+              onClick={() => setActiveTab("css")}
+            >
+              CSS
+            </button>
+            <button
+              className={`tab-button ${activeTab === "js" ? "active" : ""}`}
+              onClick={() => setActiveTab("js")}
+            >
+              JS
+            </button>
+          </div>
 
-        {/* Панель с одним активным редактором */}
-        <div className="editor-panes">
-          <Editor
-            height="100%" // Редактор займет всю высоту панели
-            language={editorMapping[activeTab].language}
-            value={editorMapping[activeTab].value}
-            onChange={editorMapping[activeTab].setter}
-            theme="vs-dark"
-          />
+          {/* Панель с одним активным редактором */}
+          <div className="editor-panes">
+            <Editor
+              height="100%" // Редактор займет всю высоту панели
+              language={editorMapping[activeTab].language}
+              value={editorMapping[activeTab].value}
+              onChange={editorMapping[activeTab].setter}
+              theme="vs-dark"
+            />
+          </div>
         </div>
-      </div>
 
       <div className="preview-panel">
         <h3>Превью</h3>
         <PreviewPane html={localHtml} css={localCss} js={localJs} />
       </div>
-    </div>
+    </Split>
   );
 });
 

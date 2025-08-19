@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
+import Split from "react-split"; // <-- 1. Импортируем Split
 import TaskPanel from "../components/ProjectPage/TaskPanel";
 import Workspace from "../components/ProjectPage/Workspace";
 import "./ProjectPage.css"; // Импортируем стили из нового файла
@@ -146,7 +147,12 @@ const ProjectPage = observer(() => {
         onNext={goToNextStep}
         isNextDisabled={!isCurrentStepCompleted && !isLastStep}
       />
-      <main className="main-content">
+      <Split
+        className="main-content"
+        sizes={[30, 70]} // Начальные размеры: 30% для заданий, 70% для редактора
+        minSize={300} // Минимальный размер каждой панели
+        gutterSize={10}
+      >
         <TaskPanel currentStep={currentStep} onCheck={handleCheck} />
         <Workspace
           // `key` здесь - самый надежный способ сбросить состояние редакторов при смене шага
@@ -154,7 +160,7 @@ const ProjectPage = observer(() => {
           project={project}
           currentStep={currentStep}
         />
-      </main>
+      </Split>
     </div>
   );
 });
