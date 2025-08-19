@@ -5,6 +5,7 @@
  */
 import React from "react";
 import { Link } from "react-router-dom"; // Для создания ссылки на страницу курса
+import { useStore } from "../hooks/useStore";
 
 // Простое стилизованное оформление. Вы можете вынести стили в отдельный CSS-файл.
 const cardStyle = {
@@ -20,14 +21,27 @@ const cardHoverStyle = {
   transform: "translateY(-5px)",
 };
 
-const CourseCard = ({ course, isAdmin }) => {
+const CourseCard = ({ course, isAdmin, onDelete }) => {
+  const { courseStore } = useStore();
   // Состояние для отслеживания наведения мыши для добавления hover-эффекта
   const [isHovered, setIsHovered] = React.useState(false);
-	console.log(isAdmin);
-	
+  console.log(isAdmin);
+
+  const handleEditClick = (e) => {
+    // Предотвращаем переход по ссылке, когда кликаем на кнопку
+    e.preventDefault();
+    e.stopPropagation();
+    courseStore.openEditModal(course); // <-- 3. Вызываем action
+  };
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete(course); // Вызываем функцию, переданную из родителя
+  };
+
   return (
     <div style={{ position: "relative" }}>
-     
       <Link
         to={`/courses/${course.slug}`}
         style={{ textDecoration: "none", color: "inherit" }}
@@ -51,8 +65,10 @@ const CourseCard = ({ course, isAdmin }) => {
           className="card-admin-actions"
           style={{ position: "absolute", top: "15px", right: "15px" }}
         >
-          <button style={{ marginRight: "5px" }}>✏️</button>
-          <button>🗑️</button>
+          <button onClick={handleEditClick} style={{ marginRight: "5px" }}>
+            ✏️
+          </button>
+          <button onClick={handleDeleteClick}>🗑️</button>
         </div>
       )}
       {/* -------------------------------------- */}

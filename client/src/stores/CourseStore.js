@@ -11,6 +11,10 @@ export class CourseStore {
   isLoading = false;
   isCreateModalOpen = false; // Управляет видимостью модального окна
   isLoadingCreate = false; // Отдельный флаг загрузки для процесса создания
+  isEditModalOpen = false;
+  editingCourse = null; // Здесь будет храниться объект курса для редактирования
+  isLoadingUpdate = false;
+  isLoadingDelete = false;
   rootStore;
 
   constructor(rootStore) {
@@ -18,7 +22,60 @@ export class CourseStore {
     this.rootStore = rootStore;
   }
 
-  // --- 2. НОВЫЕ ACTIONS ДЛЯ УПРАВЛЕНИЯ МОДАЛЬНЫМ ОКНОМ ---
+  // --- 1. НОВЫЙ ACTION ДЛЯ УДАЛЕНИЯ КУРСА ---
+  async deleteCourse(courseId) {
+    this.isLoadingDelete = true;
+    try {
+      // Используем DELETE-запрос, который мы уже создали на бэкенде
+      await api.delete(`/courses/${courseId}`);
+
+      runInAction(() => {
+        // Просто обновляем список курсов, чтобы удаленный исчез
+        this.fetchCourses();
+      });
+    } catch (error) {
+      console.error(`Ошибка при удалении курса ${courseId}:`, error);
+      // В реальном приложении здесь бы показывалось уведомление об ошибке
+      throw error;
+    } finally {
+      runInAction(() => {
+        this.isLoadingDelete = false;
+      });
+    }
+  }
+
+  // --- 2. НОВЫЕ ACTIONS ДЛЯ УПРАВЛЕНИЯ РЕДАКТИРОВАНИЕМ ---
+  openEditModal(course) {
+    this.editingCourse = course; // Запоминаем, какой курс редактируем
+    this.isEditModalOpen = true;
+  }
+  closeEditModal() {
+    this.editingCourse = null; // Очищаем
+    this.isEditModalOpen = false;
+  }
+
+  // --- 3. НОВЫЙ ACTION ДЛЯ ОБНОВЛЕНИЯ КУРСА ---
+  async updateCourse(courseId, courseData) {
+    this.isLoadingUpdate = true;
+    try {
+      // Используем PUT-запрос, который мы уже создали на бэкенде
+      await api.put(`/courses/${courseId}`, courseData);
+
+      runInAction(() => {
+        this.closeEditModal();
+        this.fetchCourses(); // Обновляем список, чтобы увидеть изменения
+      });
+    } catch (error) {
+      console.error(`Ошибка при обновлении курса ${courseId}:`, error);
+      throw error;
+    } finally {
+      runInAction(() => {
+        this.isLoadingUpdate = false;
+      });
+    }
+  }
+
+  // --- 4. НОВЫЕ ACTIONS ДЛЯ УПРАВЛЕНИЯ МОДАЛЬНЫМ ОКНОМ ---
   openCreateModal() {
     this.isCreateModalOpen = true;
   }
@@ -67,7 +124,7 @@ export class CourseStore {
       });
     }
   }
-  // --- 2. Добавляем новый action для загрузки одного курса ---
+  // --- 5. Добавляем новый action для загрузки одного курса ---
   async fetchCourseBySlug(slug) {
     this.isLoading = true;
     this.currentCourse = null; // Сбрасываем предыдущий курс

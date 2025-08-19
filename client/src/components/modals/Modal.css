@@ -63,3 +63,12 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+.btn-danger {
+    background-color: #e53e3e; /* Красный цвет */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
