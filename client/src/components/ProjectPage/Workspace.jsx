@@ -1,14 +1,18 @@
+/**
+ * @file components/ProjectPage/Workspace.jsx
+ * @description Правая панель с редакторами кода (вкладки) и окном превью.
+ */
 import React, { useMemo, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { useDebounce } from "use-debounce";
 import { useStore } from "../../hooks/useStore";
-import Split from "react-split";
-// Импортируйте редакторы, если они используются, например:
 import Editor from "@monaco-editor/react";
 import PreviewPane from "./PreviewPane";
 
 const Workspace = observer(({ project, currentStep }) => {
   const { projectStore } = useStore();
+
+  // Новое состояние для отслеживания активной вкладки
+  const [activeTab, setActiveTab] = useState("html"); // По умолчанию открыт HTML
 
   // Ваша логика вычисления initialCode
   const initialCode = useMemo(() => {
@@ -59,75 +63,65 @@ const Workspace = observer(({ project, currentStep }) => {
     };
   }, [project, currentStep]);
 
-  // Локальное состояние редакторов
   const [localHtml, setLocalHtml] = useState(initialCode.html);
   const [localCss, setLocalCss] = useState(initialCode.css);
   const [localJs, setLocalJs] = useState(initialCode.js);
 
-  // Debounce для обновления глобального стора
-  const [debouncedHtml] = useDebounce(localHtml, 300);
-  const [debouncedCss] = useDebounce(localCss, 300);
-  const [debouncedJs] = useDebounce(localJs, 300);
+  // Карта для удобного сопоставления вкладок и данных
+  const editorMapping = {
+    html: { value: localHtml, setter: setLocalHtml, language: "html" },
+    css: { value: localCss, setter: setLocalCss, language: "css" },
+    js: { value: localJs, setter: setLocalJs, language: "javascript" },
+  };
 
   useEffect(() => {
-    projectStore.updateCode("html", debouncedHtml);
-  }, [debouncedHtml, projectStore]);
-  useEffect(() => {
-    projectStore.updateCode("css", debouncedCss);
-  }, [debouncedCss, projectStore]);
-  useEffect(() => {
-    projectStore.updateCode("js", debouncedJs);
-  }, [debouncedJs, projectStore]);
-
-  // Сброс локального состояния при смене шага
-  useEffect(() => {
-    setLocalHtml(initialCode.html);
-    setLocalCss(initialCode.css);
-    setLocalJs(initialCode.js);
-  }, [initialCode]);
+    projectStore.updateCode("html", localHtml);
+    projectStore.updateCode("css", localCss);
+    projectStore.updateCode("javascript", localJs);
+  }, [localHtml, localCss, localJs, projectStore]);
 
   return (
-    <Split
-      direction="vertical"
-      style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-      sizes={[50, 50]}
-    >
-      <Split className="split-editors" sizes={[33, 33, 34]}>
-        {/*
-			--- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: ДОБАВЛЯЕМ KEY К РЕДАКТОРАМ ---
-			Мы создаем уникальный ключ для каждого редактора, зависящий от ID шага.
-			Когда ID шага меняется, React уничтожает старый <Editor> и создает новый,
-			который гарантированно возьмет новое значение из `value`.
-		  */}
-        <Editor
-          key={`html-${currentStep.id}`}
-          height="100%"
-          language="html"
-          value={initialCode.html} // Используем defaultValue для инициализации
-          onChange={setLocalHtml}
-          theme="vs-dark"
-        />
-        <Editor
-          key={`css-${currentStep.id}`}
-          height="100%"
-          language="css"
-          value={initialCode.css}
-          onChange={setLocalCss}
-          theme="vs-dark"
-        />
-        <Editor
-          key={`javascript-${currentStep.id}`}
-          height="100%"
-          language="javascript"
-          value={initialCode.js}
-          onChange={setLocalJs}
-          theme="vs-dark"
-        />
-      </Split>
-      <div className="preview-pane">
+    <div className="right-panel">
+      <div className="editor-area">
+        {/* Вкладки для переключения */}
+        <div className="editor-tabs">
+          <button
+            className={`tab-button ${activeTab === "html" ? "active" : ""}`}
+            onClick={() => setActiveTab("html")}
+          >
+            HTML
+          </button>
+          <button
+            className={`tab-button ${activeTab === "css" ? "active" : ""}`}
+            onClick={() => setActiveTab("css")}
+          >
+            CSS
+          </button>
+          <button
+            className={`tab-button ${activeTab === "js" ? "active" : ""}`}
+            onClick={() => setActiveTab("js")}
+          >
+            JS
+          </button>
+        </div>
+
+        {/* Панель с одним активным редактором */}
+        <div className="editor-panes">
+          <Editor
+            height="100%" // Редактор займет всю высоту панели
+            language={editorMapping[activeTab].language}
+            value={editorMapping[activeTab].value}
+            onChange={editorMapping[activeTab].setter}
+            theme="vs-dark"
+          />
+        </div>
+      </div>
+
+      <div className="preview-panel">
+        <h3>Превью</h3>
         <PreviewPane html={localHtml} css={localCss} js={localJs} />
       </div>
-    </Split>
+    </div>
   );
 });
 
