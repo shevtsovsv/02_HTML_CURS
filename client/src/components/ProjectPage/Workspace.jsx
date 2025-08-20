@@ -68,6 +68,12 @@ const Workspace = observer(({ project, currentStep }) => {
   const [localCss, setLocalCss] = useState(initialCode.css);
   const [localJs, setLocalJs] = useState(initialCode.js);
 
+  useEffect(() => {
+    setLocalHtml(initialCode.html);
+    setLocalCss(initialCode.css);
+    setLocalJs(initialCode.js);
+  }, [initialCode]); // Зависимость от initialCode - это ключ к успеху!
+
   // Карта для удобного сопоставления вкладок и данных
   const editorMapping = {
     html: { value: localHtml, setter: setLocalHtml, language: "html" },
@@ -81,13 +87,11 @@ const Workspace = observer(({ project, currentStep }) => {
     projectStore.updateCode("javascript", localJs);
   }, [localHtml, localCss, localJs, projectStore]);
 
-
-
-    const handleOpenPreview = () => {
-      const newWindow = window.open(); // Открываем пустую вкладку
-      if (newWindow) {
-        // Собираем полный HTML-документ
-        const documentContent = `
+  const handleOpenPreview = () => {
+    const newWindow = window.open(); // Открываем пустую вкладку
+    if (newWindow) {
+      // Собираем полный HTML-документ
+      const documentContent = `
         <html>
           <head>
             <title>Превью: ${project.title || "Проект"}</title>
@@ -103,15 +107,15 @@ const Workspace = observer(({ project, currentStep }) => {
           </body>
         </html>
       `;
-        // Записываем контент в новую вкладку
-        newWindow.document.write(documentContent);
-        newWindow.document.close(); // Завершаем запись, чтобы браузер отрендерил страницу
-      } else {
-        alert(
-          "Не удалось открыть новую вкладку. Возможно, она была заблокирована вашим браузером."
-        );
-      }
-    };
+      // Записываем контент в новую вкладку
+      newWindow.document.write(documentContent);
+      newWindow.document.close(); // Завершаем запись, чтобы браузер отрендерил страницу
+    } else {
+      alert(
+        "Не удалось открыть новую вкладку. Возможно, она была заблокирована вашим браузером."
+      );
+    }
+  };
 
   return (
     <Split

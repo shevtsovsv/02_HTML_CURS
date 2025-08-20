@@ -169,8 +169,6 @@ const ProjectPage = observer(() => {
       >
         <TaskPanel currentStep={currentStep} onCheck={handleCheck} />
         <Workspace
-          // `key` здесь - самый надежный способ сбросить состояние редакторов при смене шага
-          key={currentStep.id}
           project={project}
           currentStep={currentStep}
         />
