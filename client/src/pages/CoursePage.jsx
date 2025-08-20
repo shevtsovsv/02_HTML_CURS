@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
 import ProjectListItem from "../components/ProjectListItem";
+import ProjectFormModal from "../components/modals/ProjectFormModal";
 import "./CoursePage.css"; // Подключаем стили
 
 const CoursePage = observer(() => {
@@ -28,7 +29,15 @@ const CoursePage = observer(() => {
 
       <h2>Проекты курса</h2>
       {/* --- КНОПКА ДЛЯ АДМИНА --- */}
-      {authStore.isAdmin && <button>Создать проект</button>}
+      {authStore.isAdmin && (
+        <button
+          onClick={() => courseStore.openProjectCreateModal()}
+          className="btn-primary"
+          style={{ marginBottom: "1.5rem" }}
+        >
+          + Создать проект
+        </button>
+      )}
       {/* ------------------------ */}
       <div>
         {projects && projects.length > 0 ? (
@@ -46,6 +55,7 @@ const CoursePage = observer(() => {
           <p>В этом курсе пока нет проектов.</p>
         )}
       </div>
+      <ProjectFormModal />
     </div>
   );
 });

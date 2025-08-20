@@ -15,6 +15,8 @@ export class CourseStore {
   editingCourse = null; // Здесь будет храниться объект курса для редактирования
   isLoadingUpdate = false;
   isLoadingDelete = false;
+  isProjectCreateModalOpen = false;
+  isLoadingProjectCreate = false;
   rootStore;
 
   constructor(rootStore) {
@@ -83,6 +85,13 @@ export class CourseStore {
     this.isCreateModalOpen = false;
   }
 
+  openProjectCreateModal = () => {
+    this.isProjectCreateModalOpen = true;
+  };
+  closeProjectCreateModal = () => {
+    this.isProjectCreateModalOpen = false;
+  };
+
   // --- 3. НОВЫЙ ACTION ДЛЯ СОЗДАНИЯ КУРСА ---
   async createCourse(courseData) {
     this.isLoadingCreate = true;
@@ -140,6 +149,36 @@ export class CourseStore {
     } finally {
       runInAction(() => {
         this.isLoading = false;
+      });
+    }
+  }
+
+  // --- НОВЫЙ ACTION ДЛЯ СОЗДАНИЯ ПРОЕКТА ---
+  async createProject(projectData) {
+    if (!this.currentCourse) {
+      throw new Error("Невозможно создать проект: курс не загружен.");
+    }
+
+    this.isLoadingProjectCreate = true;
+    try {
+      // Добавляем ID текущего курса к данным проекта
+      const dataToSend = { ...projectData, course_id: this.currentCourse.id };
+
+      // Используем API-эндпоинт, который мы уже создали
+      await api.post("/projects", dataToSend);
+
+      runInAction(async () => {
+        // После успешного создания:
+        this.closeProjectCreateModal();
+        // И самое главное: обновляем данные текущего курса, чтобы увидеть новый проект
+        await this.fetchCourseBySlug(this.currentCourse.slug);
+      });
+    } catch (error) {
+      console.error("Ошибка при создании проекта:", error);
+      throw error; // Пробрасываем ошибку, чтобы форма могла ее показать
+    } finally {
+      runInAction(() => {
+        this.isLoadingProjectCreate = false;
       });
     }
   }
