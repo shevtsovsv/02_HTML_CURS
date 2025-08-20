@@ -8,6 +8,7 @@ import DashboardPage from "./pages/DashboardPage";
 import CoursePage from "./pages/CoursePage";
 import ProjectPage from "./pages/ProjectPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProjectAdminPage from "./pages/ProjectAdminPage";
 
 function App() {
   return (
@@ -41,6 +42,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ProjectPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/projects/:id"
+          element={
+            <ProtectedRoute>
+              <ProjectAdminPage />
             </ProtectedRoute>
           }
         />

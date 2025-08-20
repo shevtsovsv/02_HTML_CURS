@@ -71,6 +71,12 @@ const ProjectListItem = ({ project, isAdmin, onEdit, onDelete }) => {
       </Link>
       {isAdmin && (
         <div style={{ position: "absolute", top: "15px", right: "15px" }}>
+          <Link
+            to={`/admin/projects/${project.id}`}
+            style={{ marginRight: "5px" }}
+          >
+            ⚙️
+          </Link>
           <button onClick={handleEditClick} style={{ marginRight: "5px" }}>
             ✏️
           </button>

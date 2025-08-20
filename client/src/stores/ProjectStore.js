@@ -22,6 +22,12 @@ export class ProjectStore {
   validationResult = null;
   isChecking = false; // Показывает, идет ли проверка кода на сервере
 
+  // --- НОВОЕ СОСТОЯНИЕ ДЛЯ МОДАЛЬНЫХ ОКОН ШАГОВ ---
+  isStepCreateModalOpen = false;
+  isStepEditModalOpen = false;
+  editingStep = null;
+  isLoadingStepAction = false; // Единый флаг для всех CRUD-операций с шагами
+
   rootStore;
 
   constructor(rootStore) {
@@ -37,6 +43,24 @@ export class ProjectStore {
    * и ВЕСЬ сохраненный код пользователя для этого проекта.
    * @param {number} id - ID проекта для загрузки.
    */
+
+  // --- ACTIONS ДЛЯ МОДАЛЬНЫХ ОКОН ШАГОВ ---
+  openStepCreateModal = () => {
+    this.isStepCreateModalOpen = true;
+  };
+  closeStepCreateModal = () => {
+    this.isStepCreateModalOpen = false;
+  };
+
+  openStepEditModal = (step) => {
+    this.editingStep = step;
+    this.isStepEditModalOpen = true;
+  };
+  closeStepEditModal = () => {
+    this.editingStep = null;
+    this.isStepEditModalOpen = false;
+  };
+
   async fetchProject(id) {
     this.isLoading = true;
     this.currentProject = null; // Сбрасываем старые данные
@@ -214,5 +238,48 @@ export class ProjectStore {
    */
   resetValidationResult() {
     this.validationResult = null;
+  }
+
+  // --- ACTIONS ДЛЯ CRUD-ОПЕРАЦИЙ С ШАГАМИ ---
+  async createStep(stepData) {
+    this.isLoadingStepAction = true;
+    try {
+      await api.post("/steps", {
+        ...stepData,
+        projectId: this.currentProject.id,
+      });
+      // После любого изменения просто перезагружаем все данные проекта
+      await this.fetchProject(this.currentProject.id);
+      this.closeStepCreateModal();
+    } finally {
+      runInAction(() => {
+        this.isLoadingStepAction = false;
+      });
+    }
+  }
+
+  async updateStep(stepId, stepData) {
+    this.isLoadingStepAction = true;
+    try {
+      await api.put(`/steps/${stepId}`, stepData);
+      await this.fetchProject(this.currentProject.id);
+      this.closeStepEditModal();
+    } finally {
+      runInAction(() => {
+        this.isLoadingStepAction = false;
+      });
+    }
+  }
+
+  async deleteStep(stepId) {
+    this.isLoadingStepAction = true;
+    try {
+      await api.delete(`/steps/${stepId}`);
+      await this.fetchProject(this.currentProject.id);
+    } finally {
+      runInAction(() => {
+        this.isLoadingStepAction = false;
+      });
+    }
   }
 }
