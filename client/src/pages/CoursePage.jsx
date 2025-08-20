@@ -1,14 +1,19 @@
-import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
+import { useParams } from "react-router-dom";
 import { useStore } from "../hooks/useStore";
 import ProjectListItem from "../components/ProjectListItem";
 import ProjectFormModal from "../components/modals/ProjectFormModal";
+import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal"
 import "./CoursePage.css"; // Подключаем стили
 
 const CoursePage = observer(() => {
   const { authStore, courseStore } = useStore();
   const { slug } = useParams();
+
+  const [isProjectDeleteModalOpen, setProjectDeleteModalOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+
 
   useEffect(() => {
     if (slug) courseStore.fetchCourseBySlug(slug);
@@ -19,6 +24,21 @@ const CoursePage = observer(() => {
   }
 
   const { title, description, projects } = courseStore.currentCourse;
+  
+  const handleOpenDeleteModal = (project) => {
+    setProjectToDelete(project);
+    setProjectDeleteModalOpen(true);
+  };
+
+
+  
+  const handleConfirmDelete = async () => {
+    if (projectToDelete) {
+      await courseStore.deleteProject(projectToDelete.id);
+      setProjectDeleteModalOpen(false);
+      setProjectToDelete(null);
+    }
+  };
 
   return (
     <div className="course-page-container">
@@ -49,6 +69,8 @@ const CoursePage = observer(() => {
                 key={project.id}
                 project={project}
                 isAdmin={authStore.isAdmin}
+                onEdit={courseStore.openProjectEditModal}
+                onDelete={handleOpenDeleteModal}
               />
             ))
         ) : (
@@ -56,6 +78,13 @@ const CoursePage = observer(() => {
         )}
       </div>
       <ProjectFormModal />
+      <ConfirmDeleteModal
+        isOpen={isProjectDeleteModalOpen}
+        onClose={() => setProjectDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title={`Удалить проект "${projectToDelete?.title}"?`}
+        isLoading={courseStore.isLoadingProjectDelete}
+      />
     </div>
   );
 });

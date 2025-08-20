@@ -25,7 +25,6 @@ const CourseCard = ({ course, isAdmin, onDelete }) => {
   const { courseStore } = useStore();
   // Состояние для отслеживания наведения мыши для добавления hover-эффекта
   const [isHovered, setIsHovered] = React.useState(false);
-  console.log(isAdmin);
 
   const handleEditClick = (e) => {
     // Предотвращаем переход по ссылке, когда кликаем на кнопку

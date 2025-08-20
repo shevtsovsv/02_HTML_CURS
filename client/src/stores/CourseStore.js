@@ -17,6 +17,10 @@ export class CourseStore {
   isLoadingDelete = false;
   isProjectCreateModalOpen = false;
   isLoadingProjectCreate = false;
+  isProjectEditModalOpen = false;
+  editingProject = null;
+  isLoadingProjectUpdate = false;
+  isLoadingProjectDelete = false;
   rootStore;
 
   constructor(rootStore) {
@@ -179,6 +183,54 @@ export class CourseStore {
     } finally {
       runInAction(() => {
         this.isLoadingProjectCreate = false;
+      });
+    }
+  }
+
+  // --- ACTIONS ДЛЯ РЕДАКТИРОВАНИЯ ПРОЕКТА ---
+  openProjectEditModal = (project) => {
+    this.editingProject = project;
+    this.isProjectEditModalOpen = true;
+  };
+  closeProjectEditModal = () => {
+    this.editingProject = null;
+    this.isProjectEditModalOpen = false;
+  };
+
+  async updateProject(projectId, projectData) {
+    this.isLoadingProjectUpdate = true;
+    try {
+      await api.put(`/projects/${projectId}`, projectData);
+      runInAction(async () => {
+        this.closeProjectEditModal();
+        // Обновляем данные, чтобы увидеть изменения
+        await this.fetchCourseBySlug(this.currentCourse.slug);
+      });
+    } catch (error) {
+      console.error(`Ошибка при обновлении проекта ${projectId}:`, error);
+      throw error;
+    } finally {
+      runInAction(() => {
+        this.isLoadingProjectUpdate = false;
+      });
+    }
+  }
+
+  // --- ACTION ДЛЯ УДАЛЕНИЯ ПРОЕКТА ---
+  async deleteProject(projectId) {
+    this.isLoadingProjectDelete = true;
+    try {
+      await api.delete(`/projects/${projectId}`);
+      runInAction(async () => {
+        // Обновляем данные, чтобы удаленный проект исчез
+        await this.fetchCourseBySlug(this.currentCourse.slug);
+      });
+    } catch (error) {
+      console.error(`Ошибка при удалении проекта ${projectId}:`, error);
+      throw error;
+    } finally {
+      runInAction(() => {
+        this.isLoadingProjectDelete = false;
       });
     }
   }

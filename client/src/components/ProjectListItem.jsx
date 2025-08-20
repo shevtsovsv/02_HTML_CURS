@@ -5,6 +5,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+
 // Стили можно вынести в отдельный CSS-файл
 const itemStyle = {
   display: "flex",
@@ -30,12 +31,26 @@ const orderStyle = {
   marginRight: "20px",
 };
 
-const ProjectListItem = ({ project, isAdmin }) => {
+
+
+const ProjectListItem = ({ project, isAdmin, onEdit, onDelete }) => {
   const [isHovered, setIsHovered] = React.useState(false);
 
   // В будущем мы будем переходить на страницу вроде /projects/5
   // А пока ссылка ведет на заглушку
   const projectUrl = `/projects/${project.id}`;
+
+   const handleEditClick = (e) => {
+     e.preventDefault();
+     e.stopPropagation();
+     onEdit(project);
+   };
+
+   const handleDeleteClick = (e) => {
+     e.preventDefault();
+     e.stopPropagation();
+     onDelete(project);
+   };
 
   return (
     <div style={{ position: "relative" }}>
@@ -55,12 +70,11 @@ const ProjectListItem = ({ project, isAdmin }) => {
         </div>
       </Link>
       {isAdmin && (
-        <div
-          className="item-admin-actions"
-          style={{ position: "absolute", top: "15px", right: "15px" }}
-        >
-          <button style={{ marginRight: "5px" }}>✏️</button>
-          <button>🗑️</button>
+        <div style={{ position: "absolute", top: "15px", right: "15px" }}>
+          <button onClick={handleEditClick} style={{ marginRight: "5px" }}>
+            ✏️
+          </button>
+          <button onClick={handleDeleteClick}>🗑️</button>
         </div>
       )}
     </div>
