@@ -197,24 +197,24 @@ export class CourseStore {
     this.isProjectEditModalOpen = false;
   };
 
-  async updateProject(projectId, projectData) {
-    this.isLoadingProjectUpdate = true;
-    try {
-      await api.put(`/projects/${projectId}`, projectData);
-      runInAction(async () => {
-        this.closeProjectEditModal();
-        // Обновляем данные, чтобы увидеть изменения
-        await this.fetchCourseBySlug(this.currentCourse.slug);
-      });
-    } catch (error) {
-      console.error(`Ошибка при обновлении проекта ${projectId}:`, error);
-      throw error;
-    } finally {
-      runInAction(() => {
-        this.isLoadingProjectUpdate = false;
-      });
-    }
-  }
+//   async updateProject(projectId, projectData) {
+//     this.isLoadingProjectUpdate = true;
+//     try {
+//       await api.put(`/projects/${projectId}`, projectData);
+//       runInAction(async () => {
+//         this.closeProjectEditModal();
+//         // Обновляем данные, чтобы увидеть изменения
+//         await this.fetchCourseBySlug(this.currentCourse.slug);
+//       });
+//     } catch (error) {
+//       console.error(`Ошибка при обновлении проекта ${projectId}:`, error);
+//       throw error;
+//     } finally {
+//       runInAction(() => {
+//         this.isLoadingProjectUpdate = false;
+//       });
+//     }
+//   }
 
   // --- ACTION ДЛЯ УДАЛЕНИЯ ПРОЕКТА ---
   async deleteProject(projectId) {

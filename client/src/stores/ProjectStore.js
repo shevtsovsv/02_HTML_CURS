@@ -27,6 +27,7 @@ export class ProjectStore {
   isStepEditModalOpen = false;
   editingStep = null;
   isLoadingStepAction = false; // Единый флаг для всех CRUD-операций с шагами
+  isExampleModalOpen = false;
 
   rootStore;
 
@@ -60,6 +61,29 @@ export class ProjectStore {
     this.editingStep = null;
     this.isStepEditModalOpen = false;
   };
+  openExampleModal = () => {
+    this.isExampleModalOpen = true;
+  };
+  closeExampleModal = () => {
+    this.isExampleModalOpen = false;
+  };
+
+  async updateProject(projectId, projectData) {
+    this.isLoading = true; // Можно использовать отдельный флаг
+    try {
+      // Используем правильный эндпоинт, который мы создали
+      await api.put(`/projects/${projectId}`, projectData);
+      // После обновления перезагружаем данные, чтобы увидеть изменения
+      await this.fetchProject(projectId);
+    } catch (error) {
+      console.error(`Ошибка при обновлении проекта ${projectId}:`, error);
+      throw error;
+    } finally {
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    }
+  }
 
   async fetchProject(id) {
     this.isLoading = true;

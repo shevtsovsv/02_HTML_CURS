@@ -7,6 +7,7 @@ const db = require("./models");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("public/uploads"));
 
 // Подключаем маршруты
 const userRoutes = require("./routes/users");

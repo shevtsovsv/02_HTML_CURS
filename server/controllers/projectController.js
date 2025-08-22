@@ -9,6 +9,7 @@ const {
   course,
   userCode,
   userProgress,
+  ProjectAsset,
 } = require("../models");
 
 /**
@@ -55,6 +56,11 @@ const getProjectById = async (req, res) => {
         {
           model: course,
           as: "course", // Используем alias из модели project
+        },
+        {
+          model: ProjectAsset,
+          as: "assets", // Alias из модели project
+          required: false, // LEFT JOIN
         },
         {
           model: projectStep,
@@ -144,36 +150,60 @@ const createProject = async (req, res) => {
  * @route   PUT /api/projects/:id
  * @access  Private (admin)
  */
+// const updateProject = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     // Данные для обновления в теле запроса. Мы не позволяем менять course_id.
+//     const {
+//       title,
+//       description,
+//       order,
+//       html_template,
+//       css_template,
+//       js_template,
+//     } = req.body;
+
+//     const [updatedRows] = await project.update(
+//       { title, description, order, html_template, css_template, js_template },
+//       { where: { id } }
+//     );
+
+//     if (updatedRows > 0) {
+//       const updatedProject = await project.findByPk(id);
+//       res.json(updatedProject);
+//     } else {
+//       res.status(404).json({ error: "Проект не найден для обновления" });
+//     }
+//   } catch (error) {
+//     console.error(`Ошибка при обновлении проекта ${req.params.id}:`, error);
+//     res.status(500).json({ error: "Ошибка на сервере" });
+//   }
+// };
 const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    // Данные для обновления в теле запроса. Мы не позволяем менять course_id.
-    const {
-      title,
-      description,
-      order,
-      html_template,
-      css_template,
-      js_template,
-    } = req.body;
 
-    const [updatedRows] = await project.update(
-      { title, description, order, html_template, css_template, js_template },
-      { where: { id } }
-    );
-
-    if (updatedRows > 0) {
-      const updatedProject = await project.findByPk(id);
-      res.json(updatedProject);
-    } else {
-      res.status(404).json({ error: "Проект не найден для обновления" });
+    // --- ИСПРАВЛЕНИЕ ---
+    // 1. Проверяем, существует ли проект, который мы хотим обновить.
+    const projectToUpdate = await project.findByPk(id);
+    if (!projectToUpdate) {
+      return res.status(404).json({ error: "Проект не найден для обновления" });
     }
+
+    // 2. Обновляем его данными ПРЯМО из req.body.
+    // Sequelize достаточно умен, чтобы взять только те поля из req.body,
+    // которые существуют в модели, и проигнорировать остальные.
+    await projectToUpdate.update(req.body);
+
+    // 3. Возвращаем обновленный объект.
+    // findByPk здесь не нужен, так как .update() возвращает обновленный инстанс.
+    res.json(projectToUpdate);
+    // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
   } catch (error) {
     console.error(`Ошибка при обновлении проекта ${req.params.id}:`, error);
     res.status(500).json({ error: "Ошибка на сервере" });
   }
 };
-
 /**
  * @desc    Удалить проект по ID.
  * @route   DELETE /api/projects/:id

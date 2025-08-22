@@ -10,6 +10,7 @@ import { useStore } from "../hooks/useStore";
 import Split from "react-split"; // <-- 1. Импортируем Split
 import TaskPanel from "../components/ProjectPage/TaskPanel";
 import Workspace from "../components/ProjectPage/Workspace";
+import ExampleModal from "../components/modals/ExampleModal";
 import "./ProjectPage.css"; // Импортируем стили из нового файла
 
 // --- Новый суб-компонент для хедера интерфейса ---
@@ -21,6 +22,7 @@ const InterfaceHeader = ({
   onNext,
   isNextDisabled,
   courseSlug,
+  onShowExample,
 }) => {
   return (
     <header className="interface-header">
@@ -41,7 +43,9 @@ const InterfaceHeader = ({
         <button onClick={onNext} disabled={isNextDisabled}>
           Вперед &gt;
         </button>
-        <button className="show-example-btn">Показать пример</button>
+        <button className="show-example-btn" onClick={onShowExample}>
+          Показать пример
+        </button>
       </div>
     </header>
   );
@@ -110,6 +114,7 @@ const ProjectPage = observer(() => {
     return <div>Загрузка проекта...</div>;
   }
   const project = projectStore.currentProject;
+
   if (!project.steps || project.steps.length === 0) {
     return <div>В этом проекте нет шагов.</div>;
   }
@@ -160,6 +165,7 @@ const ProjectPage = observer(() => {
         onNext={goToNextStep}
         isNextDisabled={!isCurrentStepCompleted && !isLastStep}
         courseSlug={courseSlug}
+        onShowExample={projectStore.openExampleModal}
       />
       <Split
         className="main-content"
@@ -168,11 +174,18 @@ const ProjectPage = observer(() => {
         gutterSize={10}
       >
         <TaskPanel currentStep={currentStep} onCheck={handleCheck} />
-        <Workspace
-          project={project}
-          currentStep={currentStep}
-        />
+        <Workspace project={project} currentStep={currentStep} />
       </Split>
+      <ExampleModal
+        isOpen={projectStore.isExampleModalOpen}
+        onClose={projectStore.closeExampleModal}
+        imageUrl={
+          project.sampleImageUrl
+            ? `http://localhost:5000${project.sampleImageUrl}`
+            : ""
+        } // Передаем URL картинки из данных проекта
+        title={project.title}
+      />
     </div>
   );
 });

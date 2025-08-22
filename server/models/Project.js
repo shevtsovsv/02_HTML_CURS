@@ -51,6 +51,11 @@ module.exports = (sequelize, DataTypes) => {
      * @description Стартовый JavaScript-код для проекта.
      */
     js_template: DataTypes.TEXT,
+
+    sampleImageUrl: {
+      type: DataTypes.STRING, // Или DataTypes.TEXT, если URL могут быть очень длинными
+      allowNull: true, // Может быть null, если примера нет
+    },
   });
 
   /**
@@ -78,10 +83,15 @@ module.exports = (sequelize, DataTypes) => {
       as: "userCodes", // ВАЖНО: alias должен совпадать с тем, что в `include`
     });
 
-	project.hasMany(models.userProgress, {
-    foreignKey: "project_id", // Убедитесь, что это поле есть в userProgress
-    as: "userProgresses",
-  });
+    project.hasMany(models.userProgress, {
+      foreignKey: "project_id", // Убедитесь, что это поле есть в userProgress
+      as: "userProgresses",
+    });
+
+    project.hasMany(models.ProjectAsset, {
+      foreignKey: "project_id",
+      as: "assets", // Псевдоним для include
+    });
   };
 
   return project;
