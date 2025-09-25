@@ -177,7 +177,7 @@ const ProjectPage = observer(() => {
         minSize={300} // Минимальный размер каждой панели
         gutterSize={10}
       >
-        <TaskPanel currentStep={currentStep} onCheck={handleCheck} />
+        <TaskPanel project={project} currentStep={currentStep} onCheck={handleCheck} />
         <Workspace project={project} currentStep={currentStep} />
       </Split>
       <ExampleModal
