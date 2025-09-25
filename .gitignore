@@ -63,3 +63,8 @@ client/.vite/
 coverage
 client/coverage/
 server/coverage/
+
+# Temporary files
+/tmp/
+*.tmp
+*.temp

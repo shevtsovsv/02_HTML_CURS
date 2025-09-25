@@ -3,7 +3,7 @@
  * @description Rule Builder component for creating validation rules
  */
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import './RuleBuilder.css';
 
 const RuleBuilder = ({ onRuleCreate, onClose }) => {
@@ -27,7 +27,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('/api/validation/categories');
+      const response = await api.get('/validation/categories');
       if (response.data.success) {
         setCategories(response.data.categories);
         // Don't auto-select the first category - let the user choose
@@ -41,7 +41,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
 
   const loadRuleSchema = async (ruleType) => {
     try {
-      const response = await axios.get(`/api/validation/schema/${ruleType}`);
+      const response = await api.get(`/validation/schema/${ruleType}`);
       if (response.data.success) {
         setRuleSchema(response.data.rule);
         // Initialize rule data with defaults
@@ -87,7 +87,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
 
   const validateAndCreateRule = async () => {
     try {
-      const response = await axios.post('/api/validation/validate-rule', ruleData);
+      const response = await api.post('/validation/validate-rule', ruleData);
       
       if (response.data.success) {
         onRuleCreate(ruleData);
