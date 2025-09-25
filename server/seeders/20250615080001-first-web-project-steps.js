@@ -27,7 +27,7 @@ module.exports = {
           instructions:
             "Добавьте два абзаца с текстом. Первый абзац должен содержать ваше краткое представление (например: 'Меня зовут [Ваше имя], и я изучаю основы веб-разработки.'). Второй абзац - описание ваших интересов (например: 'Мне интересно создавать красивые и функциональные веб-сайты.').",
           validationRules: JSON.stringify([
-            { type: "elementCount", selector: "p", expected: 2 },
+            { type: "elementCount", selector: "body > p", expected: 2 },
             { type: "elementExists", selector: "p:first-of-type" },
             { type: "elementExists", selector: "p:last-of-type" },
           ]),
