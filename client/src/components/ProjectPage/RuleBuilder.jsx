@@ -186,11 +186,12 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
   }
 
   return (
-    <div className="rule-builder">
-      <div className="rule-builder-header">
-        <h3>Создание правила валидации</h3>
-        <button onClick={onClose} className="rule-builder-close">×</button>
-      </div>
+    <div className="rule-builder-backdrop" onClick={onClose}>
+      <div className="rule-builder" onClick={(e) => e.stopPropagation()}>
+        <div className="rule-builder-header">
+          <h3>Создание правила валидации</h3>
+          <button onClick={onClose} className="rule-builder-close">×</button>
+        </div>
 
       <div className="rule-builder-content">
         {/* Category Selection */}
@@ -308,6 +309,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
           Отмена
         </button>
       </div>
+    </div>
     </div>
   );
 };
