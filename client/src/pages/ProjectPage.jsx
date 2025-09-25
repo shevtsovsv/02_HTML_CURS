@@ -4,7 +4,7 @@
  * Управляет состоянием текущего шага и отображает основной макет.
  */
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
 import Split from "react-split"; // <-- 1. Импортируем Split
@@ -12,6 +12,7 @@ import TaskPanel from "../components/ProjectPage/TaskPanel";
 import Workspace from "../components/ProjectPage/Workspace";
 import ExampleModal from "../components/modals/ExampleModal";
 import "./ProjectPage.css"; // Импортируем стили из нового файла
+// import { toastSuccess } from "../utils/toast";
 
 // --- Новый суб-компонент для хедера интерфейса ---
 // Он получает все необходимые данные и функции через props.
@@ -55,6 +56,8 @@ const InterfaceHeader = ({
 const ProjectPage = observer(() => {
   const { projectStore } = useStore();
   const { id: projectId } = useParams(); // Переименовываем `id` в `projectId` для ясности
+
+  const navigate = useNavigate();
 
   // --- Состояние (State) ---
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -101,7 +104,8 @@ const ProjectPage = observer(() => {
         if (currentStepIndex < project.steps.length - 1) {
           goToNextStep();
         } else {
-          alert("Поздравляем! Проект завершен!");
+        //   toastSuccess("Поздравляем! Вы завершили проект!");
+		  navigate(`/projects/${projectId}/complete`);
         }
       }, 1500);
       return () => clearTimeout(timer);

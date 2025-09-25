@@ -33,24 +33,35 @@ const orderStyle = {
 
 
 
-const ProjectListItem = ({ project, isAdmin, onEdit, onDelete }) => {
+const ProjectListItem = ({
+  project,
+  isAdmin,
+  onEdit,
+  onDelete,
+  isCompleted,
+}) => {
   const [isHovered, setIsHovered] = React.useState(false);
 
   // В будущем мы будем переходить на страницу вроде /projects/5
   // А пока ссылка ведет на заглушку
   const projectUrl = `/projects/${project.id}`;
 
-   const handleEditClick = (e) => {
-     e.preventDefault();
-     e.stopPropagation();
-     onEdit(project);
-   };
+  const statusIconStyle = {
+    fontSize: "1.5rem",
+    marginRight: "15px",
+  };
 
-   const handleDeleteClick = (e) => {
-     e.preventDefault();
-     e.stopPropagation();
-     onDelete(project);
-   };
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onEdit(project);
+  };
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete(project);
+  };
 
   return (
     <div style={{ position: "relative" }}>
@@ -63,6 +74,7 @@ const ProjectListItem = ({ project, isAdmin, onEdit, onDelete }) => {
         <div
           style={isHovered ? { ...itemStyle, ...itemHoverStyle } : itemStyle}
         >
+          <div style={statusIconStyle}>{isCompleted ? "✅" : "📘"}</div>
           <div style={orderStyle}>{project.order}</div>
           <div>
             <h4 style={{ margin: "0 0 5px 0" }}>{project.title}</h4>

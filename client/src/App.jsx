@@ -9,6 +9,9 @@ import CoursePage from "./pages/CoursePage";
 import ProjectPage from "./pages/ProjectPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProjectAdminPage from "./pages/ProjectAdminPage";
+import ProjectCompletePage from "./pages/ProjectCompletePage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -46,6 +49,14 @@ function App() {
           }
         />
         <Route
+          path="projects/:id/complete"
+          element={
+            <ProtectedRoute>
+              <ProjectCompletePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="admin/projects/:id"
           element={
             <ProtectedRoute>
@@ -54,6 +65,18 @@ function App() {
           }
         />
       </Routes>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </Router>
   );
 }

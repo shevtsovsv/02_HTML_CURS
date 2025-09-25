@@ -14,6 +14,7 @@ import api from "../api";
 const ProjectAdminPage = observer(() => {
   const { projectStore} = useStore();
   const { id: projectId } = useParams();
+  
 
   const [stepToDelete, setStepToDelete] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -79,6 +80,11 @@ const handleSetAsSample = async (asset) => {
   }
 
   const project = projectStore.currentProject;
+
+  const completedStepIds = new Set(
+    project.userProgresses?.filter((p) => p.completed).map((p) => p.step_id) ||
+      []
+  );
 
   return (
     <div
@@ -222,6 +228,9 @@ const handleSetAsSample = async (asset) => {
                   borderRadius: "6px",
                 }}
               >
+                <span style={{ marginRight: "10px" }}>
+                  {completedStepIds.has(step.id) ? "✅" : "📝"}
+                </span>
                 <div>
                   <strong>Шаг {step.order}:</strong>{" "}
                   {step.instructions.substring(0, 100)}...

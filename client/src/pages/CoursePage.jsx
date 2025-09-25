@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useStore } from "../hooks/useStore";
 import ProjectListItem from "../components/ProjectListItem";
 import ProjectFormModal from "../components/modals/ProjectFormModal";
-import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal"
+import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 import "./CoursePage.css"; // Подключаем стили
 
 const CoursePage = observer(() => {
@@ -14,9 +14,23 @@ const CoursePage = observer(() => {
   const [isProjectDeleteModalOpen, setProjectDeleteModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
 
-
   useEffect(() => {
-    if (slug) courseStore.fetchCourseBySlug(slug);
+    const loadAndLog = async () => {
+      if (slug) {
+        // 1. Ждем, пока данные загрузятся
+        await courseStore.fetchCourseBySlug(slug);
+
+        // // 2. Теперь, когда данные точно есть, логируем их
+        // if (courseStore.currentCourse?.projects?.length > 0) {
+        //   console.log(
+        //     "ПОЛУЧЕННЫЕ ДАННЫЕ ДЛЯ ПЕРВОГО ПРОЕКТА:",
+        //     // Превращаем MobX-прокси в обычный JS-объект для чистого вывода
+        //     JSON.parse(JSON.stringify(courseStore.currentCourse.projects[0]))
+        //   );
+        // }
+      }
+    };
+    loadAndLog();
   }, [slug, courseStore]);
 
   if (courseStore.isLoading || !courseStore.currentCourse) {
@@ -24,14 +38,12 @@ const CoursePage = observer(() => {
   }
 
   const { title, description, projects } = courseStore.currentCourse;
-  
+
   const handleOpenDeleteModal = (project) => {
     setProjectToDelete(project);
     setProjectDeleteModalOpen(true);
   };
 
-
-  
   const handleConfirmDelete = async () => {
     if (projectToDelete) {
       await courseStore.deleteProject(projectToDelete.id);
@@ -64,15 +76,24 @@ const CoursePage = observer(() => {
           projects
             .slice()
             .sort((a, b) => a.order - b.order)
-            .map((project) => (
-              <ProjectListItem
-                key={project.id}
-                project={project}
-                isAdmin={authStore.isAdmin}
-                onEdit={courseStore.openProjectEditModal}
-                onDelete={handleOpenDeleteModal}
-              />
-            ))
+            .map((project) => {
+			// Проверяем, что у проекта вообще есть шаги
+              const totalSteps = project.steps?.length || 0;
+              // Считаем количество пройденных шагов для этого проекта
+              const completedSteps = project.userProgresses?.filter(p => p.completed).length || 0;
+              const isCompleted = totalSteps > 0 && completedSteps === totalSteps;
+
+				return (
+          <ProjectListItem
+            key={project.id}
+            project={project}
+            isAdmin={authStore.isAdmin}
+            onEdit={courseStore.openProjectEditModal}
+            onDelete={handleOpenDeleteModal}
+            isCompleted={isCompleted}
+          />
+        );
+            })
         ) : (
           <p>В этом курсе пока нет проектов.</p>
         )}

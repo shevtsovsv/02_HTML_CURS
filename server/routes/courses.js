@@ -13,6 +13,7 @@ const {
   updateCourse,
   deleteCourse,
 } = require("../controllers/courseController");
+const {protect} = require("../middleware/protect")
 
 // В будущем сюда можно будет добавить middleware для защиты роутов
 // const { protect, authorize } = require('../middleware/auth');
@@ -23,19 +24,19 @@ const {
 router.get("/", getAllCourses);
 
 // GET /api/courses/osnovy-html-i-css
-router.get("/:slug", getCourseBySlug);
+router.get("/:slug", protect, getCourseBySlug);
 
 // --- Защищенные роуты (только для администраторов) ---
 
 // POST /api/courses
 // Пример, как будет выглядеть защищенный роут:
 // router.post("/", protect, authorize('admin'), createCourse);
-router.post("/", createCourse);
+router.post("/", protect, createCourse);
 
 // PUT /api/courses/1
-router.put("/:id", updateCourse);
+router.put("/:id", protect, updateCourse);
 
 // DELETE /api/courses/1
-router.delete("/:id", deleteCourse);
+router.delete("/:id", protect, deleteCourse);
 
 module.exports = router;

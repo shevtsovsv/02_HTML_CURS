@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore.js";
 import { useNavigate } from "react-router-dom";
+import { toastError } from "../utils/toast";
 // useNavigate - это хук из react-router-dom для программного редиректа.
 // Мы установим react-router-dom на следующем шаге.
 // import { useNavigate } from 'react-router-dom';
@@ -21,12 +22,11 @@ const LoginPage = observer(() => {
   // Локальное состояние компонента для полей ввода и ошибок
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+
 
   const handleSubmit = async (e) => {
     // Предотвращаем стандартное поведение формы (перезагрузку страницы)
     e.preventDefault();
-    setError(""); // Сбрасываем предыдущую ошибку
 
     try {
       // Вызываем action `login` из нашего стора
@@ -39,7 +39,7 @@ const LoginPage = observer(() => {
     } catch (err) {
       // Если authStore.login выбросил ошибку, мы ее ловим
       // и устанавливаем сообщение для пользователя.
-      setError(err.response?.data?.error || "Произошла неизвестная ошибка");
+      toastError(err.response?.data?.error || "Произошла неизвестная ошибка");
     }
   };
 
@@ -89,10 +89,6 @@ const LoginPage = observer(() => {
             style={{ width: "100%", padding: "8px" }}
           />
         </div>
-
-        {/* Отображаем ошибку, если она есть */}
-        {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-
         <button
           type="submit"
           disabled={authStore.isLoading} // Кнопка неактивна во время запроса

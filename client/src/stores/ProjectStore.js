@@ -306,4 +306,21 @@ export class ProjectStore {
       });
     }
   }
+
+  get isCurrentProjectCompleted() {
+    if (
+      !this.currentProject ||
+      !this.currentProject.steps ||
+      this.currentProject.steps.length === 0
+    ) {
+      return false;
+    }
+
+    const completedStepsCount =
+      this.currentProject.userProgresses?.filter((p) => p.completed).length ||
+      0;
+    const totalStepsCount = this.currentProject.steps.length;
+
+    return completedStepsCount === totalStepsCount;
+  }
 }

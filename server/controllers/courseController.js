@@ -5,8 +5,10 @@
  */
 
 // Импортируем все необходимые модели в одном месте
-const { course, project, projectStep } = require("../models");
+const { course, project, projectStep, userProgress } = require("../models");
 const slugify = require("slugify"); // Понадобится для создания слага
+
+const { Op } = require("sequelize");
 
 /**
  * @desc    Получить список всех курсов.
@@ -38,27 +40,107 @@ const getAllCourses = async (req, res) => {
  * @access  Public
  */
 const getCourseBySlug = async (req, res) => {
+	console.log(">>> req.user:", req.user);
   try {
-    const courseData = await course.findOne({
-      where: { slug: req.params.slug },
-      include: {
-        // Также подгружаем проекты и их шаги для детального просмотра
-        model: project,
-        as: "projects",
-        include: {
-          model: projectStep, // предполагаем, что модель называется projectStep
-          as: "steps",
+    const { slug } = req.params;
+    const userId = req.user?.id;
+
+    // ШАГ 1: Загружаем основной контент (курс, проекты и их шаги)
+    const courseInstance = await course.findOne({
+      where: { slug: slug },
+      include: [
+        {
+          model: project,
+          as: "projects",
+          include: [
+            {
+              model: projectStep,
+              as: "steps",
+              required: false,
+            },
+          ],
         },
-      },
+      ],
+      order: [
+        [{ model: project, as: "projects" }, "order", "ASC"],
+        [
+          { model: project, as: "projects" },
+          { model: projectStep, as: "steps" },
+          "order",
+          "ASC",
+        ],
+      ],
     });
 
-    if (courseData) {
-      res.json(courseData);
-    } else {
-      res.status(404).json({ error: "Курс не найден" });
+    if (!courseInstance) {
+      return res.status(404).json({ error: "Курс не найден" });
     }
+
+    // Превращаем сложный экземпляр Sequelize в чистый JS-объект
+    const courseData = courseInstance.toJSON();
+
+    // ШАГ 2: Загружаем и "приклеиваем" прогресс
+    if (userId && courseData.projects && courseData.projects.length > 0) {
+      // --- ГЛАВНОЕ ИСПРАВЛЕНИЕ: Гарантируем, что работаем с настоящим массивом ---
+      // `Array.from()` принудительно создает новый, настоящий массив из псевдо-массива Sequelize.
+      const projectsArray = Array.from(courseData.projects);
+
+      const projectIds = projectsArray.map((p) => p.id);
+
+      const progresses = await userProgress.findAll({
+        where: {
+          user_id: userId,
+          project_id: { [Op.in]: projectIds },
+        },
+      });
+      console.log(
+        ">>> progress records:",
+        progresses.map((p) => p.toJSON())
+      );
+
+      for (const progress of progresses) {
+        console.log(">>> progress.toJSON():", progress.toJSON());
+      }
+
+      // Создаем карту прогресса для быстрой "склейки"
+      const progressMap = progresses.reduce((map, progress) => {
+        const pid = progress.project_id;
+        if (!map[pid]) map[pid] = [];
+        map[pid].push(progress.toJSON());
+        return map;
+      }, {});
+
+      // Итерируем по НАСТОЯЩЕМУ массиву и добавляем прогресс
+      //   for (const proj of projectsArray) {
+      //     proj.userProgresses = progressMap[proj.id] || [];
+      //     // Ваш отладочный лог, который теперь должен сработать
+      //     // console.log(
+      //     //   ">>> [LOG] Проект ID:",
+      //     //   proj.id,
+      //     //   "Количество записей о прогрессе:",
+      //     //   proj.userProgresses.length
+      //     // );
+      //   }
+      for (let i = 0; i < courseData.projects.length; i++) {
+        const proj = courseData.projects[i];
+        proj.userProgresses = progressMap[proj.id] ?? [];
+      }
+
+      // Заменяем псевдо-массив в итоговом объекте на наш новый, обогащенный массив
+      //   courseData.projects = projectsArray;
+    }
+    console.log(
+      courseData.projects.map((p) => ({
+        id: p.id,
+        userProgresses: p.userProgresses,
+      }))
+    );
+    res.json(courseData);
   } catch (error) {
-    console.error(`Ошибка при получении курса ${req.params.slug}:`, error);
+    console.error(
+      `Критическая ошибка при получении курса ${req.params.slug}:`,
+      error
+    );
     res.status(500).json({ error: "Ошибка на сервере" });
   }
 };
