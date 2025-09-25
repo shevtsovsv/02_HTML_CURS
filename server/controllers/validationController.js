@@ -4,6 +4,7 @@
  */
 const { projectStep } = require("../models");
 const { JSDOM } = require("jsdom");
+const ValidationRules = require("../lib/validationRules");
 
 /**
  * @desc    Проверить выполнение шага проекта
@@ -25,66 +26,27 @@ const checkProjectStep = async (req, res) => {
 
     // Создаем виртуальный DOM
     const dom = new JSDOM(
-      `<html><head><style>${css}</style></head><body>${html}</body></html>`
+      `<html><head><style>${css || ""}</style></head><body>${html || ""}</body></html>`,
+      {
+        url: "http://localhost",
+        referrer: "http://localhost",
+        contentType: "text/html",
+        includeNodeLocations: true,
+        storageQuota: 10000000,
+        runScripts: "dangerously"
+      }
     );
     const { document } = dom.window;
 
+    // Создаем экземпляр расширенной системы валидации
+    const validator = new ValidationRules(dom, document, html, css, js);
+
     const errors = [];
-    // Прогоняем правила
+    // Прогоняем правила с использованием новой системы валидации
     for (const rule of rules) {
-      const element = document.querySelector(rule.selector);
-      
-      if (rule.type === "elementExists" && !element) {
-        errors.push(`Элемент с селектором '${rule.selector}' не найден.`);
-      }
-      
-      if (rule.type === "elementText" && element) {
-        if (element.textContent.trim() !== rule.expected) {
-          errors.push(
-            `Текст в '${
-              rule.selector
-            }' ('${element.textContent.trim()}') не совпадает с ожидаемым ('${
-              rule.expected
-            }').`
-          );
-        }
-      }
-      
-      if (rule.type === "elementAttribute" && element) {
-        const attributeValue = element.getAttribute(rule.attribute);
-        if (attributeValue !== rule.expected) {
-          errors.push(
-            `Атрибут '${rule.attribute}' элемента '${rule.selector}' имеет значение '${attributeValue}', ожидалось '${rule.expected}'.`
-          );
-        }
-      }
-      
-      if (rule.type === "elementCount") {
-        const elements = document.querySelectorAll(rule.selector);
-        if (elements.length !== rule.expected) {
-          errors.push(
-            `Найдено ${elements.length} элементов с селектором '${rule.selector}', ожидалось ${rule.expected}.`
-          );
-        }
-      }
-      
-      if (rule.type === "computedStyle" && element) {
-        const styles = dom.window.getComputedStyle(element);
-        const actualValue = styles.getPropertyValue(rule.property);
-        if (actualValue !== rule.expected) {
-          errors.push(
-            `Стиль '${rule.property}' элемента '${rule.selector}' имеет значение '${actualValue}', ожидалось '${rule.expected}'.`
-          );
-        }
-      }
-      
-      // Проверка существования атрибута (без проверки значения)
-      if (rule.type === "elementHasAttribute" && element) {
-        if (!element.hasAttribute(rule.attribute)) {
-          errors.push(
-            `Элемент с селектором '${rule.selector}' не имеет атрибута '${rule.attribute}'.`
-          );
-        }
+      const error = validator.validateRule(rule);
+      if (error) {
+        errors.push(error);
       }
     }
 
