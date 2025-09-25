@@ -1,9 +1,18 @@
 /* RuleBuilder.css */
-.rule-builder {
+.rule-builder-backdrop {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.rule-builder {
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -12,18 +21,6 @@
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
-}
-
-.rule-builder::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: -1;
 }
 
 .rule-builder-header {
@@ -209,16 +206,17 @@
 
 .rule-builder-loading {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
   font-size: 16px;
-  color: #7f8c8d;
-  z-index: 1000;
+  color: white;
 }
 
 /* Responsive design */
@@ -226,8 +224,6 @@
   .rule-builder {
     width: 95vw;
     max-height: 90vh;
-    top: 5vh;
-    transform: translateX(-50%);
   }
 
   .rule-builder-content {
