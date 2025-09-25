@@ -61,11 +61,18 @@ const toggleViewMode = () => {
         <h3 style={{ marginTop: 0, textAlign: "center" }}>
           Пример выполнения: {title}
         </h3>
-        <div style={styles[viewMode].container}>
+        <div 
+          style={styles[viewMode].container}
+          onClick={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
+          onScroll={(e) => e.stopPropagation()}
+        >
           <img
             src={imageUrl}
             alt={`Пример для ${title}`}
             style={styles[viewMode].image}
+            onClick={(e) => e.stopPropagation()}
+            onDragStart={(e) => e.preventDefault()}
           />
         </div>
         <div className="modal-actions" style={{ justifyContent: "center" }}>
