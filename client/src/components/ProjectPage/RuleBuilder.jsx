@@ -30,11 +30,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
       const response = await axios.get('/api/validation/categories');
       if (response.data.success) {
         setCategories(response.data.categories);
-        // Select first category by default
-        const firstCategory = Object.keys(response.data.categories)[0];
-        if (firstCategory) {
-          setSelectedCategory(firstCategory);
-        }
+        // Don't auto-select the first category - let the user choose
       }
       setLoading(false);
     } catch (error) {
@@ -209,6 +205,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
             }}
             className="rule-builder-select"
           >
+            <option value="">Выберите категорию...</option>
             {Object.keys(categories).map(category => (
               <option key={category} value={category}>
                 {category}
