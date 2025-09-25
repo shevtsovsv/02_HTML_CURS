@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishbone - Ресторан высокой кухни</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="#home">Wishbone</a>
+      <ul>
+        <li><a href="#home">Главная</a></li>
+        <li><a href="#menu">Меню</a></li>
+        <li><a href="#about">О нас</a></li>
+        <li><a href="#contacts">Контакты</a></li>
+        <li><a href="#booking">Бронирование</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <h1>Добро пожаловать в Wishbone</h1>
+        <h2>Ресторан высокой кухни в сердце города</h2>
+        <p>Откройте для себя изысканные блюда, приготовленные из лучших ингредиентов нашими талантливыми шеф-поварами.</p>
+        <button>Забронировать столик</button>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="container">
+        <h2>О ресторане Wishbone</h2>
+        <p>Wishbone - это место, где кулинарное искусство встречается с уютной атмосферой. Основанный в 2020 году, наш ресторан быстро завоевал репутацию одного из лучших заведений города.</p>
+        <p>Мы верим, что каждое блюдо должно рассказывать свою историю. Наши шеф-повара используют только свежайшие местные продукты и авторские рецепты, создавая незабываемые вкусовые впечатления.</p>
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Интерьер ресторана Wishbone">
+      </div>
+    </section>
+
+    <section class="menu" id="menu">
+      <h2>Наше меню</h2>
+      <div class="menu-grid">
+        <div class="menu-item">
+          <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Стейк из говядины">
+          <h3>Стейк из мраморной говядины</h3>
+          <p>Сочный стейк, приготовленный на гриле до идеальной степени прожарки, подается с жареными овощами и соусом из красного вина.</p>
+          <span class="price">2 500 ₽</span>
+        </div>
+        <div class="menu-item">
+          <img src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Лосось с овощами">
+          <h3>Филе лосося в азиатском стиле</h3>
+          <p>Нежное филе лосося, маринованное в соевом соусе и меде, подается на подушке из обжаренных овощей и ароматного риса.</p>
+          <span class="price">1 900 ₽</span>
+        </div>
+        <div class="menu-item">
+          <img src="https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Паста с трюфелями">
+          <h3>Паста с черными трюфелями</h3>
+          <p>Домашняя паста тальятелле в сливочном соусе с пармезаном и черными трюфелями, украшенная свежей зеленью.</p>
+          <span class="price">2 200 ₽</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="booking" id="booking">
+      <h2>Забронировать столик</h2>
+      <form>
+        <label for="name">Имя:</label>
+        <input type="text" name="name" id="name" required>
+
+        <label for="phone">Телефон:</label>
+        <input type="tel" name="phone" id="phone" required>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+
+        <label for="date">Дата:</label>
+        <input type="date" name="date" id="date" required>
+
+        <label for="time">Время:</label>
+        <select name="time" id="time" required>
+          <option value="">Выберите время</option>
+          <option value="12:00">12:00</option>
+          <option value="13:30">13:30</option>
+          <option value="15:00">15:00</option>
+          <option value="18:00">18:00</option>
+          <option value="19:30">19:30</option>
+          <option value="21:00">21:00</option>
+        </select>
+
+        <label for="guests">Количество гостей:</label>
+        <input type="number" name="guests" id="guests" min="1" max="10" required>
+
+        <button type="submit">Забронировать</button>
+      </form>
+    </section>
+
+    <section class="contacts" id="contacts">
+      <h2>Контакты</h2>
+      <div class="contact-info">
+        <div>
+          <h3>Адрес</h3>
+          <address>ул. Невский проспект, 25<br>Санкт-Петербург, 191011</address>
+        </div>
+        <div>
+          <h3>Телефон</h3>
+          <a href="tel:+78121234567">+7 (812) 123-45-67</a>
+        </div>
+        <div>
+          <h3>Часы работы</h3>
+          <p>Ежедневно с 12:00 до 23:00</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2024 Wishbone Restaurant. Все права защищены.</p>
+    <ul class="social-links">
+      <li><a href="https://facebook.com/wishbone">Facebook</a></li>
+      <li><a href="https://instagram.com/wishbone">Instagram</a></li>
+      <li><a href="https://twitter.com/wishbone">Twitter</a></li>
+    </ul>
+    <nav class="footer-nav">
+      <a href="#home">Главная</a>
+      <a href="#menu">Меню</a>
+      <a href="#about">О нас</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+  </footer>
+</body>
+</html>
