@@ -18,7 +18,7 @@ module.exports = {
             { type: "elementText", selector: "h3", expected: "Мои увлечения" },
           ]),
           order: 1,
-          project_id: 2, // ID нового проекта (будет 2, так как карточка профиля уже имеет ID 1)
+          project_id: 12, // ID нового проекта (будет 2, так как карточка профиля уже имеет ID 1)
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -32,7 +32,7 @@ module.exports = {
             { type: "elementExists", selector: "p:last-of-type" },
           ]),
           order: 2,
-          project_id: 2,
+          project_id: 12,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -46,7 +46,7 @@ module.exports = {
             { type: "elementHasAttribute", selector: "img", attribute: "alt" },
           ]),
           order: 3,
-          project_id: 2,
+          project_id: 12,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -59,7 +59,7 @@ module.exports = {
             { type: "elementCount", selector: "ul li", expected: 3 },
           ]),
           order: 4,
-          project_id: 2,
+          project_id: 12,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -72,7 +72,7 @@ module.exports = {
             { type: "elementCount", selector: "ol li", expected: 4 },
           ]),
           order: 5,
-          project_id: 2,
+          project_id: 12,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -86,7 +86,7 @@ module.exports = {
             { type: "elementText", selector: "footer p", expected: "© 2024 Моя первая веб-страница" },
           ]),
           order: 6,
-          project_id: 2,
+          project_id: 12,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -97,7 +97,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.bulkDelete("projectSteps", {
-      project_id: 2
+      project_id: 12
     }, {});
   },
 };
