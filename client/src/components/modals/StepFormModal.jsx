@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../hooks/useStore";
+import RuleBuilder from "../ProjectPage/RuleBuilder";
 import "./Modal.css";
 
 const StepFormModal = observer(() => {
@@ -20,6 +21,7 @@ const StepFormModal = observer(() => {
   const [validationRules, setValidationRules] = useState("[]");
   const [error, setError] = useState("");
   const [jsonError, setJsonError] = useState("");
+  const [showRuleBuilder, setShowRuleBuilder] = useState(false);
 
   useEffect(() => {
     if (isEditing && stepToEdit) {
@@ -60,8 +62,22 @@ const StepFormModal = observer(() => {
     try {
       JSON.parse(value);
       setJsonError(""); // Если парсинг прошел, ошибки нет
-    } catch (err) {
+    } catch {
       setJsonError("Невалидный JSON"); // Если парсинг упал, показываем ошибку
+    }
+  };
+
+  const appendRule = (newRule) => {
+    try {
+      const current = validationRules?.trim() ? JSON.parse(validationRules) : [];
+      const arr = Array.isArray(current) ? current : [];
+      arr.push(newRule);
+      setValidationRules(JSON.stringify(arr, null, 2));
+      setJsonError('');
+    } catch {
+      // если текущее содержимое — невалидный JSON, просто заменим массивом с одним правилом
+      setValidationRules(JSON.stringify([newRule], null, 2));
+      setJsonError('');
     }
   };
 
@@ -139,6 +155,13 @@ const StepFormModal = observer(() => {
                 {jsonError}
               </p>
             )}
+            <button
+              type="button"
+              onClick={() => setShowRuleBuilder(true)}
+              style={{ marginTop: "10px" }}
+            >
+              Открыть конструктор правил
+            </button>
           </div>
 
           {error && <p className="error-message">{error}</p>}
@@ -164,6 +187,15 @@ const StepFormModal = observer(() => {
           </div>
         </form>
       </div>
+      {showRuleBuilder && (
+        <RuleBuilder
+          onRuleCreate={(rule) => {
+            appendRule(rule);
+            setShowRuleBuilder(false);
+          }}
+          onClose={() => setShowRuleBuilder(false)}
+        />
+      )}
     </div>
   );
 });

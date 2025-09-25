@@ -77,7 +77,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
         if (typeof value === 'string' && value.trim()) {
           convertedValue = JSON.parse(value);
         }
-      } catch (e) {
+      } catch {
         // Keep original value if JSON is invalid, validation will catch it
         convertedValue = value;
       }
