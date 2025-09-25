@@ -2,16 +2,37 @@
  * @file components/ProjectPage/PreviewPane.jsx
  * @description Компонент с iframe для отображения результата кода.
  */
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 
-const PreviewPane = ({ html, css, js }) => {
+const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
+  const iframeRef = useRef(null);
+
   const documentContent = useMemo(() => {
     const safeJs = `
       document.addEventListener('DOMContentLoaded', function() {
+        // Перехватываем console методы для отправки сообщений в родительское окно
+        const originalConsole = {
+          log: console.log,
+          error: console.error,
+          warn: console.warn,
+          info: console.info
+        };
+        
+        ['log', 'error', 'warn', 'info'].forEach(method => {
+          console[method] = function(...args) {
+            originalConsole[method].apply(console, args);
+            window.parent.postMessage({
+              type: 'console',
+              method: method,
+              args: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
+            }, '*');
+          };
+        });
+
         try {
           ${js || ""}
         } catch (e) {
-          console.error('Ошибка выполнения кода в превью:', e);
+          console.error('Ошибка выполнения кода в превью:', e.message || e);
         }
       });
     `;
@@ -26,6 +47,7 @@ const PreviewPane = ({ html, css, js }) => {
 
   return (
     <iframe
+      ref={iframeRef}
       srcDoc={documentContent}
       title="preview"
       sandbox="allow-scripts"

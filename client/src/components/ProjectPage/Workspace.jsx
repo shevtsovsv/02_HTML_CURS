@@ -2,7 +2,7 @@
  * @file components/ProjectPage/Workspace.jsx
  * @description Правая панель с редакторами кода (вкладки) и окном превью.
  */
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../hooks/useStore";
 import Split from "react-split"; // <-- 1. Импортируем Split
@@ -14,6 +14,10 @@ const Workspace = observer(({ project, currentStep }) => {
 
   // Новое состояние для отслеживания активной вкладки
   const [activeTab, setActiveTab] = useState("html"); // По умолчанию открыт HTML
+  
+  // Состояние для консоли
+  const [consoleLogs, setConsoleLogs] = useState([]);
+  const consoleRef = useRef(null);
 
   // Ваша логика вычисления initialCode
   const initialCode = useMemo(() => {
@@ -81,11 +85,42 @@ const Workspace = observer(({ project, currentStep }) => {
     js: { value: localJs, setter: setLocalJs, language: "javascript" },
   };
 
+  // Функция для добавления сообщения в консоль
+  const addConsoleMessage = (message, type = 'log') => {
+    const timestamp = new Date().toLocaleTimeString();
+    setConsoleLogs(prev => [...prev, { message, type, timestamp }]);
+  };
+
+  // Функция для очистки консоли
+  const clearConsole = () => {
+    setConsoleLogs([]);
+  };
+
   useEffect(() => {
     projectStore.updateCode("html", localHtml);
     projectStore.updateCode("css", localCss);
     projectStore.updateCode("javascript", localJs);
   }, [localHtml, localCss, localJs, projectStore]);
+
+  // Эффект для перехвата console сообщений из preview iframe
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'console') {
+        const { method, args } = event.data;
+        addConsoleMessage(args.join(' '), method);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Эффект для автоскролла консоли
+  useEffect(() => {
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+    }
+  }, [consoleLogs]);
 
   const handleOpenPreview = () => {
     const newWindow = window.open(); // Открываем пустую вкладку
@@ -100,8 +135,29 @@ const Workspace = observer(({ project, currentStep }) => {
           <body>
             ${localHtml}
             <script>
+              // Перехватываем console методы для отправки сообщений в родительское окно
+              const originalConsole = {
+                log: console.log,
+                error: console.error,
+                warn: console.warn,
+                info: console.info
+              };
+              
+              ['log', 'error', 'warn', 'info'].forEach(method => {
+                console[method] = function(...args) {
+                  originalConsole[method].apply(console, args);
+                  window.parent.postMessage({
+                    type: 'console',
+                    method: method,
+                    args: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
+                  }, '*');
+                };
+              });
+
               document.addEventListener('DOMContentLoaded', function() {
-                try { ${localJs} } catch (e) { console.error(e); }
+                try { ${localJs} } catch (e) { 
+                  console.error(e.message || e); 
+                }
               });
             </script>
           </body>
@@ -146,17 +202,46 @@ const Workspace = observer(({ project, currentStep }) => {
           >
             JS
           </button>
+          <button
+            className={`tab-button ${activeTab === "console" ? "active" : ""}`}
+            onClick={() => setActiveTab("console")}
+          >
+            Console
+          </button>
         </div>
 
-        {/* Панель с одним активным редактором */}
+        {/* Панель с одним активным редактором или консолью */}
         <div className="editor-panes">
-          <Editor
-            height="100%" // Редактор займет всю высоту панели
-            language={editorMapping[activeTab].language}
-            value={editorMapping[activeTab].value}
-            onChange={editorMapping[activeTab].setter}
-            theme="vs-dark"
-          />
+          {activeTab === "console" ? (
+            <div className="console-pane">
+              <div className="console-header">
+                <button onClick={clearConsole} className="console-clear-btn">
+                  Clear
+                </button>
+              </div>
+              <div className="console-content" ref={consoleRef}>
+                {consoleLogs.map((log, index) => (
+                  <div key={index} className={`console-message console-${log.type}`}>
+                    <span className="console-timestamp">[{log.timestamp}]</span>
+                    <span className="console-text">{log.message}</span>
+                  </div>
+                ))}
+                {consoleLogs.length === 0 && (
+                  <div className="console-message console-info">
+                    <span className="console-text">Console is empty. Run your code to see output.</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <Editor
+              height="100%" // Редактор займет всю высоту панели
+              language={editorMapping[activeTab].language}
+              value={editorMapping[activeTab].value}
+              onChange={editorMapping[activeTab].setter}
+              theme="vs-dark"
+            />
+          )}
         </div>
       </div>
 

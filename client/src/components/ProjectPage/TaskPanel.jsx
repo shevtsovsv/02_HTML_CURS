@@ -5,8 +5,9 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../hooks/useStore";
+import ProjectAssets from "./ProjectAssets";
 
-const TaskPanel = observer(({ currentStep, onCheck }) => {
+const TaskPanel = observer(({ project, currentStep, onCheck }) => {
   const { projectStore } = useStore();
 
   if (!currentStep) {
@@ -15,35 +16,40 @@ const TaskPanel = observer(({ currentStep, onCheck }) => {
 
   return (
     <div className="task-panel">
-      <h2>Шаг {currentStep.order}</h2>
-      <p>{currentStep.instructions}</p>
+      <div className="task-content">
+        <h2>Шаг {currentStep.order}</h2>
+        <p>{currentStep.instructions}</p>
 
-      {/* Кнопка проверки */}
-      <button
-        onClick={onCheck}
-        className="check-btn"
-        disabled={projectStore.isChecking}
-      >
-        {projectStore.isChecking ? "Проверка..." : "Проверить"}
-      </button>
-
-      {/* Отображение результата проверки */}
-      {projectStore.validationResult && (
-        <div
-          className={
-            projectStore.validationResult.success ? "success" : "error"
-          }
-          style={{ marginTop: "1rem" }}
+        {/* Кнопка проверки */}
+        <button
+          onClick={onCheck}
+          className="check-btn"
+          disabled={projectStore.isChecking}
         >
-          {projectStore.validationResult.success ? (
-            <p>{projectStore.validationResult.message}</p>
-          ) : (
-            projectStore.validationResult.errors.map((err, i) => (
-              <p key={i}>{err}</p>
-            ))
-          )}
-        </div>
-      )}
+          {projectStore.isChecking ? "Проверка..." : "Проверить"}
+        </button>
+
+        {/* Отображение результата проверки */}
+        {projectStore.validationResult && (
+          <div
+            className={
+              projectStore.validationResult.success ? "success" : "error"
+            }
+            style={{ marginTop: "1rem" }}
+          >
+            {projectStore.validationResult.success ? (
+              <p>{projectStore.validationResult.message}</p>
+            ) : (
+              projectStore.validationResult.errors.map((err, i) => (
+                <p key={i}>{err}</p>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Файлы проекта */}
+      <ProjectAssets assets={project?.assets} />
     </div>
   );
 });
