@@ -22,38 +22,40 @@ class ValidationRules {
   setupInterception() {
     // Intercept console methods
     const originalConsole = this.window.console;
+    const self = this; // Store reference to avoid binding issues
+    
     ['log', 'info', 'warn', 'error'].forEach(method => {
       this.window.console[method] = (...args) => {
-        this.consoleMessages.push({
+        self.consoleMessages.push({
           type: method,
           message: args.join(' '),
           timestamp: Date.now()
         });
-        // Call original method if needed for debugging
-        if (originalConsole[method]) {
-          originalConsole[method](...args);
-        }
+        // Don't call original to avoid recursion in test environment
       };
     });
 
     // Intercept addEventListener
     const originalAddEventListener = this.window.EventTarget.prototype.addEventListener;
+    const validationInstance = this; // Store reference
+    
     this.window.EventTarget.prototype.addEventListener = function(type, listener, options) {
       const element = this;
-      const elementKey = element.tagName + (element.id ? '#' + element.id : '') + 
+      const elementKey = (element.tagName || 'Unknown') + 
+                        (element.id ? '#' + element.id : '') + 
                         (element.className ? '.' + element.className.split(' ').join('.') : '');
       
-      if (!this.validationInstance.eventListeners.has(elementKey)) {
-        this.validationInstance.eventListeners.set(elementKey, []);
+      if (!validationInstance.eventListeners.has(elementKey)) {
+        validationInstance.eventListeners.set(elementKey, []);
       }
-      this.validationInstance.eventListeners.get(elementKey).push({
+      validationInstance.eventListeners.get(elementKey).push({
         type,
         listener,
         options
       });
       
       return originalAddEventListener.call(this, type, listener, options);
-    }.bind({ validationInstance: this });
+    };
   }
 
   /**
@@ -292,12 +294,12 @@ class ValidationRules {
     this.executeJavaScript();
     
     const found = this.consoleMessages.some(msg => 
-      msg.type === (rule.type || 'log') && 
+      msg.type === (rule.consoleType || 'log') && 
       msg.message.includes(rule.message)
     );
     
     if (!found) {
-      return `Сообщение '${rule.message}' не найдено в консоли (тип: ${rule.type || 'log'}).`;
+      return `Сообщение '${rule.message}' не найдено в консоли (тип: ${rule.consoleType || 'log'}).`;
     }
     return null;
   }

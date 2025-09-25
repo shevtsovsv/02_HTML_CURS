@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './RuleBuilder.css';
 
 const RuleBuilder = ({ onRuleCreate, onClose }) => {
   const [categories, setCategories] = useState({});

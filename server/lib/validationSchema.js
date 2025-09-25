@@ -397,7 +397,7 @@ const validationSchema = {
         description: "Часть сообщения для поиска",
         placeholder: "Hello World, Error:"
       },
-      type: {
+      consoleType: {
         type: "select",
         required: false,
         title: "Тип сообщения",
@@ -408,7 +408,7 @@ const validationSchema = {
     example: {
       type: "jsConsoleContains",
       message: "Функция выполнена успешно",
-      type: "log"
+      consoleType: "log"
     }
   },
 
