@@ -33,9 +33,11 @@ const checkProjectStep = async (req, res) => {
     // Прогоняем правила
     for (const rule of rules) {
       const element = document.querySelector(rule.selector);
+      
       if (rule.type === "elementExists" && !element) {
         errors.push(`Элемент с селектором '${rule.selector}' не найден.`);
       }
+      
       if (rule.type === "elementText" && element) {
         if (element.textContent.trim() !== rule.expected) {
           errors.push(
@@ -47,7 +49,43 @@ const checkProjectStep = async (req, res) => {
           );
         }
       }
-      // Сюда можно добавлять другие, более сложные правила
+      
+      if (rule.type === "elementAttribute" && element) {
+        const attributeValue = element.getAttribute(rule.attribute);
+        if (attributeValue !== rule.expected) {
+          errors.push(
+            `Атрибут '${rule.attribute}' элемента '${rule.selector}' имеет значение '${attributeValue}', ожидалось '${rule.expected}'.`
+          );
+        }
+      }
+      
+      if (rule.type === "elementCount") {
+        const elements = document.querySelectorAll(rule.selector);
+        if (elements.length !== rule.expected) {
+          errors.push(
+            `Найдено ${elements.length} элементов с селектором '${rule.selector}', ожидалось ${rule.expected}.`
+          );
+        }
+      }
+      
+      if (rule.type === "computedStyle" && element) {
+        const styles = dom.window.getComputedStyle(element);
+        const actualValue = styles.getPropertyValue(rule.property);
+        if (actualValue !== rule.expected) {
+          errors.push(
+            `Стиль '${rule.property}' элемента '${rule.selector}' имеет значение '${actualValue}', ожидалось '${rule.expected}'.`
+          );
+        }
+      }
+      
+      // Проверка существования атрибута (без проверки значения)
+      if (rule.type === "elementHasAttribute" && element) {
+        if (!element.hasAttribute(rule.attribute)) {
+          errors.push(
+            `Элемент с селектором '${rule.selector}' не имеет атрибута '${rule.attribute}'.`
+          );
+        }
+      }
     }
 
     if (errors.length > 0) {
