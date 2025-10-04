@@ -43,16 +43,16 @@ const ProjectAssets = ({ assets = [] }) => {
             <div key={asset.id} className="asset-item">
               <div className="asset-info">
                 <div className="asset-name">{asset.file_name}</div>
-                <div className="asset-url">{asset.file_url}</div>
+                <div className="asset-url">{fileUrl}</div>
               </div>
-              
+
               <div className="asset-preview">
                 {isImageFile(asset.file_name) && (
                   <img
                     src={fileUrl}
                     alt={asset.file_name}
                     className="asset-preview-image"
-                    onClick={() => window.open(fileUrl, '_blank')}
+                    onClick={() => window.open(fileUrl, "_blank")}
                   />
                 )}
                 {isVideoFile(asset.file_name) && (
@@ -63,27 +63,28 @@ const ProjectAssets = ({ assets = [] }) => {
                     preload="metadata"
                   />
                 )}
-                {!isImageFile(asset.file_name) && !isVideoFile(asset.file_name) && (
-                  <div className="asset-preview-file">
-                    <span>📄</span>
-                  </div>
-                )}
+                {!isImageFile(asset.file_name) &&
+                  !isVideoFile(asset.file_name) && (
+                    <div className="asset-preview-file">
+                      <span>📄</span>
+                    </div>
+                  )}
               </div>
 
               <div className="asset-actions">
                 <button
-                  onClick={() => window.open(fileUrl, '_blank')}
+                  onClick={() => window.open(fileUrl, "_blank")}
                   className="asset-action-btn preview-btn"
                   title="Открыть в новой вкладке"
                 >
                   👁️
                 </button>
                 <button
-                  onClick={() => copyToClipboard(asset.file_url, asset.id)}
+                  onClick={() => copyToClipboard(fileUrl , asset.id)}
                   className="asset-action-btn copy-btn"
                   title="Копировать ссылку"
                 >
-                  {copiedAsset === asset.id ? '✓' : '📋'}
+                  {copiedAsset === asset.id ? "✓" : "📋"}
                 </button>
               </div>
             </div>
