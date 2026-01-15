@@ -2,18 +2,19 @@
  * @file components/ProjectPage/RuleBuilder.jsx
  * @description Rule Builder component for creating validation rules
  */
-import React, { useState, useEffect } from 'react';
-import api from '../../api';
-import './RuleBuilder.css';
+import React, { useState, useEffect, useRef } from "react";
+import api from "../../api";
+import "./RuleBuilder.css";
 
 const RuleBuilder = ({ onRuleCreate, onClose }) => {
   const [categories, setCategories] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedRuleType, setSelectedRuleType] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedRuleType, setSelectedRuleType] = useState("");
   const [ruleSchema, setRuleSchema] = useState(null);
   const [ruleData, setRuleData] = useState({});
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     loadCategories();
@@ -25,16 +26,54 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
     }
   }, [selectedRuleType]);
 
+  // Предотвращаем закрытие при переключении вкладок
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // Не делаем ничего при смене видимости страницы
+    };
+
+    const handleFocusLoss = (e) => {
+      // Проверяем, что фокус не перешел внутри модального окна
+      if (modalRef.current && modalRef.current.contains(e.relatedTarget)) {
+        return;
+      }
+      // Не закрываем модальное окно при потере фокуса
+    };
+
+    const handleEscapeKey = (e) => {
+      // Закрываем только при явном нажатии Escape и только если модальное окно активно
+      if (
+        e.key === "Escape" &&
+        e.isTrusted &&
+        document.activeElement &&
+        modalRef.current &&
+        modalRef.current.contains(document.activeElement)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("focusout", handleFocusLoss);
+    document.addEventListener("keydown", handleEscapeKey);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("focusout", handleFocusLoss);
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, [onClose]);
+
   const loadCategories = async () => {
     try {
-      const response = await api.get('/validation/categories');
+      const response = await api.get("/validation/categories");
       if (response.data.success) {
         setCategories(response.data.categories);
         // Don't auto-select the first category - let the user choose
       }
       setLoading(false);
     } catch (error) {
-      console.error('Ошибка загрузки категорий:', error);
+      console.error("Ошибка загрузки категорий:", error);
       setLoading(false);
     }
   };
@@ -46,7 +85,7 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
         setRuleSchema(response.data.rule);
         // Initialize rule data with defaults
         const initialData = { type: ruleType };
-        Object.keys(response.data.rule.parameters).forEach(paramName => {
+        Object.keys(response.data.rule.parameters).forEach((paramName) => {
           const param = response.data.rule.parameters[paramName];
           if (param.default !== undefined) {
             initialData[paramName] = param.default;
@@ -55,22 +94,22 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
         setRuleData(initialData);
       }
     } catch (error) {
-      console.error('Ошибка загрузки схемы правила:', error);
+      console.error("Ошибка загрузки схемы правила:", error);
     }
   };
 
   const handleParameterChange = (paramName, value) => {
     const param = ruleSchema.parameters[paramName];
-    
+
     // Convert value based on parameter type
     let convertedValue = value;
-    if (param.type === 'number') {
-      convertedValue = value === '' ? '' : Number(value);
-    } else if (param.type === 'boolean') {
-      convertedValue = value === 'true' || value === true;
-    } else if (param.type === 'json') {
+    if (param.type === "number") {
+      convertedValue = value === "" ? "" : Number(value);
+    } else if (param.type === "boolean") {
+      convertedValue = value === "true" || value === true;
+    } else if (param.type === "json") {
       try {
-        if (typeof value === 'string' && value.trim()) {
+        if (typeof value === "string" && value.trim()) {
           convertedValue = JSON.parse(value);
         }
       } catch {
@@ -79,33 +118,44 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
       }
     }
 
-    setRuleData(prev => ({
+    setRuleData((prev) => ({
       ...prev,
-      [paramName]: convertedValue
+      [paramName]: convertedValue,
     }));
   };
 
   const validateAndCreateRule = async () => {
     try {
-      const response = await api.post('/validation/validate-rule', ruleData);
-      
+      const response = await api.post("/validation/validate-rule", ruleData);
+
       if (response.data.success) {
         onRuleCreate(ruleData);
         setErrors([]);
       } else {
-        setErrors(response.data.errors || ['Ошибка валидации']);
+        setErrors(response.data.errors || ["Ошибка валидации"]);
       }
     } catch (error) {
-      console.error('Ошибка валидации правила:', error);
-      setErrors(['Ошибка сервера при валидации']);
+      console.error("Ошибка валидации правила:", error);
+      setErrors(["Ошибка сервера при валидации"]);
+    }
+  };
+
+  // Безопасное закрытие модального окна - только при явном клике на backdrop
+  const handleBackdropClick = (e) => {
+    // Проверяем, что клик был именно на backdrop, а не на дочерние элементы
+    if (e.target === e.currentTarget) {
+      // Дополнительная проверка: убеждаемся что это был реальный клик мышью
+      if (e.isTrusted && e.clientX > 0 && e.clientY > 0) {
+        onClose();
+      }
     }
   };
 
   const renderParameterInput = (paramName, param) => {
-    const value = ruleData[paramName] || '';
+    const value = ruleData[paramName] || "";
 
     switch (param.type) {
-      case 'number':
+      case "number":
         return (
           <input
             type="number"
@@ -117,8 +167,8 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
             className="rule-builder-input"
           />
         );
-      
-      case 'boolean':
+
+      case "boolean":
         return (
           <select
             value={value.toString()}
@@ -129,8 +179,8 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
             <option value="false">Нет</option>
           </select>
         );
-      
-      case 'select':
+
+      case "select":
         return (
           <select
             value={value}
@@ -138,15 +188,15 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
             className="rule-builder-select"
           >
             <option value="">Выберите...</option>
-            {param.options.map(option => (
+            {param.options.map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
             ))}
           </select>
         );
-      
-      case 'text':
+
+      case "text":
         return (
           <textarea
             value={value}
@@ -156,18 +206,20 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
             rows={3}
           />
         );
-      
-      case 'json':
+
+      case "json":
         return (
           <textarea
-            value={typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
+            value={
+              typeof value === "string" ? value : JSON.stringify(value, null, 2)
+            }
             onChange={(e) => handleParameterChange(paramName, e.target.value)}
             placeholder={param.placeholder}
             className="rule-builder-textarea"
             rows={4}
           />
         );
-      
+
       default:
         return (
           <input
@@ -186,130 +238,132 @@ const RuleBuilder = ({ onRuleCreate, onClose }) => {
   }
 
   return (
-    <div className="rule-builder-backdrop" onClick={onClose}>
-      <div className="rule-builder" onClick={(e) => e.stopPropagation()}>
+    <div className="rule-builder-backdrop" onClick={handleBackdropClick}>
+      <div
+        className="rule-builder"
+        ref={modalRef}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="rule-builder-header">
           <h3>Создание правила валидации</h3>
-          <button onClick={onClose} className="rule-builder-close">×</button>
+          <button onClick={onClose} className="rule-builder-close">
+            ×
+          </button>
         </div>
 
-      <div className="rule-builder-content">
-        {/* Category Selection */}
-        <div className="rule-builder-section">
-          <label className="rule-builder-label">Категория:</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => {
-              setSelectedCategory(e.target.value);
-              setSelectedRuleType('');
-              setRuleSchema(null);
-            }}
-            className="rule-builder-select"
-          >
-            <option value="">Выберите категорию...</option>
-            {Object.keys(categories).map(category => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Rule Type Selection */}
-        {selectedCategory && (
+        <div className="rule-builder-content">
+          {/* Category Selection */}
           <div className="rule-builder-section">
-            <label className="rule-builder-label">Тип правила:</label>
+            <label className="rule-builder-label">Категория:</label>
             <select
-              value={selectedRuleType}
-              onChange={(e) => setSelectedRuleType(e.target.value)}
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setSelectedRuleType("");
+                setRuleSchema(null);
+              }}
               className="rule-builder-select"
             >
-              <option value="">Выберите тип правила...</option>
-              {categories[selectedCategory].map(rule => (
-                <option key={rule.type} value={rule.type}>
-                  {rule.title}
+              <option value="">Выберите категорию...</option>
+              {Object.keys(categories).map((category) => (
+                <option key={category} value={category}>
+                  {category}
                 </option>
               ))}
             </select>
           </div>
-        )}
 
-        {/* Rule Description */}
-        {ruleSchema && (
-          <div className="rule-builder-section">
-            <div className="rule-builder-description">
-              {ruleSchema.description}
+          {/* Rule Type Selection */}
+          {selectedCategory && (
+            <div className="rule-builder-section">
+              <label className="rule-builder-label">Тип правила:</label>
+              <select
+                value={selectedRuleType}
+                onChange={(e) => setSelectedRuleType(e.target.value)}
+                className="rule-builder-select"
+              >
+                <option value="">Выберите тип правила...</option>
+                {categories[selectedCategory].map((rule) => (
+                  <option key={rule.type} value={rule.type}>
+                    {rule.title}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Parameters */}
-        {ruleSchema && Object.keys(ruleSchema.parameters).map(paramName => {
-          const param = ruleSchema.parameters[paramName];
-          return (
-            <div key={paramName} className="rule-builder-section">
-              <label className="rule-builder-label">
-                {param.title}
-                {param.required && <span className="required">*</span>}
-              </label>
-              {param.description && (
-                <div className="rule-builder-help">
-                  {param.description}
-                </div>
-              )}
-              {renderParameterInput(paramName, param)}
-            </div>
-          );
-        })}
-
-        {/* Example */}
-        {ruleSchema && (
-          <div className="rule-builder-section">
-            <label className="rule-builder-label">Пример:</label>
-            <pre className="rule-builder-example">
-              {JSON.stringify(ruleSchema.example, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {/* Current Rule Preview */}
-        {ruleSchema && Object.keys(ruleData).length > 1 && (
-          <div className="rule-builder-section">
-            <label className="rule-builder-label">Текущее правило:</label>
-            <pre className="rule-builder-preview">
-              {JSON.stringify(ruleData, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {/* Errors */}
-        {errors.length > 0 && (
-          <div className="rule-builder-errors">
-            {errors.map((error, index) => (
-              <div key={index} className="rule-builder-error">
-                {error}
+          {/* Rule Description */}
+          {ruleSchema && (
+            <div className="rule-builder-section">
+              <div className="rule-builder-description">
+                {ruleSchema.description}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
 
-      <div className="rule-builder-footer">
-        <button
-          onClick={validateAndCreateRule}
-          disabled={!selectedRuleType}
-          className="rule-builder-create-btn"
-        >
-          Создать правило
-        </button>
-        <button
-          onClick={onClose}
-          className="rule-builder-cancel-btn"
-        >
-          Отмена
-        </button>
+          {/* Parameters */}
+          {ruleSchema &&
+            Object.keys(ruleSchema.parameters).map((paramName) => {
+              const param = ruleSchema.parameters[paramName];
+              return (
+                <div key={paramName} className="rule-builder-section">
+                  <label className="rule-builder-label">
+                    {param.title}
+                    {param.required && <span className="required">*</span>}
+                  </label>
+                  {param.description && (
+                    <div className="rule-builder-help">{param.description}</div>
+                  )}
+                  {renderParameterInput(paramName, param)}
+                </div>
+              );
+            })}
+
+          {/* Example */}
+          {ruleSchema && (
+            <div className="rule-builder-section">
+              <label className="rule-builder-label">Пример:</label>
+              <pre className="rule-builder-example">
+                {JSON.stringify(ruleSchema.example, null, 2)}
+              </pre>
+            </div>
+          )}
+
+          {/* Current Rule Preview */}
+          {ruleSchema && Object.keys(ruleData).length > 1 && (
+            <div className="rule-builder-section">
+              <label className="rule-builder-label">Текущее правило:</label>
+              <pre className="rule-builder-preview">
+                {JSON.stringify(ruleData, null, 2)}
+              </pre>
+            </div>
+          )}
+
+          {/* Errors */}
+          {errors.length > 0 && (
+            <div className="rule-builder-errors">
+              {errors.map((error, index) => (
+                <div key={index} className="rule-builder-error">
+                  {error}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rule-builder-footer">
+          <button
+            onClick={validateAndCreateRule}
+            disabled={!selectedRuleType}
+            className="rule-builder-create-btn"
+          >
+            Создать правило
+          </button>
+          <button onClick={onClose} className="rule-builder-cancel-btn">
+            Отмена
+          </button>
+        </div>
       </div>
-    </div>
     </div>
   );
 };

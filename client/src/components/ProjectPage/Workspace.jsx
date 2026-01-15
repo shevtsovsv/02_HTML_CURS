@@ -135,7 +135,8 @@ const Workspace = observer(({ project, currentStep }) => {
   // Функция для добавления сообщения в консоль
   const addConsoleMessage = (message, type = "log") => {
     const timestamp = new Date().toLocaleTimeString();
-    setConsoleLogs((prev) => [...prev, { message, type, timestamp }]);
+    const id = Date.now() + Math.random(); // Уникальный ID для каждого сообщения
+    setConsoleLogs((prev) => [...prev, { id, message, type, timestamp }]);
   };
 
   // Функция для очистки консоли
@@ -368,7 +369,12 @@ const Workspace = observer(({ project, currentStep }) => {
         <button onClick={handleOpenPreview} className="open-preview-btn">
           Открыть в новой вкладке
         </button>
-        <PreviewPane html={localHtml} css={localCss} js={localJs} />
+        <PreviewPane
+          html={localHtml}
+          css={localCss}
+          js={localJs}
+          onConsoleMessage={addConsoleMessage}
+        />
       </div>
     </Split>
   );

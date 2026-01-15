@@ -324,7 +324,7 @@ class ValidationRules {
     // Комбинированная проверка: сначала наличие свойства, потом значение
 
     // Функция нормализации CSS значений для сравнения
-    const normalizeValue = (value) => {
+    const normalizeValue = (value, currentRule = null) => {
       if (!value) return value;
 
       // Удаляем лишние пробелы
@@ -343,9 +343,70 @@ class ValidationRules {
       // Нормализуем цвета
       if (value.startsWith("#") && value.length === 4) {
         // Расширяем короткие hex цвета #abc -> #aabbcc
-        return (
-          "#" + value[1] + value[1] + value[2] + value[2] + value[3] + value[3]
-        );
+        value =
+          "#" + value[1] + value[1] + value[2] + value[2] + value[3] + value[3];
+      }
+
+      // Преобразуем hex цвета в rgb для унификации
+      if (value.startsWith("#") && value.length === 7) {
+        const r = parseInt(value.slice(1, 3), 16);
+        const g = parseInt(value.slice(3, 5), 16);
+        const b = parseInt(value.slice(5, 7), 16);
+        return `rgb(${r},${g},${b})`;
+      }
+
+      // Нормализуем именованные цвета в RGB значения
+      const colorMap = {
+        white: "rgb(255,255,255)",
+        black: "rgb(0,0,0)",
+        red: "rgb(255,0,0)",
+        green: "rgb(0,128,0)",
+        blue: "rgb(0,0,255)",
+        yellow: "rgb(255,255,0)",
+        cyan: "rgb(0,255,255)",
+        magenta: "rgb(255,0,255)",
+        silver: "rgb(192,192,192)",
+        gray: "rgb(128,128,128)",
+        maroon: "rgb(128,0,0)",
+        olive: "rgb(128,128,0)",
+        lime: "rgb(0,255,0)",
+        aqua: "rgb(0,255,255)",
+        teal: "rgb(0,128,128)",
+        navy: "rgb(0,0,128)",
+        fuchsia: "rgb(255,0,255)",
+        purple: "rgb(128,0,128)",
+      };
+
+      // Проверяем, есть ли цвет в нашей карте
+      const lowerValue = value.toLowerCase();
+      if (colorMap[lowerValue]) {
+        return colorMap[lowerValue];
+      }
+
+      // Специальная обработка для border: none
+      if (
+        value === "" &&
+        currentRule &&
+        currentRule.property === "border" &&
+        currentRule.expected === "none"
+      ) {
+        return "none";
+      }
+
+      // Специальная обработка для border-style
+      if (currentRule && currentRule.property === "border-style") {
+        // Если ожидается none, а computed style показывает outset/initial - это норма для сброшенных границ
+        if (
+          currentRule.expected === "none" &&
+          (value === "outset" || value === "initial")
+        ) {
+          return "none";
+        }
+      }
+
+      // Нормализуем rgb/rgba значения (убираем пробелы)
+      if (value.startsWith("rgb")) {
+        return value.replace(/\s+/g, "");
       }
 
       // Приводим к нижнему регистру для сравнения
@@ -408,8 +469,8 @@ class ValidationRules {
         const computedValue = computedStyles.getPropertyValue(rule.property);
 
         // Нормализуем оба значения для корректного сравнения
-        const normalizedExpected = normalizeValue(rule.expected);
-        const normalizedComputed = normalizeValue(computedValue);
+        const normalizedExpected = normalizeValue(rule.expected, rule);
+        const normalizedComputed = normalizeValue(computedValue, rule);
 
         // Проверяем разные варианты соответствия
         // Для градиентов и сложных значений используем более гибкую проверку

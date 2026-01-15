@@ -2,10 +2,50 @@
  * @file components/ProjectPage/PreviewPane.jsx
  * @description Компонент с iframe для отображения результата кода.
  */
-import React, { useMemo, useRef, useEffect } from "react";
+import React, { useMemo, useRef, useEffect, useState } from "react";
 
-const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
+const PreviewPane = ({
+  html,
+  css,
+  js,
+  onConsoleMessage,
+  forceUpdate = false,
+}) => {
   const iframeRef = useRef(null);
+
+  // Состояния для debounced кода
+  const [debouncedHtml, setDebouncedHtml] = useState(html);
+  const [debouncedCss, setDebouncedCss] = useState(css);
+  const [debouncedJs, setDebouncedJs] = useState(js);
+  const debounceTimeoutRef = useRef(null);
+
+  // Debounce эффект для JavaScript кода
+  useEffect(() => {
+    // HTML и CSS обновляем сразу (обычно не вызывают ошибки при промежуточных состояниях)
+    setDebouncedHtml(html);
+    setDebouncedCss(css);
+
+    // JavaScript обновляем с задержкой, если не принудительное обновление
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    if (forceUpdate) {
+      // При принудительном обновлении (например, при валидации) обновляем сразу
+      setDebouncedJs(js);
+    } else {
+      // Обычное обновление с задержкой
+      debounceTimeoutRef.current = setTimeout(() => {
+        setDebouncedJs(js);
+      }, 200); // Уменьшаем задержку до 200мс для лучшей отзывчивости
+    }
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [html, css, js, forceUpdate]);
 
   const documentContent = useMemo(() => {
     const safeJs = `
@@ -52,7 +92,7 @@ const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
           // Выполняем пользовательский код в изолированной среде
           (function() {
             try {
-              ${js || ""}
+              ${debouncedJs || ""}
             } catch (e) {
               console.error('Ошибка выполнения кода:', e.message || e);
             }
@@ -69,15 +109,15 @@ const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>${css || ""}</style>
+          <style>${debouncedCss || ""}</style>
         </head>
         <body>
-          ${html || ""}
+          ${debouncedHtml || ""}
           <script>${safeJs}</script>
         </body>
       </html>
     `;
-  }, [html, css, js]);
+  }, [debouncedHtml, debouncedCss, debouncedJs]);
 
   return (
     <iframe
