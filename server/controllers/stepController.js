@@ -7,15 +7,67 @@ const { projectStep } = require("../models");
 // Создание нового шага
 const createStep = async (req, res) => {
   try {
-    // Мы ожидаем все данные, включая project_id, в теле запроса
-    const { projectId, instructions, order, validationRules } = req.body;
-    const newStep = await projectStep.create({
-      project_id: projectId,
+    const {
+      projectId,
       instructions,
       order,
       validationRules,
-    });
-    res.status(201).json(newStep);
+      insertAfterOrder,
+    } = req.body;
+
+    // Если указано вставить после определенного шага
+    if (insertAfterOrder !== undefined && insertAfterOrder !== null) {
+      let newOrder;
+
+      if (insertAfterOrder === 0) {
+        // Вставка в самое начало - все шаги сдвигаем на +1
+        const allSteps = await projectStep.findAll({
+          where: { project_id: projectId },
+          order: [["order", "ASC"]],
+        });
+
+        for (const step of allSteps) {
+          await step.update({ order: step.order + 1 });
+        }
+
+        newOrder = 1; // Новый шаг становится первым
+      } else {
+        // Вставка после конкретного шага
+        const stepsToReorder = await projectStep.findAll({
+          where: {
+            project_id: projectId,
+            order: { [require("sequelize").Op.gt]: insertAfterOrder },
+          },
+          order: [["order", "ASC"]],
+        });
+
+        // Сдвигаем все последующие шаги на +1
+        for (const step of stepsToReorder) {
+          await step.update({ order: step.order + 1 });
+        }
+
+        newOrder = insertAfterOrder + 1;
+      }
+
+      // Создаем новый шаг с вычисленным order
+      const newStep = await projectStep.create({
+        project_id: projectId,
+        instructions,
+        order: newOrder,
+        validationRules,
+      });
+
+      res.status(201).json(newStep);
+    } else {
+      // Обычное создание в конце (как было раньше)
+      const newStep = await projectStep.create({
+        project_id: projectId,
+        instructions,
+        order,
+        validationRules,
+      });
+      res.status(201).json(newStep);
+    }
   } catch (error) {
     console.error("Ошибка при создании шага:", error);
     res.status(500).json({ error: "Ошибка на сервере" });

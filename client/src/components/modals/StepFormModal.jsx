@@ -30,11 +30,22 @@ const StepFormModal = observer(() => {
       // Превращаем объект/массив JSON в отформатированную строку для удобного редактирования
       setValidationRules(JSON.stringify(stepToEdit.validationRules, null, 2));
     } else {
-      // Устанавливаем порядок для нового шага (следующий после последнего)
-      const nextOrder = projectStore.currentProject?.steps.length || 0;
-      setOrder(nextOrder);
+      // Логика для нового шага
+      if (projectStore.insertAfterOrder !== null) {
+        // Вставка после определенного шага
+        setOrder(projectStore.insertAfterOrder + 1);
+      } else {
+        // Добавление в конец
+        const nextOrder = (projectStore.currentProject?.steps.length || 0) + 1;
+        setOrder(nextOrder);
+      }
     }
-  }, [isEditing, stepToEdit, projectStore.currentProject]);
+  }, [
+    isEditing,
+    stepToEdit,
+    projectStore.currentProject,
+    projectStore.insertAfterOrder,
+  ]);
 
   if (
     !projectStore.isStepCreateModalOpen &&
@@ -69,15 +80,17 @@ const StepFormModal = observer(() => {
 
   const appendRule = (newRule) => {
     try {
-      const current = validationRules?.trim() ? JSON.parse(validationRules) : [];
+      const current = validationRules?.trim()
+        ? JSON.parse(validationRules)
+        : [];
       const arr = Array.isArray(current) ? current : [];
       arr.push(newRule);
       setValidationRules(JSON.stringify(arr, null, 2));
-      setJsonError('');
+      setJsonError("");
     } catch {
       // если текущее содержимое — невалидный JSON, просто заменим массивом с одним правилом
       setValidationRules(JSON.stringify([newRule], null, 2));
-      setJsonError('');
+      setJsonError("");
     }
   };
 
@@ -110,8 +123,27 @@ const StepFormModal = observer(() => {
         <h2>
           {isEditing
             ? `Редактировать Шаг ${stepToEdit?.order}`
+            : projectStore.insertAfterOrder !== null
+            ? `Вставить новый шаг после шага ${projectStore.insertAfterOrder}`
             : "Создать новый шаг"}
         </h2>
+        {!isEditing && projectStore.insertAfterOrder !== null && (
+          <p
+            style={{
+              color: "#0066cc",
+              fontStyle: "italic",
+              marginBottom: "1rem",
+              backgroundColor: "#f0f8ff",
+              padding: "0.5rem",
+              borderRadius: "4px",
+              border: "1px solid #b8daff",
+            }}
+          >
+            ℹ️ Новый шаг будет вставлен после шага{" "}
+            {projectStore.insertAfterOrder}. Все последующие шаги будут
+            автоматически перенумерованы.
+          </p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="step-order">Порядковый номер</label>

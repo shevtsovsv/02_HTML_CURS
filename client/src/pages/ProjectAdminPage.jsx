@@ -10,11 +10,9 @@ import StepFormModal from "../components/modals/StepFormModal";
 import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 import api from "../api";
 
-
 const ProjectAdminPage = observer(() => {
-  const { projectStore} = useStore();
+  const { projectStore } = useStore();
   const { id: projectId } = useParams();
-  
 
   const [stepToDelete, setStepToDelete] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -59,21 +57,18 @@ const ProjectAdminPage = observer(() => {
     }
   };
 
-const handleSetAsSample = async (asset) => {
-  try {
-    // Вызываем action для обновления проекта.
-    // Мы передаем только одно поле, которое хотим изменить.
-    await projectStore.updateProject(projectId, {
-      sampleImageUrl: asset.file_url,
-    });
-  } catch (error) {
-    console.error("Не удалось установить изображение как пример:", error);
-    alert("Произошла ошибка при назначении примера.");
-  }
-};
-
-
-
+  const handleSetAsSample = async (asset) => {
+    try {
+      // Вызываем action для обновления проекта.
+      // Мы передаем только одно поле, которое хотим изменить.
+      await projectStore.updateProject(projectId, {
+        sampleImageUrl: asset.file_url,
+      });
+    } catch (error) {
+      console.error("Не удалось установить изображение как пример:", error);
+      alert("Произошла ошибка при назначении примера.");
+    }
+  };
 
   if (projectStore.isLoading || !projectStore.currentProject) {
     return <div>Загрузка данных проекта...</div>;
@@ -202,12 +197,20 @@ const handleSetAsSample = async (asset) => {
           }}
         >
           <h2>Шаги проекта</h2>
-          <button
-            onClick={() => projectStore.openStepCreateModal()}
-            className="btn-primary"
-          >
-            + Добавить шаг
-          </button>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              onClick={() => projectStore.openStepCreateModal(0)}
+              className="btn-secondary"
+            >
+              ➕ Вставить в начало
+            </button>
+            <button
+              onClick={() => projectStore.openStepCreateModal()}
+              className="btn-primary"
+            >
+              + Добавить в конец
+            </button>
+          </div>
         </div>
 
         {/* Список шагов */}
@@ -215,34 +218,61 @@ const handleSetAsSample = async (asset) => {
           {project.steps
             .slice()
             .sort((a, b) => a.order - b.order)
-            .map((step) => (
-              <div
-                key={step.id}
-                className="step-item"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  border: "1px solid #eee",
-                  padding: "1rem",
-                  marginBottom: "0.5rem",
-                  borderRadius: "6px",
-                }}
-              >
-                <span style={{ marginRight: "10px" }}>
-                  {completedStepIds.has(step.id) ? "✅" : "📝"}
-                </span>
-                <div>
-                  <strong>Шаг {step.order}:</strong>{" "}
-                  {step.instructions.substring(0, 100)}...
+            .map((step, index) => (
+              <div key={step.id}>
+                <div
+                  className="step-item"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    border: "1px solid #eee",
+                    padding: "1rem",
+                    marginBottom: "0.5rem",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <span style={{ marginRight: "10px" }}>
+                    {completedStepIds.has(step.id) ? "✅" : "📝"}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <strong>Шаг {step.order}:</strong>{" "}
+                    {step.instructions.substring(0, 100)}...
+                  </div>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      onClick={() => projectStore.openStepEditModal(step)}
+                      className="btn-secondary"
+                      style={{ padding: "0.25rem 0.5rem" }}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => setStepToDelete(step)}
+                      className="btn-danger"
+                      style={{ padding: "0.25rem 0.5rem" }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
-                <div>
+                {/* Кнопка "Вставить шаг после" */}
+                <div style={{ textAlign: "center", marginBottom: "1rem" }}>
                   <button
-                    onClick={() => projectStore.openStepEditModal(step)}
-                    style={{ marginRight: "0.5rem" }}
+                    onClick={() =>
+                      projectStore.openStepCreateModal(step.order + 1)
+                    }
+                    className="btn-outline"
+                    style={{
+                      padding: "0.25rem 1rem",
+                      fontSize: "0.9rem",
+                      border: "2px dashed #007bff",
+                      backgroundColor: "transparent",
+                      color: "#007bff",
+                      borderRadius: "4px",
+                    }}
                   >
-                    ✏️
+                    ➕ Вставить шаг после шага {step.order}
                   </button>
-                  <button onClick={() => setStepToDelete(step)}>🗑️</button>
                 </div>
               </div>
             ))}

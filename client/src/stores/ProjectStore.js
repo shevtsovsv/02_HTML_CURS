@@ -29,6 +29,7 @@ export class ProjectStore {
   isStepCreateModalOpen = false;
   isStepEditModalOpen = false;
   editingStep = null;
+  insertAfterOrder = null; // Новое поле: после какого шага вставлять новый
   isLoadingStepAction = false; // Единый флаг для всех CRUD-операций с шагами
   isExampleModalOpen = false;
 
@@ -49,10 +50,12 @@ export class ProjectStore {
    */
 
   // --- ACTIONS ДЛЯ МОДАЛЬНЫХ ОКОН ШАГОВ ---
-  openStepCreateModal = () => {
+  openStepCreateModal = (insertAfterOrder = null) => {
+    this.insertAfterOrder = insertAfterOrder;
     this.isStepCreateModalOpen = true;
   };
   closeStepCreateModal = () => {
+    this.insertAfterOrder = null;
     this.isStepCreateModalOpen = false;
   };
 
@@ -302,10 +305,17 @@ export class ProjectStore {
   async createStep(stepData) {
     this.isLoadingStepAction = true;
     try {
-      await api.post("/steps", {
+      const payload = {
         ...stepData,
         projectId: this.currentProject.id,
-      });
+      };
+
+      // Если указано после какого шага вставить, добавляем это в payload
+      if (this.insertAfterOrder !== null) {
+        payload.insertAfterOrder = this.insertAfterOrder;
+      }
+
+      await api.post("/steps", payload);
       // После любого изменения просто перезагружаем все данные проекта
       await this.fetchProject(this.currentProject.id);
       this.closeStepCreateModal();
