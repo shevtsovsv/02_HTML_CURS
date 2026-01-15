@@ -30,31 +30,29 @@ const checkProjectStep = asyncHandler(async (req, res) => {
   // Если HTML содержит DOCTYPE и полную HTML структуру, используем его как есть
   // Иначе, оборачиваем в стандартную структуру
   let fullHTML;
-  
-  if (html && html.trim().toLowerCase().startsWith('<!doctype')) {
+
+  if (html && html.trim().toLowerCase().startsWith("<!doctype")) {
     // HTML уже содержит полную структуру документа
     fullHTML = html;
     // Добавляем стили в head, если есть
     if (css) {
-      fullHTML = fullHTML.replace(
-        /<\/head>/i, 
-        `<style>${css}</style></head>`
-      );
+      fullHTML = fullHTML.replace(/<\/head>/i, `<style>${css}</style></head>`);
     }
   } else {
     // HTML содержит только фрагмент, оборачиваем в полную структуру
-    fullHTML = `<html><head><style>${css || ""}</style></head><body>${html || ""}</body></html>`;
+    fullHTML = `<html><head><style>${css || ""}</style></head><body>${
+      html || ""
+    }</body></html>`;
   }
 
   const dom = new JSDOM(fullHTML, {
-      url: "http://localhost",
-      referrer: "http://localhost",
-      contentType: "text/html",
-      includeNodeLocations: true,
-      storageQuota: 10000000,
-      runScripts: "dangerously"
-    }
-  );
+    url: "http://localhost",
+    referrer: "http://localhost",
+    contentType: "text/html",
+    includeNodeLocations: true,
+    storageQuota: 10000000,
+    runScripts: "dangerously",
+  });
   const { document } = dom.window;
 
   // Создаем экземпляр расширенной системы валидации
@@ -70,11 +68,11 @@ const checkProjectStep = asyncHandler(async (req, res) => {
   }
 
   if (errors.length > 0) {
-    logger.debug('Validation failed', { stepId, errorCount: errors.length });
+    logger.debug("Validation failed", { stepId, errorCount: errors.length });
     return res.json({ success: false, errors });
   }
 
-  logger.debug('Validation successful', { stepId });
+  logger.debug("Validation successful", { stepId });
   return res.json({ success: true, message: "Отлично, шаг выполнен верно!" });
 });
 

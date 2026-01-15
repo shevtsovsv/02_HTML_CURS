@@ -7,20 +7,19 @@
 let clickCount = 0;
 
 const magicPhrases = [
-    "✨ Магия работает! ✨",
-    "🌟 Невероятно! 🌟",
-    "🎭 Удивительно! 🎭", 
-    "🔮 Волшебство! 🔮",
-    "🎪 Фантастика! 🎪"
+  "✨ Магия работает! ✨",
+  "🌟 Невероятно! 🌟",
+  "🎭 Удивительно! 🎭",
+  "🔮 Волшебство! 🔮",
+  "🎪 Фантастика! 🎪",
 ];
 
-const magicButton = document.querySelector('.magic-button');
+const magicButton = document.querySelector(".magic-button");
 
 /* 
   TODO 5.3: Получите ссылку на элемент счетчика
   Добавьте: const clickCounterElement = document.getElementById('click-counter');
 */
-
 
 /* 
   TODO 5.4: Обновите обработчик события
@@ -31,12 +30,13 @@ const magicButton = document.querySelector('.magic-button');
 */
 
 // Базовый обработчик из урока 4 (нужно будет модифицировать)
-magicButton.addEventListener('click', function() {
-    clickCount++;
-    console.log('Кликов:', clickCount);
-    
-    const randomPhrase = magicPhrases[Math.floor(Math.random() * magicPhrases.length)];
-    alert(randomPhrase);
+magicButton.addEventListener("click", function () {
+  clickCount++;
+  console.log("Кликов:", clickCount);
+
+  const randomPhrase =
+    magicPhrases[Math.floor(Math.random() * magicPhrases.length)];
+  alert(randomPhrase);
 });
 
 console.log("Magic Button урок 5 - добавляем статистику!");

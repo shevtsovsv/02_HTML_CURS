@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * @file seeders/...-magic-button-lesson5-steps.js
@@ -19,56 +19,69 @@ module.exports = {
 
     const projectId = projects[0].id;
 
-    return queryInterface.bulkInsert('projectSteps', [
+    return queryInterface.bulkInsert("projectSteps", [
       {
-        instructions: 'Добавьте блок статистики в HTML: div с классом "stats", заголовок h3 "Статистика магии:" и параграф с span id="click-counter".',
+        instructions:
+          'Добавьте блок статистики в HTML: div с классом "stats", заголовок h3 "Статистика магии:" и параграф с span id="click-counter".',
         order: 1,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "elementExists", "selector": "div.stats" },
-          { "type": "elementExists", "selector": "h3" },
-          { "type": "elementExists", "selector": "#click-counter" }
+          { type: "elementExists", selector: "div.stats" },
+          { type: "elementExists", selector: "h3" },
+          { type: "elementExists", selector: "#click-counter" },
         ]),
         starterCode: JSON.stringify({
-          html: 'Готовый HTML с кнопкой + TODO для добавления блока статистики',
-          css: 'Готовые стили предыдущих уроков + TODO для .stats',
-          js: 'Готовый JS с обработчиком + TODO для обновления счетчика'
+          html: "Готовый HTML с кнопкой + TODO для добавления блока статистики",
+          css: "Готовые стили предыдущих уроков + TODO для .stats",
+          js: "Готовый JS с обработчиком + TODO для обновления счетчика",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        instructions: 'Добавьте CSS стили для .stats: background rgba(255, 255, 255, 0.2), padding 20px, border-radius 15px, margin-top 30px.',
+        instructions:
+          "Добавьте CSS стили для .stats: background rgba(255, 255, 255, 0.2), padding 20px, border-radius 15px, margin-top 30px.",
         order: 2,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "cssRule", "selector": ".stats", "property": "background", "contains": "rgba(255, 255, 255, 0.2)" },
-          { "type": "cssRule", "selector": ".stats", "property": "padding", "expected": "20px" }
+          {
+            type: "cssRule",
+            selector: ".stats",
+            property: "background",
+            contains: "rgba(255, 255, 255, 0.2)",
+          },
+          {
+            type: "cssRule",
+            selector: ".stats",
+            property: "padding",
+            expected: "20px",
+          },
         ]),
         starterCode: JSON.stringify({
-          html: 'HTML с добавленным блоком статистики',
-          css: 'Стили + TODO для .stats правила',
-          js: 'JavaScript логика урока 4'
+          html: "HTML с добавленным блоком статистики",
+          css: "Стили + TODO для .stats правила",
+          js: "JavaScript логика урока 4",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        instructions: 'Получите ссылку на элемент счетчика и обновите обработчик клика для показа количества кликов на экране.',
+        instructions:
+          "Получите ссылку на элемент счетчика и обновите обработчик клика для показа количества кликов на экране.",
         order: 3,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "jsVariableExists", "name": "clickCounterElement" },
-          { "type": "jsFunction", "name": "getElementById", "called": true }
+          { type: "jsVariableExists", name: "clickCounterElement" },
+          { type: "jsFunction", name: "getElementById", called: true },
         ]),
         starterCode: JSON.stringify({
-          html: 'Полный HTML с блоком статистики',
-          css: 'Полные стили с .stats',
-          js: 'JavaScript + TODO для обновления DOM'
+          html: "Полный HTML с блоком статистики",
+          css: "Полные стили с .stats",
+          js: "JavaScript + TODO для обновления DOM",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ]);
   },
 
@@ -80,7 +93,9 @@ module.exports = {
     );
 
     if (projects.length > 0) {
-      return queryInterface.bulkDelete('projectSteps', { project_id: projects[0].id });
+      return queryInterface.bulkDelete("projectSteps", {
+        project_id: projects[0].id,
+      });
     }
-  }
+  },
 };

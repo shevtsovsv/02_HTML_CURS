@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * @file seeders/...-magic-button-lesson6-steps.js
@@ -19,73 +19,87 @@ module.exports = {
 
     const projectId = projects[0].id;
 
-    return queryInterface.bulkInsert('projectSteps', [
+    return queryInterface.bulkInsert("projectSteps", [
       {
-        instructions: 'Обновите стили .game-container для стеклянного дизайна: background rgba(255, 255, 255, 0.1), backdrop-filter blur(10px), border-radius 20px.',
+        instructions:
+          "Обновите стили .game-container для стеклянного дизайна: background rgba(255, 255, 255, 0.1), backdrop-filter blur(10px), border-radius 20px.",
         order: 1,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "cssRule", "selector": ".game-container", "property": "background", "contains": "rgba(255, 255, 255, 0.1)" },
-          { "type": "cssRule", "selector": ".game-container", "property": "backdrop-filter", "contains": "blur" }
+          {
+            type: "cssRule",
+            selector: ".game-container",
+            property: "background",
+            contains: "rgba(255, 255, 255, 0.1)",
+          },
+          {
+            type: "cssRule",
+            selector: ".game-container",
+            property: "backdrop-filter",
+            contains: "blur",
+          },
         ]),
         starterCode: JSON.stringify({
-          html: 'Полный HTML из урока 5',
-          css: 'Стили урока 5 + TODO для улучшения .game-container',
-          js: 'JavaScript урока 5'
+          html: "Полный HTML из урока 5",
+          css: "Стили урока 5 + TODO для улучшения .game-container",
+          js: "JavaScript урока 5",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        instructions: 'Добавьте функцию playClickSound() для воспроизведения звука с помощью Web Audio API.',
+        instructions:
+          "Добавьте функцию playClickSound() для воспроизведения звука с помощью Web Audio API.",
         order: 2,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "jsFunctionExists", "name": "playClickSound" },
-          { "type": "jsFunction", "name": "AudioContext", "called": true }
+          { type: "jsFunctionExists", name: "playClickSound" },
+          { type: "jsFunction", name: "AudioContext", called: true },
         ]),
         starterCode: JSON.stringify({
-          html: 'Финальный HTML',
-          css: 'Стили со стеклянным дизайном',
-          js: 'JavaScript + TODO для функции звука'
+          html: "Финальный HTML",
+          css: "Стили со стеклянным дизайном",
+          js: "JavaScript + TODO для функции звука",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        instructions: 'Создайте систему достижений: функцию checkAchievements() и div для отображения достижений.',
+        instructions:
+          "Создайте систему достижений: функцию checkAchievements() и div для отображения достижений.",
         order: 3,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "jsFunctionExists", "name": "checkAchievements" },
-          { "type": "elementExists", "selector": "#achievements" }
+          { type: "jsFunctionExists", name: "checkAchievements" },
+          { type: "elementExists", selector: "#achievements" },
         ]),
         starterCode: JSON.stringify({
-          html: 'HTML + div для достижений',
-          css: 'Финальные стили + .achievement класс',
-          js: 'Полный JavaScript с достижениями'
+          html: "HTML + div для достижений",
+          css: "Финальные стили + .achievement класс",
+          js: "Полный JavaScript с достижениями",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        instructions: 'Финальная проверка: убедитесь, что все работает - кнопка кликабельна, счетчик обновляется, звуки играют, достижения показываются.',
+        instructions:
+          "Финальная проверка: убедитесь, что все работает - кнопка кликабельна, счетчик обновляется, звуки играют, достижения показываются.",
         order: 4,
         project_id: projectId,
         validationRules: JSON.stringify([
-          { "type": "elementExists", "selector": ".magic-button" },
-          { "type": "jsEventListener", "event": "click", "exists": true },
-          { "type": "jsFunctionExists", "name": "playClickSound" },
-          { "type": "jsFunctionExists", "name": "checkAchievements" }
+          { type: "elementExists", selector: ".magic-button" },
+          { type: "jsEventListener", event: "click", exists: true },
+          { type: "jsFunctionExists", name: "playClickSound" },
+          { type: "jsFunctionExists", name: "checkAchievements" },
         ]),
         starterCode: JSON.stringify({
-          html: 'Готовый HTML игры',
-          css: 'Готовые стили игры',
-          js: 'Готовый JavaScript игры'
+          html: "Готовый HTML игры",
+          css: "Готовые стили игры",
+          js: "Готовый JavaScript игры",
         }),
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ]);
   },
 
@@ -97,7 +111,9 @@ module.exports = {
     );
 
     if (projects.length > 0) {
-      return queryInterface.bulkDelete('projectSteps', { project_id: projects[0].id });
+      return queryInterface.bulkDelete("projectSteps", {
+        project_id: projects[0].id,
+      });
     }
-  }
+  },
 };

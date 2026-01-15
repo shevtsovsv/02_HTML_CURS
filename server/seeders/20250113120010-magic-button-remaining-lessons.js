@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * @file seeders/...-magic-button-remaining-lessons.js
@@ -16,36 +16,55 @@ module.exports = {
 
     if (lesson3Projects.length > 0) {
       const projectId3 = lesson3Projects[0].id;
-      await queryInterface.bulkInsert('projectSteps', [
+      await queryInterface.bulkInsert("projectSteps", [
         {
           instructions: 'Добавьте класс "magic-button" к кнопке в HTML.',
           order: 1,
           project_id: projectId3,
-          validationRules: JSON.stringify([{ "type": "elementExists", "selector": "button.magic-button" }]),
+          validationRules: JSON.stringify([
+            { type: "elementExists", selector: "button.magic-button" },
+          ]),
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
-          instructions: 'Создайте CSS правило для .magic-button с градиентным фоном, белым цветом текста, без границы.',
+          instructions:
+            "Создайте CSS правило для .magic-button с градиентным фоном, белым цветом текста, без границы.",
           order: 2,
           project_id: projectId3,
           validationRules: JSON.stringify([
-            { "type": "cssRule", "selector": ".magic-button", "property": "background", "contains": "linear-gradient" },
-            { "type": "cssRule", "selector": ".magic-button", "property": "color", "expected": "white" }
+            {
+              type: "cssRule",
+              selector: ".magic-button",
+              property: "background",
+              contains: "linear-gradient",
+            },
+            {
+              type: "cssRule",
+              selector: ".magic-button",
+              property: "color",
+              expected: "white",
+            },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
-          instructions: 'Добавьте CSS правило для .magic-button:hover с эффектами transform и изменением box-shadow.',
+          instructions:
+            "Добавьте CSS правило для .magic-button:hover с эффектами transform и изменением box-shadow.",
           order: 3,
           project_id: projectId3,
           validationRules: JSON.stringify([
-            { "type": "cssRule", "selector": ".magic-button:hover", "property": "transform", "contains": "scale" }
+            {
+              type: "cssRule",
+              selector: ".magic-button:hover",
+              property: "transform",
+              contains: "scale",
+            },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       ]);
     }
 
@@ -58,34 +77,41 @@ module.exports = {
 
     if (lesson4Projects.length > 0) {
       const projectId4 = lesson4Projects[0].id;
-      await queryInterface.bulkInsert('projectSteps', [
+      await queryInterface.bulkInsert("projectSteps", [
         {
-          instructions: 'Создайте переменную let clickCount = 0; для подсчета кликов.',
+          instructions:
+            "Создайте переменную let clickCount = 0; для подсчета кликов.",
           order: 1,
           project_id: projectId4,
-          validationRules: JSON.stringify([{ "type": "jsVariableExists", "name": "clickCount" }]),
+          validationRules: JSON.stringify([
+            { type: "jsVariableExists", name: "clickCount" },
+          ]),
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
-          instructions: 'Получите ссылку на кнопку с помощью document.querySelector(".magic-button").',
+          instructions:
+            'Получите ссылку на кнопку с помощью document.querySelector(".magic-button").',
           order: 2,
           project_id: projectId4,
-          validationRules: JSON.stringify([{ "type": "jsFunction", "name": "querySelector", "called": true }]),
+          validationRules: JSON.stringify([
+            { type: "jsFunction", name: "querySelector", called: true },
+          ]),
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
-          instructions: 'Добавьте обработчик события click к кнопке и создайте массив с волшебными фразами.',
+          instructions:
+            "Добавьте обработчик события click к кнопке и создайте массив с волшебными фразами.",
           order: 3,
           project_id: projectId4,
           validationRules: JSON.stringify([
-            { "type": "jsFunction", "name": "addEventListener", "called": true },
-            { "type": "jsFunction", "name": "alert", "called": true }
+            { type: "jsFunction", name: "addEventListener", called: true },
+            { type: "jsFunction", name: "alert", called: true },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       ]);
     }
 
@@ -98,29 +124,36 @@ module.exports = {
 
     if (lesson5Projects.length > 0) {
       const projectId5 = lesson5Projects[0].id;
-      await queryInterface.bulkInsert('projectSteps', [
+      await queryInterface.bulkInsert("projectSteps", [
         {
-          instructions: 'Добавьте блок статистики в HTML: div с классом "stats" и span с id="click-counter".',
+          instructions:
+            'Добавьте блок статистики в HTML: div с классом "stats" и span с id="click-counter".',
           order: 1,
           project_id: projectId5,
           validationRules: JSON.stringify([
-            { "type": "elementExists", "selector": "div.stats" },
-            { "type": "elementExists", "selector": "#click-counter" }
+            { type: "elementExists", selector: "div.stats" },
+            { type: "elementExists", selector: "#click-counter" },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
-          instructions: 'Добавьте CSS стили для .stats и обновите JavaScript для показа счетчика на экране.',
+          instructions:
+            "Добавьте CSS стили для .stats и обновите JavaScript для показа счетчика на экране.",
           order: 2,
           project_id: projectId5,
           validationRules: JSON.stringify([
-            { "type": "cssRule", "selector": ".stats", "property": "background", "contains": "rgba" },
-            { "type": "jsFunction", "name": "getElementById", "called": true }
+            {
+              type: "cssRule",
+              selector: ".stats",
+              property: "background",
+              contains: "rgba",
+            },
+            { type: "jsFunction", name: "getElementById", called: true },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       ]);
     }
 
@@ -133,32 +166,39 @@ module.exports = {
 
     if (lesson6Projects.length > 0) {
       const projectId6 = lesson6Projects[0].id;
-      await queryInterface.bulkInsert('projectSteps', [
+      await queryInterface.bulkInsert("projectSteps", [
         {
-          instructions: 'Обновите стили .game-container для стеклянного дизайна с backdrop-filter.',
+          instructions:
+            "Обновите стили .game-container для стеклянного дизайна с backdrop-filter.",
           order: 1,
           project_id: projectId6,
           validationRules: JSON.stringify([
-            { "type": "cssRule", "selector": ".game-container", "property": "backdrop-filter", "contains": "blur" }
+            {
+              type: "cssRule",
+              selector: ".game-container",
+              property: "backdrop-filter",
+              contains: "blur",
+            },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
-          instructions: 'Добавьте функции playClickSound() и checkAchievements() для звуков и достижений.',
+          instructions:
+            "Добавьте функции playClickSound() и checkAchievements() для звуков и достижений.",
           order: 2,
           project_id: projectId6,
           validationRules: JSON.stringify([
-            { "type": "jsFunctionExists", "name": "playClickSound" },
-            { "type": "jsFunctionExists", "name": "checkAchievements" }
+            { type: "jsFunctionExists", name: "playClickSound" },
+            { type: "jsFunctionExists", name: "checkAchievements" },
           ]),
           createdAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       ]);
     }
 
-    console.log('Созданы шаги для уроков 3-6 курса Magic Button');
+    console.log("Созданы шаги для уроков 3-6 курса Magic Button");
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -170,10 +210,10 @@ module.exports = {
     );
 
     if (projects.length > 0) {
-      const projectIds = projects.map(p => p.id);
-      return queryInterface.bulkDelete('projectSteps', {
-        project_id: { [Sequelize.Op.in]: projectIds }
+      const projectIds = projects.map((p) => p.id);
+      return queryInterface.bulkDelete("projectSteps", {
+        project_id: { [Sequelize.Op.in]: projectIds },
       });
     }
-  }
+  },
 };

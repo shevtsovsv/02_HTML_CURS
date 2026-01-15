@@ -62,7 +62,7 @@ const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
         }
       });
     `;
-    
+
     return `
       <!DOCTYPE html>
       <html>
@@ -87,10 +87,10 @@ const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
       sandbox="allow-scripts allow-popups allow-forms"
       width="100%"
       height="100%"
-      style={{ 
-        border: "none", 
+      style={{
+        border: "none",
         backgroundColor: "#fff",
-        isolation: "isolate" 
+        isolation: "isolate",
       }}
     />
   );
