@@ -1,0 +1,108 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f8ff;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+#game-info {
+  margin-bottom: 15px;
+  font-size: 18px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+#game-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+.card {
+  width: 100px;
+  height: 100px;
+  background-color: #4a6fa5;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-front {
+  background-color: #ffcc00;
+  display: none; /* Изначально скрыта */
+}
+
+.card-back {
+  background-color: #4a6fa5;
+  color: white;
+  font-size: 24px;
+}
+
+.card.flipped .card-front {
+  display: flex; /* Показываем картинку */
+}
+
+.card.flipped .card-back {
+  display: none; /* Скрываем рубашку */
+}
+
+.card.matched {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.card.matched .card-front {
+  display: flex; /* Всегда показываем картинку у найденных пар */
+  background-color: #a5d6a7; /* Зеленый фон для найденных */
+  border: 3px solid #4caf50; /* Зеленая рамка */
+}
+
+.card.matched .card-back {
+  display: none; /* Всегда скрываем рубашку у найденных пар */
+}
+
+.card img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #45a049;
+}

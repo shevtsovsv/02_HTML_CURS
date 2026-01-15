@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 1: HTML основы игрового интерфейса</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #f093fb 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "🔢📝✨";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #74b9ff;
+      }
+
+      .section h2 {
+        color: #74b9ff;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(116, 185, 255, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #74b9ff;
+      }
+
+      .html-tag {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .html-attr {
+        color: #f39c12;
+      }
+
+      .html-value {
+        color: #2ecc71;
+      }
+
+      .html-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .demo-container {
+        background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+        border: 2px solid #74b9ff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-container h3 {
+        color: #2d3436;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .form-showcase {
+        background: linear-gradient(135deg, #e8f5e8, #d5edd5);
+        border: 2px solid #00b894;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .form-showcase h3 {
+        color: #00b894;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .form-example {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 15px 0;
+      }
+
+      .input-demo {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 300px;
+        margin: 0 auto;
+      }
+
+      .input-demo label {
+        font-weight: bold;
+        color: #2d3436;
+        margin-bottom: 5px;
+      }
+
+      .input-demo input {
+        padding: 12px 15px;
+        border: 2px solid #74b9ff;
+        border-radius: 25px;
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .input-demo input:focus {
+        border-color: #0984e3;
+        box-shadow: 0 0 15px rgba(116, 185, 255, 0.3);
+        transform: scale(1.05);
+      }
+
+      .input-demo input:invalid {
+        border-color: #e74c3c;
+        box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+      }
+
+      .input-demo button {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .input-demo button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(116, 185, 255, 0.4);
+      }
+
+      .semantic-showcase {
+        background: linear-gradient(135deg, #fff5e6, #ffe6cc);
+        border: 2px solid #f39c12;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .semantic-showcase h3 {
+        color: #d68910;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .semantic-structure {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 4px solid #f39c12;
+      }
+
+      .structure-level {
+        margin-left: 20px;
+        padding: 10px;
+        border-left: 2px solid #ddd;
+        margin-bottom: 10px;
+      }
+
+      .structure-level h4 {
+        color: #d68910;
+        font-size: 1rem;
+        margin-bottom: 5px;
+      }
+
+      .structure-level p {
+        color: #5d4e37;
+        font-size: 0.9rem;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .accessibility-tips {
+        background: linear-gradient(135deg, #e8e8ff, #d1d1ff);
+        border: 2px solid #6c5ce7;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .accessibility-tips h3 {
+        color: #5f3dc4;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .tip-card {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #6c5ce7;
+      }
+
+      .tip-card h4 {
+        color: #5f3dc4;
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .tip-card p {
+        color: #4c3788;
+        font-size: 0.9rem;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "📝";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(116, 185, 255, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .tips-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .input-demo {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>📝 Урок 1: HTML основы</h1>
+        <p class="lesson-info">
+          Создаём игровой интерфейс с формами ввода чисел
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы изучим, как создавать HTML-структуру для игры
+            "Угадай число". Научимся работать с числовыми полями ввода,
+            валидацией и семантической разметкой.
+          </p>
+          <p>
+            Ты узнаешь, как правильно структурировать игровой интерфейс и
+            сделать его доступным для всех пользователей, включая людей с
+            ограниченными возможностями.
+          </p>
+        </div>
+
+        <div class="demo-container">
+          <h3>Демонстрация структуры игры</h3>
+          <p>Вот как выглядит основная структура нашей игры:</p>
+
+          <div class="form-example">
+            <div class="input-demo">
+              <label for="demoGuess">Твоя попытка (1-50):</label>
+              <input
+                type="number"
+                id="demoGuess"
+                min="1"
+                max="50"
+                placeholder="Введи число..."
+                required
+              />
+              <button type="button" onclick="showDemoFeedback()">
+                🎯 Проверить
+              </button>
+              <div
+                id="demoResult"
+                style="margin-top: 10px; font-weight: bold; color: #0984e3"
+              >
+                Введи число от 1 до 50
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🏗️ Базовая HTML структура</h2>
+          <p>
+            Начнём с создания базовой структуры HTML-документа. Игра "Угадай
+            число" требует чёткой организации элементов для удобства
+            пользователя.
+          </p>
+
+          <div class="code-title">🏗️ Базовый HTML шаблон</div>
+          <div class="code-example">
+            <pre><span class="html-comment">&lt;!-- Базовая структура HTML документа --&gt;</span>
+<span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html <span class="html-attr">lang</span>=<span class="html-value">"ru"</span>&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta <span class="html-attr">charset</span>=<span class="html-value">"UTF-8"</span>&gt;</span>
+    <span class="html-tag">&lt;meta <span class="html-attr">name</span>=<span class="html-value">"viewport"</span> <span class="html-attr">content</span>=<span class="html-value">"width=device-width, initial-scale=1.0"</span>&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>Угадай число - Математический детектив!<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"game-container"</span>&gt;</span>
+        <span class="html-comment">&lt;!-- Здесь будет содержимое игры --&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+          </div>
+
+          <p>
+            Атрибут <span class="highlight">lang="ru"</span> сообщает браузерам
+            и экранным читалкам, что контент на русском языке.
+            <span class="highlight">viewport</span>
+            мета-тег обеспечивает корректное отображение на мобильных
+            устройствах.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🔢 Числовые поля ввода</h2>
+          <p>
+            Самый важный элемент игры - поле для ввода числа. Используем
+            специальный тип input для работы с числами и добавляем валидацию.
+          </p>
+
+          <div class="code-title">🔢 Числовой input с валидацией</div>
+          <div class="code-example">
+            <pre><span class="html-comment">&lt;!-- Контейнер для ввода числа --&gt;</span>
+<span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"input-section"</span>&gt;</span>
+    <span class="html-tag">&lt;label <span class="html-attr">for</span>=<span class="html-value">"guessInput"</span>&gt;</span>
+        Введи число от <span class="html-tag">&lt;span <span class="html-attr">id</span>=<span class="html-value">"minRange"</span>&gt;</span>1<span class="html-tag">&lt;/span&gt;</span> 
+        до <span class="html-tag">&lt;span <span class="html-attr">id</span>=<span class="html-value">"maxRange"</span>&gt;</span>50<span class="html-tag">&lt;/span&gt;</span>:
+    <span class="html-tag">&lt;/label&gt;</span>
+    
+    <span class="html-tag">&lt;input</span>
+        <span class="html-attr">type</span>=<span class="html-value">"number"</span>
+        <span class="html-attr">id</span>=<span class="html-value">"guessInput"</span>
+        <span class="html-attr">name</span>=<span class="html-value">"guess"</span>
+        <span class="html-attr">min</span>=<span class="html-value">"1"</span>
+        <span class="html-attr">max</span>=<span class="html-value">"50"</span>
+        <span class="html-attr">placeholder</span>=<span class="html-value">"Твоя попытка..."</span>
+        <span class="html-attr">required</span>
+        <span class="html-attr">autofocus</span>
+        <span class="html-attr">aria-describedby</span>=<span class="html-value">"guessHelp"</span>
+    <span class="html-tag">/&gt;</span>
+    
+    <span class="html-tag">&lt;button <span class="html-attr">type</span>=<span class="html-value">"button"</span> <span class="html-attr">id</span>=<span class="html-value">"guessButton"</span>&gt;</span>
+        🎯 Проверить
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;div <span class="html-attr">id</span>=<span class="html-value">"guessHelp"</span> <span class="html-attr">class</span>=<span class="html-value">"help-text"</span>&gt;</span>
+        Число должно быть от 1 до 50
+    <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/div&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">type="number"</span> создаёт поле только для
+            чисел. Атрибуты <span class="highlight">min</span> и
+            <span class="highlight">max</span> ограничивают диапазон, а
+            <span class="highlight">required</span> делает поле обязательным.
+          </p>
+        </div>
+
+        <div class="form-showcase">
+          <h3>🛠️ Расширенная валидация</h3>
+          <p>
+            Добавим дополнительные атрибуты для улучшения пользовательского
+            опыта:
+          </p>
+
+          <div class="code-title">🛠️ Продвинутая валидация</div>
+          <div class="code-example">
+            <pre><span class="html-comment">&lt;!-- Форма с расширенной валидацией --&gt;</span>
+<span class="html-tag">&lt;form <span class="html-attr">id</span>=<span class="html-value">"guessForm"</span> <span class="html-attr">novalidate</span>&gt;</span>
+    <span class="html-tag">&lt;fieldset&gt;</span>
+        <span class="html-tag">&lt;legend&gt;</span>Игровая область<span class="html-tag">&lt;/legend&gt;</span>
+        
+        <span class="html-tag">&lt;input</span>
+            <span class="html-attr">type</span>=<span class="html-value">"number"</span>
+            <span class="html-attr">id</span>=<span class="html-value">"playerGuess"</span>
+            <span class="html-attr">min</span>=<span class="html-value">"1"</span>
+            <span class="html-attr">max</span>=<span class="html-value">"50"</span>
+            <span class="html-attr">step</span>=<span class="html-value">"1"</span>
+            <span class="html-attr">pattern</span>=<span class="html-value">"[0-9]+"</span>
+            <span class="html-attr">inputmode</span>=<span class="html-value">"numeric"</span>
+            <span class="html-attr">autocomplete</span>=<span class="html-value">"off"</span>
+            <span class="html-attr">aria-invalid</span>=<span class="html-value">"false"</span>
+        <span class="html-tag">/&gt;</span>
+        
+        <span class="html-tag">&lt;div <span class="html-attr">id</span>=<span class="html-value">"validationMessage"</span> <span class="html-attr">class</span>=<span class="html-value">"error-message"</span>&gt;&lt;/div&gt;</span>
+    <span class="html-tag">&lt;/fieldset&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">inputmode="numeric"</span> показывает
+            цифровую клавиатуру на мобильных.
+            <span class="highlight">novalidate</span> отключает стандартную
+            валидацию браузера для кастомной.
+          </p>
+        </div>
+
+        <div class="semantic-showcase">
+          <h3>🏷️ Семантическая структура</h3>
+          <p>Правильная семантика делает код понятным и доступным:</p>
+
+          <div class="semantic-structure">
+            <div class="structure-level">
+              <h4>&lt;main&gt; - Основное содержимое</h4>
+              <p>Содержит главную игровую область</p>
+
+              <div class="structure-level">
+                <h4>&lt;header&gt; - Заголовок игры</h4>
+                <p>Название, описание правил, статистика</p>
+              </div>
+
+              <div class="structure-level">
+                <h4>&lt;section&gt; - Игровая зона</h4>
+                <p>Поле ввода, кнопки, результаты</p>
+              </div>
+
+              <div class="structure-level">
+                <h4>&lt;aside&gt; - Дополнительная информация</h4>
+                <p>Подсказки, достижения, история</p>
+              </div>
+
+              <div class="structure-level">
+                <h4>&lt;footer&gt; - Подвал</h4>
+                <p>Дополнительные кнопки и настройки</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="code-title">🏷️ Семантическая разметка</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;main <span class="html-attr">class</span>=<span class="html-value">"game-container"</span>&gt;</span>
+    <span class="html-tag">&lt;header <span class="html-attr">class</span>=<span class="html-value">"game-header"</span>&gt;</span>
+        <span class="html-tag">&lt;h1&gt;</span>🎯 Угадай число<span class="html-tag">&lt;/h1&gt;</span>
+        <span class="html-tag">&lt;p <span class="html-attr">class</span>=<span class="html-value">"game-description"</span>&gt;</span>
+            Я загадал число от 1 до 50. Попробуй угадать!
+        <span class="html-tag">&lt;/p&gt;</span>
+    <span class="html-tag">&lt;/header&gt;</span>
+    
+    <span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"game-area"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Игровая зона"</span>&gt;</span>
+        <span class="html-comment">&lt;!-- Здесь форма ввода --&gt;</span>
+    <span class="html-tag">&lt;/section&gt;</span>
+    
+    <span class="html-tag">&lt;aside <span class="html-attr">class</span>=<span class="html-value">"game-info"</span>&gt;</span>
+        <span class="html-tag">&lt;h2&gt;</span>📊 Статистика<span class="html-tag">&lt;/h2&gt;</span>
+        <span class="html-comment">&lt;!-- Статистика игры --&gt;</span>
+    <span class="html-tag">&lt;/aside&gt;</span>
+<span class="html-tag">&lt;/main&gt;</span></pre>
+          </div>
+        </div>
+
+        <div class="accessibility-tips">
+          <h3>♿ Доступность и ARIA</h3>
+          <p>Делаем игру доступной для всех пользователей:</p>
+
+          <div class="tips-grid">
+            <div class="tip-card">
+              <h4>ARIA Labels</h4>
+              <p>
+                Используй aria-label для описания назначения элементов экранным
+                читалкам
+              </p>
+            </div>
+
+            <div class="tip-card">
+              <h4>Связи элементов</h4>
+              <p>
+                aria-describedby связывает input с подсказками и сообщениями об
+                ошибках
+              </p>
+            </div>
+
+            <div class="tip-card">
+              <h4>Состояния</h4>
+              <p>aria-invalid показывает, есть ли ошибки в поле ввода</p>
+            </div>
+
+            <div class="tip-card">
+              <h4>Живые области</h4>
+              <p>aria-live анонсирует изменения результатов игры</p>
+            </div>
+          </div>
+
+          <div class="code-title">♿ ARIA атрибуты</div>
+          <div class="code-example">
+            <pre><span class="html-comment">&lt;!-- Доступная игровая форма --&gt;</span>
+<span class="html-tag">&lt;form <span class="html-attr">role</span>=<span class="html-value">"form"</span> <span class="html-attr">aria-labelledby</span>=<span class="html-value">"game-title"</span>&gt;</span>
+    <span class="html-tag">&lt;h2 <span class="html-attr">id</span>=<span class="html-value">"game-title"</span>&gt;</span>Твоя попытка<span class="html-tag">&lt;/h2&gt;</span>
+    
+    <span class="html-tag">&lt;label <span class="html-attr">for</span>=<span class="html-value">"guess"</span> <span class="html-attr">class</span>=<span class="html-value">"visually-hidden"</span>&gt;</span>
+        Введи число от 1 до 50
+    <span class="html-tag">&lt;/label&gt;</span>
+    
+    <span class="html-tag">&lt;input</span>
+        <span class="html-attr">type</span>=<span class="html-value">"number"</span>
+        <span class="html-attr">id</span>=<span class="html-value">"guess"</span>
+        <span class="html-attr">aria-label</span>=<span class="html-value">"Твоё число от 1 до 50"</span>
+        <span class="html-attr">aria-describedby</span>=<span class="html-value">"range-info error-msg"</span>
+        <span class="html-attr">aria-required</span>=<span class="html-value">"true"</span>
+    <span class="html-tag">/&gt;</span>
+    
+    <span class="html-tag">&lt;div <span class="html-attr">id</span>=<span class="html-value">"range-info"</span>&gt;</span>Диапазон: 1-50<span class="html-tag">&lt;/div&gt;</span>
+    <span class="html-tag">&lt;div <span class="html-attr">id</span>=<span class="html-value">"error-msg"</span> <span class="html-attr">role</span>=<span class="html-value">"alert"</span>&gt;&lt;/div&gt;</span>
+    
+    <span class="html-tag">&lt;div <span class="html-attr">id</span>=<span class="html-value">"game-result"</span> <span class="html-attr">aria-live</span>=<span class="html-value">"polite"</span>&gt;&lt;/div&gt;</span>
+<span class="html-tag">&lt;/form&gt;</span></pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 Структура статистики</h2>
+          <p>
+            Игра должна показывать статистику: количество попыток, лучший
+            результат, процент побед. Используем семантические элементы для
+            структурирования данных.
+          </p>
+
+          <div class="code-title">📊 HTML для статистики</div>
+          <div class="code-example">
+            <pre><span class="html-comment">&lt;!-- Раздел статистики игры --&gt;</span>
+<span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"game-stats"</span> <span class="html-attr">aria-labelledby</span>=<span class="html-value">"stats-title"</span>&gt;</span>
+    <span class="html-tag">&lt;h3 <span class="html-attr">id</span>=<span class="html-value">"stats-title"</span>&gt;</span>📊 Твоя статистика<span class="html-tag">&lt;/h3&gt;</span>
+    
+    <span class="html-tag">&lt;dl <span class="html-attr">class</span>=<span class="html-value">"stats-list"</span>&gt;</span>
+        <span class="html-tag">&lt;dt&gt;</span>Попытки в игре:<span class="html-tag">&lt;/dt&gt;</span>
+        <span class="html-tag">&lt;dd <span class="html-attr">id</span>=<span class="html-value">"currentAttempts"</span>&gt;</span>0<span class="html-tag">&lt;/dd&gt;</span>
+        
+        <span class="html-tag">&lt;dt&gt;</span>Максимум попыток:<span class="html-tag">&lt;/dt&gt;</span>
+        <span class="html-tag">&lt;dd <span class="html-attr">id</span>=<span class="html-value">"maxAttempts"</span>&gt;</span>7<span class="html-tag">&lt;/dd&gt;</span>
+        
+        <span class="html-tag">&lt;dt&gt;</span>Всего игр:<span class="html-tag">&lt;/dt&gt;</span>
+        <span class="html-tag">&lt;dd <span class="html-attr">id</span>=<span class="html-value">"totalGames"</span>&gt;</span>0<span class="html-tag">&lt;/dd&gt;</span>
+        
+        <span class="html-tag">&lt;dt&gt;</span>Побед:<span class="html-tag">&lt;/dt&gt;</span>
+        <span class="html-tag">&lt;dd <span class="html-attr">id</span>=<span class="html-value">"gamesWon"</span>&gt;</span>0<span class="html-tag">&lt;/dd&gt;</span>
+        
+        <span class="html-tag">&lt;dt&gt;</span>Лучший результат:<span class="html-tag">&lt;/dt&gt;</span>
+        <span class="html-tag">&lt;dd <span class="html-attr">id</span>=<span class="html-value">"bestScore"</span>&gt;</span>-<span class="html-tag">&lt;/dd&gt;</span>
+    <span class="html-tag">&lt;/dl&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            Элемент <span class="highlight">&lt;dl&gt;</span> (definition list)
+            идеально подходит для пар "термин-описание".
+            <span class="highlight">&lt;dt&gt;</span> - термин,
+            <span class="highlight">&lt;dd&gt;</span> - определение.
+          </p>
+        </div>
+
+        <div class="task-section">
+          <h3>📝 Твоё задание</h3>
+          <p>Создай базовую HTML-структуру для игры "Угадай число":</p>
+
+          <ol class="task-list">
+            <li>Создай HTML-документ с правильным DOCTYPE и meta-тегами</li>
+            <li>Добавь семантические элементы: main, header, section, aside</li>
+            <li>Создай форму с числовым полем ввода и валидацией</li>
+            <li>Добавь label и связи между элементами</li>
+            <li>Реализуй структуру для отображения статистики</li>
+            <li>Добавь ARIA-атрибуты для доступности</li>
+            <li>Создай контейнер для отображения результатов</li>
+            <li>Протестируй с экранной читалкой или валидатором</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Помни: хорошая HTML-структура - основа любого веб-приложения!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="guess-lesson-2.html" class="next-lesson">
+            Следующий урок: CSS дизайн →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демонстрация валидации для урока
+      function showDemoFeedback() {
+        const input = document.getElementById("demoGuess");
+        const result = document.getElementById("demoResult");
+        const value = parseInt(input.value);
+
+        if (input.value === "") {
+          result.textContent = "Пожалуйста, введи число!";
+          result.style.color = "#e74c3c";
+          return;
+        }
+
+        if (isNaN(value)) {
+          result.textContent = "Это не число! Попробуй ещё раз.";
+          result.style.color = "#e74c3c";
+          return;
+        }
+
+        if (value < 1 || value > 50) {
+          result.textContent = "Число должно быть от 1 до 50!";
+          result.style.color = "#e74c3c";
+          return;
+        }
+
+        result.textContent = `✅ Отлично! Ты ввёл число ${value}. В настоящей игре здесь была бы проверка!`;
+        result.style.color = "#00b894";
+
+        // Сброс через 3 секунды
+        setTimeout(() => {
+          input.value = "";
+          result.textContent = "Введи число от 1 до 50";
+          result.style.color = "#0984e3";
+        }, 3000);
+      }
+
+      // Анимация появления элементов
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .demo-container, .form-showcase, .semantic-showcase, .accessibility-tips, .task-section"
+        );
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+
+        // Обработка Enter в демо-поле
+        document
+          .getElementById("demoGuess")
+          .addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              showDemoFeedback();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

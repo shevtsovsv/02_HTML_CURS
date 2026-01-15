@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 2: CSS стилизация игры "Волшебная кнопка"</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f0f8ff;
+        padding: 20px;
+      }
+
+      .back-to-menu {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-menu:hover {
+        background: #ff5252;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-number {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 30px;
+        border-radius: 15px;
+        background: #f8f9fa;
+        border-left: 5px solid #ff6b6b;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        margin-bottom: 15px;
+        margin-top: 25px;
+        font-size: 1.4rem;
+      }
+
+      .section p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 25px;
+        border-radius: 10px;
+        margin: 20px 0;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        line-height: 1.5;
+        border-left: 4px solid #ff6b6b;
+      }
+
+      .code-block pre {
+        margin: 0;
+      }
+
+      .highlight {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #f39c12;
+        margin: 20px 0;
+      }
+
+      .highlight h4 {
+        color: #8b4513;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      .highlight p {
+        color: #8b4513;
+        margin: 0;
+      }
+
+      .demo-container {
+        background: white;
+        border: 2px dashed #ddd;
+        border-radius: 10px;
+        padding: 30px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .before-after {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .before-after .demo-box {
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      .before-after .before {
+        background: #f8f9fa;
+        border: 2px solid #ddd;
+      }
+
+      .before-after .after {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .basic-button {
+        background: #ddd;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .styled-button {
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .styled-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+      }
+
+      .css-property {
+        background: #e8f5e8;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin: 10px 0;
+        font-family: "Courier New", monospace;
+      }
+
+      .css-property strong {
+        color: #155724;
+      }
+
+      .properties-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding: 20px 0;
+        border-top: 1px solid #eee;
+      }
+
+      .nav-btn {
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .before-after {
+          grid-template-columns: 1fr;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-menu"> ← Вернуться к урокам </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🎨 CSS стилизация</h1>
+        <p class="lesson-number">Урок 2 из 5</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы изучим CSS (Cascading Style Sheets) и превратим нашу
+            простую HTML страницу в красивую и стильную игру. CSS отвечает за
+            внешний вид веб-страниц.
+          </p>
+
+          <div class="highlight">
+            <h4>💡 Что вы узнаете:</h4>
+            <p>
+              • Что такое CSS и как он работает<br />
+              • Как подключить стили к HTML<br />
+              • Основные CSS свойства<br />
+              • Как создавать градиенты и эффекты
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📚 Основы CSS</h2>
+
+          <h3>Что такое CSS?</h3>
+          <p>
+            CSS позволяет нам изменять внешний вид HTML элементов: цвета,
+            размеры, шрифты, расположение и многое другое. CSS состоит из
+            правил, которые применяются к HTML элементам.
+          </p>
+
+          <h3>Структура CSS правила:</h3>
+          <div class="code-block">
+            <pre>
+селектор {
+  свойство: значение;
+  другое-свойство: значение;
+}</pre
+            >
+          </div>
+
+          <div class="highlight">
+            <h4>🔍 Пример:</h4>
+            <p>
+              <code>button { color: white; background: red; }</code><br />
+              Это правило сделает все кнопки белыми с красным фоном
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔄 До и после</h2>
+          <p>Посмотрите, как CSS преображает нашу страницу:</p>
+
+          <div class="before-after">
+            <div class="demo-box before">
+              <h3>ДО (только HTML)</h3>
+              <h2 style="color: black">Волшебная кнопка</h2>
+              <p style="color: black">Нажми на кнопку и увидишь магию!</p>
+              <button class="basic-button">✨ Магия! ✨</button>
+            </div>
+            <div class="demo-box after">
+              <h3>ПОСЛЕ (HTML + CSS)</h3>
+              <h2 style="text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3)">
+                Волшебная кнопка
+              </h2>
+              <p style="opacity: 0.9">Нажми на кнопку и увидишь магию!</p>
+              <button class="styled-button">✨ Магия! ✨</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🛠️ Создание стилей</h2>
+          <p>Давайте создадим красивые стили для нашей игры:</p>
+
+          <div class="code-block">
+            <pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Волшебная кнопка&lt;/title&gt;
+    &lt;style&gt;
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .game-container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .magic-button {
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        color: white;
+        border: none;
+        padding: 20px 40px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+      }
+
+      .magic-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="game-container"&gt;
+      &lt;h1&gt;Волшебная кнопка&lt;/h1&gt;
+      &lt;p&gt;Нажми на кнопку и увидишь магию!&lt;/p&gt;
+      &lt;button class="magic-button"&gt;✨ Магия! ✨&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔧 Объяснение CSS свойств</h2>
+          <p>Разберём каждое CSS свойство, которое мы использовали:</p>
+
+          <div class="properties-grid">
+            <div class="css-property">
+              <strong>font-family</strong><br />
+              Задаёт шрифт для текста
+            </div>
+            <div class="css-property">
+              <strong>background</strong><br />
+              Цвет или градиент фона
+            </div>
+            <div class="css-property">
+              <strong>linear-gradient</strong><br />
+              Создаёт плавный переход цветов
+            </div>
+            <div class="css-property">
+              <strong>border-radius</strong><br />
+              Скругляет углы элементов
+            </div>
+            <div class="css-property">
+              <strong>box-shadow</strong><br />
+              Добавляет тень к элементу
+            </div>
+            <div class="css-property">
+              <strong>transform</strong><br />
+              Позволяет поворачивать, масштабировать, перемещать элементы
+            </div>
+            <div class="css-property">
+              <strong>transition</strong><br />
+              Создаёт плавные анимации при изменениях
+            </div>
+            <div class="css-property">
+              <strong>:hover</strong><br />
+              Стили, которые применяются при наведении мыши
+            </div>
+          </div>
+
+          <div class="highlight">
+            <h4>🎨 Магия градиентов:</h4>
+            <p>
+              <code>linear-gradient(135deg, #667eea 0%, #764ba2 100%)</code
+              ><br />
+              Создаёт диагональный градиент от синего к фиолетовому
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Результат</h2>
+          <p>Вот как выглядит наша стилизованная игра:</p>
+
+          <div
+            class="demo-container"
+            style="
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+            "
+          >
+            <div
+              style="
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              "
+            >
+              <h1
+                style="
+                  font-size: 2.5rem;
+                  margin-bottom: 10px;
+                  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                "
+              >
+                Волшебная кнопка
+              </h1>
+              <p style="margin-bottom: 30px; font-size: 1.2rem">
+                Нажми на кнопку и увидишь магию!
+              </p>
+              <button class="styled-button">✨ Магия! ✨</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎓 Что вы изучили</h2>
+          <ul style="font-size: 1.1rem; line-height: 1.8">
+            <li>Основы CSS и структуру правил</li>
+            <li>Как подключить стили через тег &lt;style&gt;</li>
+            <li>Градиенты и их применение</li>
+            <li>Тени и скругление углов</li>
+            <li>Анимации и эффекты при наведении</li>
+            <li>Flexbox для центрирования элементов</li>
+          </ul>
+
+          <div class="highlight">
+            <h4>🚀 Что дальше?</h4>
+            <p>
+              В следующем уроке мы добавим JavaScript и сделаем кнопку
+              интерактивной! Научимся обрабатывать клики и показывать сообщения.
+            </p>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <a href="magic-button-lesson-1.html" class="nav-btn">
+            ← Предыдущий урок
+          </a>
+          <a href="magic-button-lesson-3.html" class="nav-btn">
+            Следующий урок →
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

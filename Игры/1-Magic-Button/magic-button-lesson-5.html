@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5: Финальные улучшения игры "Волшебная кнопка"</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f0f8ff;
+        padding: 20px;
+      }
+
+      .back-to-menu {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-menu:hover {
+        background: #ff5252;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-number {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 30px;
+        border-radius: 15px;
+        background: #f8f9fa;
+        border-left: 5px solid #ff6b6b;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        margin-bottom: 15px;
+        margin-top: 25px;
+        font-size: 1.4rem;
+      }
+
+      .section p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 25px;
+        border-radius: 10px;
+        margin: 20px 0;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        line-height: 1.5;
+        border-left: 4px solid #ff6b6b;
+      }
+
+      .code-block pre {
+        margin: 0;
+      }
+
+      .highlight {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #f39c12;
+        margin: 20px 0;
+      }
+
+      .highlight h4 {
+        color: #8b4513;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      .highlight p {
+        color: #8b4513;
+        margin: 0;
+      }
+
+      .demo-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 30px;
+        margin: 20px 0;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-game {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      .demo-button {
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        color: white;
+        border: none;
+        padding: 20px 40px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        position: relative;
+        z-index: 2;
+      }
+
+      .demo-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+      }
+
+      .demo-button.clicked {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 20px 40px rgba(255, 107, 107, 0.6);
+      }
+
+      .reset-button {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .reset-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+      }
+
+      .click-counter {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 20px 0;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .particle {
+        position: absolute;
+        font-size: 1.5rem;
+        animation: particleFloat 2s ease-out forwards;
+        pointer-events: none;
+      }
+
+      @keyframes particleFloat {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-100px) scale(0.5);
+        }
+      }
+
+      .js-concept {
+        background: #e8f5e8;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin: 15px 0;
+      }
+
+      .js-concept strong {
+        color: #155724;
+        font-size: 1.1rem;
+      }
+
+      .js-concept p {
+        color: #155724;
+        margin-top: 8px;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding: 20px 0;
+        border-top: 1px solid #eee;
+      }
+
+      .nav-btn {
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+      }
+
+      .nav-btn.disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .success-section {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border-left: 5px solid #28a745;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+
+      .success-section h2 {
+        color: #155724;
+        margin-bottom: 20px;
+      }
+
+      .success-section p {
+        color: #155724;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+        }
+        
+        .content {
+          padding: 20px;
+        }
+        
+        .header h1 {
+          font-size: 2rem;
+        }
+        
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-menu">
+      ← Вернуться к урокам
+    </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>✨ Финальные улучшения</h1>
+        <p class="lesson-number">Урок 5 из 5</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом финальном уроке мы добавим последние штрихи к нашей игре: 
+            визуальные эффекты с частицами, кнопку сброса, звуковые эффекты 
+            и сделаем игру ещё более впечатляющей!
+          </p>
+          
+          <div class="highlight">
+            <h4>💡 Что вы узнаете:</h4>
+            <p>
+              • Создание анимированных частиц<br>
+              • Добавление кнопки сброса<br>
+              • Работа со звуками (основы)<br>
+              • Финальная оптимизация кода<br>
+              • Создание полноценной игры
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📚 Новые концепции</h2>
+          
+          <div class="js-concept">
+            <strong>createElement()</strong>
+            <p>Создаёт новый HTML элемент в JavaScript, который можно добавить на страницу.</p>
+          </div>
+
+          <div class="js-concept">
+            <strong>appendChild()</strong>
+            <p>Добавляет созданный элемент как дочерний элемент к другому элементу.</p>
+          </div>
+
+          <div class="js-concept">
+            <strong>removeChild()</strong>
+            <p>Удаляет элемент из DOM (Document Object Model).</p>
+          </div>
+
+          <div class="js-concept">
+            <strong>CSS Animations</strong>
+            <p>CSS анимации через @keyframes для создания плавных визуальных эффектов.</p>
+          </div>
+
+          <div class="js-concept">
+            <strong>Audio API</strong>
+            <p>Базовая работа со звуками в браузере (воспроизведение звуковых эффектов).</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🛠️ Финальная версия игры</h2>
+          <p>Вот полный код нашей улучшенной игры:</p>
+
+          <div class="code-block">
+            <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Волшебная кнопка - Финальная версия&lt;/title&gt;
+    &lt;style&gt;
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .game-container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        max-width: 500px;
+      }
+
+      .magic-button {
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        color: white;
+        border: none;
+        padding: 20px 40px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        position: relative;
+        z-index: 2;
+      }
+
+      .magic-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+      }
+
+      .magic-button.clicked {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 20px 40px rgba(255, 107, 107, 0.6);
+      }
+
+      .reset-button {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .reset-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+      }
+
+      .click-counter {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 20px 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .particle {
+        position: absolute;
+        font-size: 1.5rem;
+        animation: particleFloat 2s ease-out forwards;
+        pointer-events: none;
+      }
+
+      @keyframes particleFloat {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-100px) scale(0.5) rotate(360deg);
+        }
+      }
+
+      .achievement {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #8b4513;
+        padding: 15px;
+        border-radius: 15px;
+        margin-top: 20px;
+        font-weight: bold;
+        border: 2px solid #ffc107;
+        animation: achievementPulse 0.5s ease-in-out;
+      }
+
+      @keyframes achievementPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="game-container"&gt;
+      &lt;div class="particles" id="particles"&gt;&lt;/div&gt;
+      &lt;h1&gt;🪄 Волшебная кнопка&lt;/h1&gt;
+      &lt;div id="clickCounter" class="click-counter"&gt;Кликов: 0&lt;/div&gt;
+      &lt;p&gt;Нажми на кнопку и увидишь магию!&lt;/p&gt;
+      &lt;button class="magic-button" onclick="showMagic()"&gt;✨ Магия! ✨&lt;/button&gt;
+      &lt;div id="magicMessage"&gt;&lt;/div&gt;
+      &lt;div id="achievements"&gt;&lt;/div&gt;
+      &lt;button class="reset-button" onclick="resetGame()"&gt;🔄 Начать сначала&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+      let clickCount = 0;
+      
+      const magicMessages = [
+        "🎉 Вау! Это действительно магия! 🎉",
+        "✨ Звёзды танцуют в небе! ✨",
+        "🌟 Ты призвал магическую силу! 🌟",
+        "🎨 Радуга появилась из ниоткуда! 🎨",
+        "🦄 Единорог мелькнул где-то рядом! 🦄",
+        "🎪 Магический цирк открыт! 🎪",
+        "🌙 Луна улыбается тебе! 🌙",
+        "⭐ Падающая звезда исполняет желания! ⭐"
+      ];
+
+      const particleEmojis = ["✨", "🌟", "💫", "⭐", "🎆", "🎇", "💥", "🔮"];
+
+      function showMagic() {
+        clickCount++;
+        
+        // Обновляем счётчик
+        document.getElementById('clickCounter').innerHTML = `Кликов: ${clickCount}`;
+        
+        // Создаём частицы
+        createParticles();
+        
+        // Проверяем достижения
+        checkAchievements();
+        
+        // Показываем сообщение
+        showRandomMessage();
+        
+        // Анимация кнопки
+        animateButton();
+        
+        // Воспроизводим звук (если доступен)
+        playClickSound();
+      }
+
+      function createParticles() {
+        const particleContainer = document.getElementById('particles');
+        
+        // Создаём 5-8 случайных частиц
+        const particleCount = 5 + Math.floor(Math.random() * 4);
+        
+        for (let i = 0; i &lt; particleCount; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.innerHTML = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
+          
+          // Случайная позиция
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.top = Math.random() * 100 + '%';
+          
+          // Случайная задержка анимации
+          particle.style.animationDelay = Math.random() * 0.5 + 's';
+          
+          particleContainer.appendChild(particle);
+          
+          // Удаляем частицу через 2.5 секунды
+          setTimeout(() =&gt; {
+            if (particle.parentNode) {
+              particle.parentNode.removeChild(particle);
+            }
+          }, 2500);
+        }
+      }
+
+      function showRandomMessage() {
+        const randomIndex = Math.floor(Math.random() * magicMessages.length);
+        const randomMessage = magicMessages[randomIndex];
+        
+        const messageElement = document.getElementById('magicMessage');
+        messageElement.innerHTML = `&lt;p style="margin-top: 20px; font-size: 1.2rem; animation: fadeIn 0.5s ease-in;"&gt;${randomMessage}&lt;/p&gt;`;
+        
+        setTimeout(() =&gt; {
+          messageElement.innerHTML = '';
+        }, 3000);
+      }
+
+      function animateButton() {
+        const button = document.querySelector('.magic-button');
+        button.classList.add('clicked');
+        
+        setTimeout(() =&gt; {
+          button.classList.remove('clicked');
+        }, 200);
+      }
+
+      function checkAchievements() {
+        const achievementContainer = document.getElementById('achievements');
+        let achievement = '';
+        
+        switch(clickCount) {
+          case 5:
+            achievement = '🏆 Первые шаги в магии!';
+            break;
+          case 10:
+            achievement = '🌟 Юный волшебник!';
+            break;
+          case 25:
+            achievement = '🔮 Опытный маг!';
+            break;
+          case 50:
+            achievement = '🧙‍♂️ Мастер магии!';
+            break;
+          case 100:
+            achievement = '👑 ЛЕГЕНДА МАГИИ!';
+            break;
+        }
+        
+        if (achievement) {
+          achievementContainer.innerHTML = `&lt;div class="achievement"&gt;${achievement}&lt;/div&gt;`;
+          
+          setTimeout(() =&gt; {
+            achievementContainer.innerHTML = '';
+          }, 5000);
+        }
+      }
+
+      function playClickSound() {
+        // Простой звук клика (если браузер поддерживает)
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+          
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.1);
+        } catch (e) {
+          // Звук не поддерживается - ничего страшного
+        }
+      }
+
+      function resetGame() {
+        clickCount = 0;
+        document.getElementById('clickCounter').innerHTML = 'Кликов: 0';
+        document.getElementById('magicMessage').innerHTML = '';
+        document.getElementById('achievements').innerHTML = '';
+        
+        // Очищаем частицы
+        const particleContainer = document.getElementById('particles');
+        particleContainer.innerHTML = '';
+        
+        // Показываем сообщение о сбросе
+        const messageElement = document.getElementById('magicMessage');
+        messageElement.innerHTML = '&lt;p style="margin-top: 20px; font-size: 1.2rem; color: #ffd700;"&gt;🔄 Игра сброшена! Начинаем заново! 🔄&lt;/p&gt;';
+        
+        setTimeout(() =&gt; {
+          messageElement.innerHTML = '';
+        }, 2000);
+      }
+
+      // Добавляем CSS анимацию для сообщений
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Попробуйте финальную версию!</h2>
+          <p>Вот как выглядит наша полностью готовая игра:</p>
+          
+          <div class="demo-container">
+            <div class="demo-game">
+              <div class="particles" id="demoParticles"></div>
+              <h1 style="font-size: 2.5rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">🪄 Волшебная кнопка</h1>
+              <div id="demoCounter" class="click-counter">Кликов: 0</div>
+              <p style="margin-bottom: 20px; font-size: 1.2rem;">Нажми на кнопку и увидишь магию!</p>
+              <button class="demo-button" onclick="demoMagic()">✨ Магия! ✨</button>
+              <div id="demoMessage"></div>
+              <div id="demoAchievements"></div>
+              <button class="reset-button" onclick="demoReset()">🔄 Начать сначала</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔧 Объяснение новых функций</h2>
+          
+          <h3>1. Система частиц:</h3>
+          <div class="code-block">
+            <pre>function createParticles() {
+  const particleContainer = document.getElementById('particles');
+  const particleCount = 5 + Math.floor(Math.random() * 4);
+  
+  for (let i = 0; i &lt; particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.innerHTML = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
+    
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    
+    particleContainer.appendChild(particle);
+  }
+}</pre>
+          </div>
+
+          <h3>2. Система достижений:</h3>
+          <p>Проверяет количество кликов и показывает особые сообщения при достижении определённых целей.</p>
+
+          <h3>3. Кнопка сброса:</h3>
+          <p>Обнуляет все счётчики и очищает экран, позволяя начать игру заново.</p>
+
+          <h3>4. Звуковые эффекты:</h3>
+          <p>Использует Web Audio API для создания простых звуков клика (работает не во всех браузерах).</p>
+        </div>
+
+        <div class="success-section">
+          <h2>🎊 Поздравляем!</h2>
+          <p>Вы успешно создали свою первую интерактивную игру!</p>
+          <p>Теперь у вас есть:</p>
+          <ul style="text-align: left; max-width: 400px; margin: 20px auto;">
+            <li>✅ Красивая HTML структура</li>
+            <li>✅ Стильная CSS анимация</li>
+            <li>✅ Интерактивный JavaScript</li>
+            <li>✅ Система счётчика</li>
+            <li>✅ Визуальные эффекты</li>
+            <li>✅ Система достижений</li>
+            <li>✅ Полноценная игра!</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🎓 Что вы изучили за весь курс</h2>
+          <ul style="font-size: 1.1rem; line-height: 1.8;">
+            <li><strong>HTML:</strong> Структура веб-страниц, теги, атрибуты</li>
+            <li><strong>CSS:</strong> Стилизация, градиенты, анимации, переходы</li>
+            <li><strong>JavaScript:</strong> Переменные, функции, события, DOM</li>
+            <li><strong>Интерактивность:</strong> Обработка кликов, изменение содержимого</li>
+            <li><strong>Анимации:</strong> CSS анимации, динамические эффекты</li>
+            <li><strong>Игровая логика:</strong> Счётчики, случайность, достижения</li>
+            <li><strong>Пользовательский опыт:</strong> Визуальная обратная связь, звуки</li>
+          </ul>
+
+          <div class="highlight">
+            <h4>🚀 Что дальше?</h4>
+            <p>
+              Теперь вы можете:<br>
+              • Изменить дизайн и цвета игры<br>
+              • Добавить новые типы сообщений<br>
+              • Создать другие мини-игры<br>
+              • Изучить более сложные возможности JavaScript<br>
+              • Поделиться своей игрой с друзьями!
+            </p>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <a href="magic-button-lesson-4.html" class="nav-btn">
+            ← Предыдущий урок
+          </a>
+          <span class="nav-btn disabled">
+            Курс завершён! 🎉
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let demoClickCount = 0;
+      const demoMagicMessages = [
+        "🎉 Вау! Это действительно магия! 🎉",
+        "✨ Звёзды танцуют в небе! ✨",
+        "🌟 Ты призвал магическую силу! 🌟"
+      ];
+      const demoParticleEmojis = ["✨", "🌟", "💫", "⭐"];
+
+      function demoMagic() {
+        demoClickCount++;
+        document.getElementById('demoCounter').innerHTML = `Кликов: ${demoClickCount}`;
+        
+        // Создаём частицы
+        const particleContainer = document.getElementById('demoParticles');
+        const particleCount = 3 + Math.floor(Math.random() * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.innerHTML = demoParticleEmojis[Math.floor(Math.random() * demoParticleEmojis.length)];
+          
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.top = Math.random() * 100 + '%';
+          particle.style.animationDelay = Math.random() * 0.5 + 's';
+          
+          particleContainer.appendChild(particle);
+          
+          setTimeout(() => {
+            if (particle.parentNode) {
+              particle.parentNode.removeChild(particle);
+            }
+          }, 2500);
+        }
+        
+        // Сообщение
+        const randomIndex = Math.floor(Math.random() * demoMagicMessages.length);
+        const randomMessage = demoMagicMessages[randomIndex];
+        const messageElement = document.getElementById('demoMessage');
+        messageElement.innerHTML = `<p style="margin-top: 20px; font-size: 1.2rem;">${randomMessage}</p>`;
+        
+        // Достижения
+        let achievement = '';
+        if (demoClickCount === 5) achievement = '🏆 Первые шаги в магии!';
+        else if (demoClickCount === 10) achievement = '🌟 Юный волшебник!';
+        
+        if (achievement) {
+          document.getElementById('demoAchievements').innerHTML = `<div class="achievement">${achievement}</div>`;
+          setTimeout(() => {
+            document.getElementById('demoAchievements').innerHTML = '';
+          }, 3000);
+        }
+        
+        // Анимация кнопки
+        const button = document.querySelector('.demo-button');
+        button.classList.add('clicked');
+        setTimeout(() => button.classList.remove('clicked'), 200);
+        
+        // Убираем сообщение
+        setTimeout(() => messageElement.innerHTML = '', 3000);
+      }
+
+      function demoReset() {
+        demoClickCount = 0;
+        document.getElementById('demoCounter').innerHTML = 'Кликов: 0';
+        document.getElementById('demoMessage').innerHTML = '<p style="margin-top: 20px; font-size: 1.2rem; color: #ffd700;">🔄 Игра сброшена!</p>';
+        document.getElementById('demoAchievements').innerHTML = '';
+        document.getElementById('demoParticles').innerHTML = '';
+        
+        setTimeout(() => {
+          document.getElementById('demoMessage').innerHTML = '';
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>

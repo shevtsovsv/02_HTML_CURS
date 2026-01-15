@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 1: HTML структура тамагочи</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #a8e6cf 0%,
+          #dcedc1 50%,
+          #ffd3a5 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "🥚→🐣→🐤→🐦→🦅";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #27ae60;
+      }
+
+      .section h2 {
+        color: #27ae60;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(46, 204, 113, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #27ae60;
+      }
+
+      .structure-preview {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #27ae60;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .structure-preview h3 {
+        color: #155724;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .pet-mockup {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 300px;
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .pet-display {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        font-size: 2rem;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .stat-bar {
+        background: #f1f3f4;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+      }
+
+      .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .action-btn {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "✨";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .tips-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .tips-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .tip-item {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+      }
+
+      .html-tag {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .attribute {
+        color: #f39c12;
+        font-weight: 600;
+      }
+
+      .string {
+        color: #2ecc71;
+      }
+
+      .comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .stats-grid,
+        .action-buttons {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🏗️ Урок 1: HTML структура тамагочи</h1>
+        <p class="lesson-info">
+          Создаём базовую разметку для виртуального питомца
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы создадим HTML-структуру для нашего тамагочи.
+            Разберём, какие элементы нужны для отображения питомца, его
+            статистики и кнопок действий.
+          </p>
+          <p>
+            Ты научишься создавать семантичную разметку для игрового интерфейса
+            с использованием современных HTML5 элементов.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>📋 Структура нашего тамагочи</h2>
+          <p>Виртуальный питомец состоит из нескольких важных частей:</p>
+
+          <div class="structure-preview">
+            <h3>Предварительный просмотр интерфейса</h3>
+            <div class="pet-mockup">
+              <div class="pet-display">
+                🥚<br /><small>Малыш (уровень 1)</small>
+              </div>
+              <div class="stats-grid">
+                <div class="stat-bar">🍎 Голод: 80%</div>
+                <div class="stat-bar">😊 Счастье: 60%</div>
+                <div class="stat-bar">💤 Энергия: 90%</div>
+                <div class="stat-bar">🛁 Чистота: 40%</div>
+              </div>
+              <div class="action-buttons">
+                <button class="action-btn">🍎 Покормить</button>
+                <button class="action-btn">🎮 Играть</button>
+                <button class="action-btn">💤 Спать</button>
+                <button class="action-btn">🛁 Мыть</button>
+              </div>
+            </div>
+            <p><em>Примерно так будет выглядеть наш тамагочи</em></p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔧 Базовая HTML разметка</h2>
+          <p>
+            Начнём с создания базовой структуры документа. Нам понадобятся
+            современные HTML5 элементы для хорошей семантики.
+          </p>
+
+          <div class="code-title">📄 Базовая структура HTML</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html</span> <span class="attribute">lang</span>=<span class="string">"ru"</span><span class="html-tag">&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+  <span class="html-tag">&lt;meta</span> <span class="attribute">charset</span>=<span class="string">"UTF-8"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;meta</span> <span class="attribute">name</span>=<span class="string">"viewport"</span> <span class="attribute">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;title&gt;</span>Мой виртуальный питомец<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+  <span class="comment">&lt;!-- Здесь будет наш тамагочи --&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">lang="ru"</span> указывает язык страницы, а
+            <span class="highlight">viewport</span> делает сайт адаптивным для
+            мобильных устройств.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🏠 Основной контейнер</h2>
+          <p>
+            Создаём главный контейнер для нашего питомца. Он будет содержать
+            весь игровой интерфейс.
+          </p>
+
+          <div class="code-title">🏠 Главный контейнер</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;main</span> <span class="attribute">class</span>=<span class="string">"pet-container"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;header</span> <span class="attribute">class</span>=<span class="string">"pet-header"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;h1&gt;</span>🐾 Мой питомец<span class="html-tag">&lt;/h1&gt;</span>
+    <span class="html-tag">&lt;p</span> <span class="attribute">class</span>=<span class="string">"pet-age"</span><span class="html-tag">&gt;</span>Возраст: <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"age"</span><span class="html-tag">&gt;</span>0<span class="html-tag">&lt;/span&gt;</span> минут<span class="html-tag">&lt;/p&gt;</span>
+  <span class="html-tag">&lt;/header&gt;</span>
+  
+  <span class="comment">&lt;!-- Здесь будет отображение питомца --&gt;</span>
+  <span class="comment">&lt;!-- Здесь будут статистики --&gt;</span>
+  <span class="comment">&lt;!-- Здесь будут кнопки действий --&gt;</span>
+<span class="html-tag">&lt;/main&gt;</span></pre>
+          </div>
+
+          <p>
+            Используем <span class="highlight">main</span> для основного
+            контента и <span class="highlight">header</span> для заголовка с
+            информацией о питомце.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🐾 Отображение питомца</h2>
+          <p>
+            Создадим область для отображения нашего виртуального друга с его
+            эмодзи и информацией о стадии развития.
+          </p>
+
+          <div class="code-title">🐾 Область питомца</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;section</span> <span class="attribute">class</span>=<span class="string">"pet-display"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"pet-avatar"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"pet-emoji"</span> <span class="attribute">class</span>=<span class="string">"emoji"</span><span class="html-tag">&gt;</span>🥚<span class="html-tag">&lt;/span&gt;</span>
+  <span class="html-tag">&lt;/div&gt;</span>
+  
+  <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"pet-info"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;h2</span> <span class="attribute">id</span>=<span class="string">"pet-stage"</span><span class="html-tag">&gt;</span>Яйцо<span class="html-tag">&lt;/h2&gt;</span>
+    <span class="html-tag">&lt;p&gt;</span>Уровень: <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"pet-level"</span><span class="html-tag">&gt;</span>1<span class="html-tag">&lt;/span&gt;</span><span class="html-tag">&lt;/p&gt;</span>
+    <span class="html-tag">&lt;p</span> <span class="attribute">id</span>=<span class="string">"pet-status"</span><span class="html-tag">&gt;</span>Спокоен<span class="html-tag">&lt;/p&gt;</span>
+  <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">id</span> атрибуты позволят нам легко
+            обновлять информацию через JavaScript, а классы помогут со
+            стилизацией.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>📊 Панель статистики</h2>
+          <p>
+            У каждого тамагочи есть важные показатели здоровья: голод, счастье,
+            энергия и чистота. Создадим для них красивые индикаторы.
+          </p>
+
+          <div class="code-title">📊 Статистики здоровья</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;section</span> <span class="attribute">class</span>=<span class="string">"pet-stats"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;h3&gt;</span>Состояние питомца<span class="html-tag">&lt;/h3&gt;</span>
+  
+  <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stats-grid"</span><span class="html-tag">&gt;</span>
+    <span class="comment">&lt;!-- Голод --&gt;</span>
+    <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-item"</span><span class="html-tag">&gt;</span>
+      <span class="html-tag">&lt;label&gt;</span>🍎 Голод<span class="html-tag">&lt;/label&gt;</span>
+      <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-bar"</span><span class="html-tag">&gt;</span>
+        <span class="html-tag">&lt;div</span> <span class="attribute">id</span>=<span class="string">"hunger-bar"</span> <span class="attribute">class</span>=<span class="string">"stat-fill"</span><span class="html-tag">&gt;</span><span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"hunger-value"</span><span class="html-tag">&gt;</span>100%<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+
+    <span class="comment">&lt;!-- Счастье --&gt;</span>
+    <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-item"</span><span class="html-tag">&gt;</span>
+      <span class="html-tag">&lt;label&gt;</span>😊 Счастье<span class="html-tag">&lt;/label&gt;</span>
+      <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-bar"</span><span class="html-tag">&gt;</span>
+        <span class="html-tag">&lt;div</span> <span class="attribute">id</span>=<span class="string">"happiness-bar"</span> <span class="attribute">class</span>=<span class="string">"stat-fill"</span><span class="html-tag">&gt;</span><span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"happiness-value"</span><span class="html-tag">&gt;</span>100%<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+
+    <span class="comment">&lt;!-- Энергия --&gt;</span>
+    <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-item"</span><span class="html-tag">&gt;</span>
+      <span class="html-tag">&lt;label&gt;</span>💤 Энергия<span class="html-tag">&lt;/label&gt;</span>
+      <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-bar"</span><span class="html-tag">&gt;</span>
+        <span class="html-tag">&lt;div</span> <span class="attribute">id</span>=<span class="string">"energy-bar"</span> <span class="attribute">class</span>=<span class="string">"stat-fill"</span><span class="html-tag">&gt;</span><span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"energy-value"</span><span class="html-tag">&gt;</span>100%<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+
+    <span class="comment">&lt;!-- Чистота --&gt;</span>
+    <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-item"</span><span class="html-tag">&gt;</span>
+      <span class="html-tag">&lt;label&gt;</span>🛁 Чистота<span class="html-tag">&lt;/label&gt;</span>
+      <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"stat-bar"</span><span class="html-tag">&gt;</span>
+        <span class="html-tag">&lt;div</span> <span class="attribute">id</span>=<span class="string">"cleanliness-bar"</span> <span class="attribute">class</span>=<span class="string">"stat-fill"</span><span class="html-tag">&gt;</span><span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;/div&gt;</span>
+      <span class="html-tag">&lt;span</span> <span class="attribute">id</span>=<span class="string">"cleanliness-value"</span><span class="html-tag">&gt;</span>100%<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+  <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            Каждый показатель имеет свой <span class="highlight">id</span> для
+            JavaScript и общий класс
+            <span class="highlight">stat-item</span> для единообразной
+            стилизации.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Кнопки действий</h2>
+          <p>
+            Создадим кнопки для взаимодействия с питомцем. Каждая кнопка будет
+            влиять на определённые статистики.
+          </p>
+
+          <div class="code-title">🎮 Панель управления</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;section</span> <span class="attribute">class</span>=<span class="string">"pet-actions"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;h3&gt;</span>Действия<span class="html-tag">&lt;/h3&gt;</span>
+  
+  <span class="html-tag">&lt;div</span> <span class="attribute">class</span>=<span class="string">"actions-grid"</span><span class="html-tag">&gt;</span>
+    <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"feed-btn"</span> <span class="attribute">class</span>=<span class="string">"action-btn"</span><span class="html-tag">&gt;</span>
+      🍎 Покормить
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"play-btn"</span> <span class="attribute">class</span>=<span class="string">"action-btn"</span><span class="html-tag">&gt;</span>
+      🎮 Играть
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"sleep-btn"</span> <span class="attribute">class</span>=<span class="string">"action-btn"</span><span class="html-tag">&gt;</span>
+      💤 Спать
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"clean-btn"</span> <span class="attribute">class</span>=<span class="string">"action-btn"</span><span class="html-tag">&gt;</span>
+      🛁 Мыть
+    <span class="html-tag">&lt;/button&gt;</span>
+  <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🏆 Дополнительные элементы</h2>
+          <p>
+            Добавим области для достижений и сохранения игры. Это сделает наш
+            тамагочи более полнофункциональным.
+          </p>
+
+          <div class="code-title">🏆 Достижения и управление</div>
+          <div class="code-example">
+            <pre><span class="comment">&lt;!-- Достижения --&gt;</span>
+<span class="html-tag">&lt;section</span> <span class="attribute">class</span>=<span class="string">"achievements"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;h3&gt;</span>🏆 Достижения<span class="html-tag">&lt;/h3&gt;</span>
+  <span class="html-tag">&lt;div</span> <span class="attribute">id</span>=<span class="string">"achievements-list"</span> <span class="attribute">class</span>=<span class="string">"achievements-grid"</span><span class="html-tag">&gt;</span>
+    <span class="comment">&lt;!-- Достижения будут добавляться JavaScript --&gt;</span>
+  <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span>
+
+<span class="comment">&lt;!-- Управление сохранением --&gt;</span>
+<span class="html-tag">&lt;section</span> <span class="attribute">class</span>=<span class="string">"game-controls"</span><span class="html-tag">&gt;</span>
+  <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"save-btn"</span> <span class="attribute">class</span>=<span class="string">"control-btn"</span><span class="html-tag">&gt;</span>
+    💾 Сохранить
+  <span class="html-tag">&lt;/button&gt;</span>
+  
+  <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"load-btn"</span> <span class="attribute">class</span>=<span class="string">"control-btn"</span><span class="html-tag">&gt;</span>
+    📁 Загрузить
+  <span class="html-tag">&lt;/button&gt;</span>
+  
+  <span class="html-tag">&lt;button</span> <span class="attribute">id</span>=<span class="string">"reset-btn"</span> <span class="attribute">class</span>=<span class="string">"control-btn danger"</span><span class="html-tag">&gt;</span>
+    🔄 Начать заново
+  <span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            Класс <span class="highlight">danger</span> для кнопки сброса
+            поможет выделить её красным цветом как потенциально опасное
+            действие.
+          </p>
+        </div>
+
+        <div class="task-section">
+          <h3>✨ Твоё задание</h3>
+          <p>
+            Создай файл <strong>tamagochi.html</strong> со следующей структурой:
+          </p>
+
+          <ol class="task-list">
+            <li>Базовая HTML5 разметка с правильным DOCTYPE</li>
+            <li>Главный контейнер с header'ом</li>
+            <li>Секция отображения питомца с эмодзи</li>
+            <li>Панель из 4 статистик с полосками прогресса</li>
+            <li>4 кнопки действий для ухода за питомцем</li>
+            <li>Область для будущих достижений</li>
+            <li>Кнопки сохранения и управления игрой</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #856404">
+            💡 Не забудь использовать семантичные HTML5 элементы: main, section,
+            header!
+          </p>
+        </div>
+
+        <div class="tips-section">
+          <h3>💡 Полезные советы</h3>
+
+          <div class="tip-item">
+            <strong>Семантика важна:</strong> Используй правильные HTML5
+            элементы. main для основного контента, section для логических
+            блоков, header для заголовков.
+          </div>
+
+          <div class="tip-item">
+            <strong>ID vs CLASS:</strong> Используй id для уникальных элементов,
+            которые будешь изменять через JavaScript (например, #pet-emoji).
+            Классы - для стилизации группы элементов.
+          </div>
+
+          <div class="tip-item">
+            <strong>Доступность:</strong> Добавляй атрибуты alt для изображений
+            и label для интерактивных элементов - это сделает игру доступной для
+            всех.
+          </div>
+
+          <div class="tip-item">
+            <strong>Планирование:</strong> Хорошая HTML структура - основа всего
+            проекта. Продумай заранее, какие элементы понадобятся для JavaScript
+            взаимодействия.
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="pet-lesson-2.html" class="next-lesson">
+            🎨 Следующий урок: CSS дизайн →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Простая анимация при загрузке
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(".section");
+
+        sections.forEach((section, index) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+
+          setTimeout(() => {
+            section.style.transition = "all 0.6s ease";
+            section.style.opacity = "1";
+            section.style.transform = "translateY(0)";
+          }, index * 200);
+        });
+
+        // Подсветка кода
+        setTimeout(() => {
+          const highlights = document.querySelectorAll(".highlight");
+          highlights.forEach((highlight) => {
+            highlight.style.animation =
+              "highlight-pulse 2s ease-in-out infinite";
+          });
+        }, 2000);
+      });
+
+      // Добавляем стиль для анимации подсветки
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes highlight-pulse {
+          0%, 100% { background-color: rgba(46, 204, 113, 0.2); }
+          50% { background-color: rgba(46, 204, 113, 0.4); }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>

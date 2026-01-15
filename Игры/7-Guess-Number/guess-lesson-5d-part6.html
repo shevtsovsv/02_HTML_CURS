@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5d-6: Персонализация и завершение курса | Угадай число</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        overflow-x: hidden;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.1) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(255, 255, 255, 0.1) 75%
+        );
+        background-size: 20px 20px;
+        animation: headerPattern 20s linear infinite;
+      }
+
+      @keyframes headerPattern {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(20px);
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: white;
+        font-size: 2.5rem;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.5rem;
+        font-size: 1.2rem;
+      }
+
+      .lesson-content {
+        background: white;
+        margin: 2rem auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-width: 1000px;
+        position: relative;
+      }
+
+      .section {
+        padding: 40px 50px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-left: 20px;
+      }
+
+      .section h2::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ecf0f1;
+      }
+
+      .theory {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 5px solid #667eea;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 10px;
+        position: relative;
+      }
+
+      .theory::before {
+        content: "🎯";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #667eea;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .practice {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        position: relative;
+      }
+
+      .practice::before {
+        content: "💡";
+        position: absolute;
+        top: -15px;
+        right: 30px;
+        background: #4caf50;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .example {
+        background: linear-gradient(135deg, #fff9e6 0%, #ffeaa7 100%);
+        border: 2px solid #fdcb6e;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        position: relative;
+      }
+
+      .example::before {
+        content: "📝";
+        position: absolute;
+        top: -15px;
+        left: 20px;
+        background: #fdcb6e;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        position: relative;
+        overflow-x: auto;
+      }
+
+      .code-block::before {
+        content: "JS";
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: #4299e1;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 50px;
+        background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+      }
+
+      .nav-button {
+        background: linear-gradient(45deg, #fff, #f8f9fa);
+        color: #4caf50;
+        border: 2px solid #4caf50;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        font-weight: bold;
+      }
+
+      .nav-button:hover {
+        background: #4caf50;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .progress-bar {
+        height: 4px;
+        background: linear-gradient(90deg, #4caf50 100%, #e9ecef 0%);
+        margin-bottom: 20px;
+      }
+
+      .completion-badge {
+        background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 30px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .completion-badge::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.2) 0%,
+          transparent 70%
+        );
+        animation: shine 2s infinite;
+      }
+
+      @keyframes shine {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .completion-badge h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: white;
+        border: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      .course-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .lesson-summary {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .lesson-summary:hover {
+        border-color: #4caf50;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .lesson-number {
+        background: #4caf50;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .recommendation-system {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        position: relative;
+      }
+
+      .recommendation-card {
+        background: white;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      ul {
+        padding-left: 30px;
+      }
+
+      li {
+        margin: 10px 0;
+        padding: 5px 0;
+      }
+
+      strong {
+        color: #2c3e50;
+      }
+
+      .highlight {
+        background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .metric-card {
+        background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .metric-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .metric-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .metric-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      @media (max-width: 768px) {
+        .section {
+          padding: 20px 25px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .course-summary {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .congratulations {
+        background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        margin: 30px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .congratulations::before {
+        content: "🎉🎉🎉";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 2rem;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-50%) translateY(-10px);
+        }
+        60% {
+          transform: translateX(-50%) translateY(-5px);
+        }
+      }
+
+      .congratulations h2 {
+        margin-top: 40px;
+        color: white;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .next-steps {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin: 30px 0;
+      }
+
+      .next-steps h3 {
+        color: white;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        margin-top: 0;
+      }
+
+      .certificate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        margin: 30px 0;
+        border: 5px solid gold;
+        position: relative;
+      }
+
+      .certificate::before {
+        content: "🏆";
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: gold;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .certificate h2 {
+        margin-top: 30px;
+        color: gold;
+        font-size: 2rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .tip {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-left: 5px solid #2196f3;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 5px;
+        position: relative;
+      }
+
+      .tip::before {
+        content: "💡";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #2196f3;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .interactive-demo {
+        background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+      }
+
+      .demo-button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .demo-button:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .demo-result {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        border: 2px solid #4caf50;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="container">
+        <h1>Урок 5d-6: Персонализация и завершение курса</h1>
+        <p class="subtitle">Финальные штрихи и подведение итогов</p>
+      </div>
+    </div>
+
+    <div class="lesson-content">
+      <div class="progress-bar"></div>
+
+      <div class="congratulations">
+        <h2>🎉 Поздравляем с завершением курса! 🎉</h2>
+        <p>
+          Вы прошли полный курс по разработке игр и продвинутым стратегиям
+          удержания игроков!
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>🎯 Адаптивный контент и рекомендательные системы</h2>
+
+        <div class="theory">
+          <h3>Рекомендательные системы для игр</h3>
+          <p>
+            Современные игры используют машинное обучение для создания
+            персонализированного опыта. Рекомендательные системы анализируют
+            поведение игрока и предлагают оптимальные вызовы, контент и функции.
+          </p>
+
+          <ul>
+            <li>
+              <strong>Content-based filtering:</strong> Рекомендации на основе
+              предпочтений
+            </li>
+            <li>
+              <strong>Collaborative filtering:</strong> Рекомендации на основе
+              похожих игроков
+            </li>
+            <li><strong>Hybrid approach:</strong> Комбинация разных методов</li>
+            <li>
+              <strong>Deep learning:</strong> Нейронные сети для сложных
+              паттернов
+            </li>
+          </ul>
+        </div>
+
+        <div class="recommendation-system">
+          <h4>Рекомендательная система для "Угадай число":</h4>
+
+          <div class="recommendation-card">
+            <strong>🎯 Уровень сложности:</strong><br />
+            Анализ результатов → рекомендация диапазона чисел
+          </div>
+
+          <div class="recommendation-card">
+            <strong>⏰ Время игры:</strong><br />
+            Анализ активности → оптимальное время для напоминаний
+          </div>
+
+          <div class="recommendation-card">
+            <strong>🏆 Вызовы:</strong><br />
+            Анализ навыков → персональные достижения и цели
+          </div>
+
+          <div class="recommendation-card">
+            <strong>👥 Социальные функции:</strong><br />
+            Анализ поведения → рекомендация друзей и сообществ
+          </div>
+        </div>
+
+        <div class="practice">
+          <h4>Базовая рекомендательная система</h4>
+
+          <div class="code-block">
+            class GameRecommendationEngine { constructor() { this.playerProfiles
+            = new Map(); this.gameFeatures = { difficulty_preference:
+            'adaptive', play_frequency: 'regular', social_engagement: 'active',
+            challenge_type: 'progressive' }; } analyzePlayer(playerId) { const
+            history = this.getPlayerHistory(playerId); const profile = {
+            skill_level: this.calculateSkillLevel(history),
+            preferred_difficulty: this.analyzePreferredDifficulty(history),
+            play_patterns: this.analyzePlayPatterns(history),
+            social_preferences: this.analyzeSocialBehavior(playerId) };
+            this.playerProfiles.set(playerId, profile); return profile; }
+            generateRecommendations(playerId) { const profile =
+            this.playerProfiles.get(playerId); if (!profile) return
+            this.getDefaultRecommendations(); return { difficulty:
+            this.recommendDifficulty(profile), challenges:
+            this.recommendChallenges(profile), social:
+            this.recommendSocialFeatures(profile), timing:
+            this.recommendPlayTime(profile) }; } recommendDifficulty(profile) {
+            if (profile.skill_level === 'beginner') { return { range: [1, 50],
+            hint_frequency: 'high' }; } else if (profile.skill_level ===
+            'advanced') { return { range: [1, 1000], hint_frequency: 'low' }; }
+            return { range: [1, 100], hint_frequency: 'medium' }; }
+            recommendChallenges(profile) { const challenges = []; if
+            (profile.skill_level === 'intermediate') { challenges.push({ type:
+            'speed_challenge', target: 'Угадай за 30 секунд', reward: 'Speed
+            Master badge' }); } if (profile.preferred_difficulty ===
+            'increasing') { challenges.push({ type: 'progression', target:
+            'Улучши средний результат на 20%', reward: 'Improvement Award' }); }
+            return challenges; } // Машинное обучение для улучшения рекомендаций
+            updateModelWithFeedback(playerId, recommendation, userAction) {
+            const feedback = { recommendation_type: recommendation.type,
+            user_response: userAction, // 'accepted', 'declined', 'ignored'
+            context: this.getPlayerContext(playerId), timestamp: Date.now() };
+            this.trainModel(feedback); } trainModel(feedback) { // Упрощенное
+            обучение модели // В реальности здесь был бы более сложный ML
+            алгоритм if (feedback.user_response === 'accepted') {
+            this.increaseWeight(feedback.recommendation_type, feedback.context);
+            } else if (feedback.user_response === 'declined') {
+            this.decreaseWeight(feedback.recommendation_type, feedback.context);
+            } } }
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🎮 Персонализация игрового опыта</h2>
+
+        <div class="theory">
+          <h3>Адаптивные игровые механики</h3>
+          <p>
+            Современные игры адаптируются под каждого игрока в реальном времени,
+            изменяя сложность, контент и даже интерфейс для создания
+            оптимального опыта.
+          </p>
+        </div>
+
+        <div class="example">
+          <h4>Примеры адаптивной персонализации:</h4>
+
+          <ul>
+            <li>
+              <strong>Dynamic Difficulty:</strong> Автоматическая настройка
+              сложности
+            </li>
+            <li><strong>Adaptive UI:</strong> Интерфейс под стиль игрока</li>
+            <li>
+              <strong>Content Curation:</strong> Персональные вызовы и задания
+            </li>
+            <li>
+              <strong>Smart Notifications:</strong> Уведомления в оптимальное
+              время
+            </li>
+            <li>
+              <strong>Predictive Features:</strong> Функции, которые понадобятся
+              игроку
+            </li>
+          </ul>
+        </div>
+
+        <div class="practice">
+          <h4>Адаптивная система для "Угадай число"</h4>
+
+          <div class="code-block">
+            class AdaptiveGameSystem { constructor() { this.adaptations = {
+            difficulty: new DifficultyAdapter(), interface: new
+            InterfaceAdapter(), content: new ContentAdapter(), timing: new
+            TimingAdapter() }; } adaptToPlayer(playerId) { const playerData =
+            this.getPlayerAnalytics(playerId); const adaptations = {}; //
+            Адаптация сложности adaptations.difficulty =
+            this.adaptDifficulty(playerData); // Адаптация интерфейса
+            adaptations.interface = this.adaptInterface(playerData); //
+            Адаптация контента adaptations.content =
+            this.adaptContent(playerData); return
+            this.applyAdaptations(playerId, adaptations); }
+            adaptDifficulty(playerData) { const successRate =
+            playerData.successRate; const averageGuesses =
+            playerData.averageGuesses; if (successRate > 0.8 && averageGuesses <
+            5) { return { action: 'increase', method: 'expand_range', newRange:
+            [1, playerData.currentRange * 2], reason: 'Player is performing too
+            well' }; } else if (successRate < 0.4 || averageGuesses > 10) {
+            return { action: 'decrease', method: 'add_hints', hintFrequency:
+            'after_3_wrong', reason: 'Player is struggling' }; } return {
+            action: 'maintain', reason: 'Optimal difficulty' }; }
+            adaptInterface(playerData) { const preferences = { colorScheme:
+            playerData.preferredColors || 'blue', layout: playerData.deviceType
+            === 'mobile' ? 'compact' : 'full', animations:
+            playerData.performance.low ? 'minimal' : 'full', soundEnabled:
+            playerData.settings.sound !== false }; return preferences; } //
+            Реальное применение адаптаций в игре applyAdaptations(playerId,
+            adaptations) { const gameState = this.getGameState(playerId); //
+            Применяем адаптации сложности if (adaptations.difficulty.action ===
+            'increase') { gameState.maxNumber =
+            adaptations.difficulty.newRange[1]; } else if
+            (adaptations.difficulty.action === 'decrease') {
+            gameState.hintsEnabled = true; gameState.hintFrequency =
+            adaptations.difficulty.hintFrequency; } // Применяем адаптации
+            интерфейса gameState.ui = { ...gameState.ui,
+            ...adaptations.interface }; this.saveGameState(playerId, gameState);
+            return gameState; } } // Интеграция с игрой const adaptiveSystem =
+            new AdaptiveGameSystem(); // Адаптация после каждой игры function
+            onGameComplete(playerId, gameResult) { // Обновляем аналитику игрока
+            updatePlayerAnalytics(playerId, gameResult); // Применяем адаптации
+            const newGameState = adaptiveSystem.adaptToPlayer(playerId); //
+            Уведомляем игрока об изменениях (если нужно) if
+            (newGameState.adaptations.length > 0) {
+            notifyPlayerAboutAdaptations(playerId, newGameState.adaptations); }
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📊 Обзор всего курса</h2>
+
+        <div class="completion-badge">
+          <h3>✅ Курс завершен успешно!</h3>
+          <p>Вы изучили все аспекты разработки игр и retention стратегий</p>
+        </div>
+
+        <div class="course-summary">
+          <div class="lesson-summary">
+            <div class="lesson-number">1</div>
+            <h4>Основы HTML, CSS, JavaScript</h4>
+            <p>
+              Базовые технологии веб-разработки, создание интерфейсов и
+              интерактивности
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">2</div>
+            <h4>Игровые механики</h4>
+            <p>
+              Логика игр, обработка пользовательского ввода, система очков и
+              достижений
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">3</div>
+            <h4>Дизайн и UX</h4>
+            <p>
+              Пользовательский опыт, адаптивный дизайн, анимации и визуальные
+              эффекты
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">4</div>
+            <h4>Аналитика и метрики</h4>
+            <p>
+              Отслеживание поведения игроков, A/B тестирование, data-driven
+              решения
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">5a</div>
+            <h4>Психология игроков</h4>
+            <p>
+              Мотивация, типы игроков, теория самоопределения, игровые механики
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">5b</div>
+            <h4>Push уведомления</h4>
+            <p>
+              Браузерные уведомления, моментальный retention, opt-in стратегии
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">5c</div>
+            <h4>Email маркетинг</h4>
+            <p>
+              Автоматизация, сегментация, персонализация, lifecycle кампании
+            </p>
+          </div>
+
+          <div class="lesson-summary">
+            <div class="lesson-number">5d</div>
+            <h4>Advanced Retention</h4>
+            <p>
+              Win-back стратегии, анализ оттока, когортный анализ, предиктивная
+              аналитика
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📈 Ваши достижения</h2>
+
+        <div class="metrics">
+          <div class="metric-card">
+            <div class="metric-number">8</div>
+            <div class="metric-label">Уроков пройдено</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-number">25+</div>
+            <div class="metric-label">Практических заданий</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-number">50+</div>
+            <div class="metric-label">Часов обучения</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-number">100%</div>
+            <div class="metric-label">Готовность к работе</div>
+          </div>
+        </div>
+
+        <div class="certificate">
+          <h2>🏆 СЕРТИФИКАТ ЗАВЕРШЕНИЯ КУРСА 🏆</h2>
+          <p style="margin-top: 20px; font-size: 1.2rem">
+            Настоящим подтверждается, что<br />
+            <strong style="font-size: 1.5rem; color: gold">ВЫ</strong><br />
+            успешно завершили курс<br />
+            <strong
+              >"Разработка игр и продвинутые стратегии удержания
+              игроков"</strong
+            >
+          </p>
+          <p style="margin-top: 20px; opacity: 0.9">
+            Дата завершения: 30 декабря 2025 г.
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🚀 Дальнейшие шаги</h2>
+
+        <div class="next-steps">
+          <h3>Куда двигаться дальше?</h3>
+
+          <div
+            class="recommendation-card"
+            style="
+              background: rgba(255, 255, 255, 0.1);
+              border-color: rgba(255, 255, 255, 0.3);
+            "
+          >
+            <strong>🎮 Создайте свою игру:</strong><br />
+            Примените полученные знания для создания собственной игры с
+            продвинутой retention системой
+          </div>
+
+          <div
+            class="recommendation-card"
+            style="
+              background: rgba(255, 255, 255, 0.1);
+              border-color: rgba(255, 255, 255, 0.3);
+            "
+          >
+            <strong>📊 Изучите продвинутую аналитику:</strong><br />
+            Углубитесь в машинное обучение, big data и предиктивную аналитику
+            для игр
+          </div>
+
+          <div
+            class="recommendation-card"
+            style="
+              background: rgba(255, 255, 255, 0.1);
+              border-color: rgba(255, 255, 255, 0.3);
+            "
+          >
+            <strong>💼 Найдите работу:</strong><br />
+            Используйте полученные навыки для поиска работы в игровой индустрии
+            или стартапах
+          </div>
+
+          <div
+            class="recommendation-card"
+            style="
+              background: rgba(255, 255, 255, 0.1);
+              border-color: rgba(255, 255, 255, 0.3);
+            "
+          >
+            <strong>🌐 Поделитесь опытом:</strong><br />
+            Создайте портфолио, напишите статьи или проведите презентацию о
+            своих проектах
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📊 Интерактивная демонстрация</h2>
+
+        <div class="interactive-demo">
+          <h3>Генератор персональных рекомендаций</h3>
+          <p>Получите персональные рекомендации для дальнейшего развития:</p>
+
+          <button
+            class="demo-button"
+            onclick="generateRecommendations('beginner')"
+          >
+            🌱 Новичок в разработке
+          </button>
+          <button
+            class="demo-button"
+            onclick="generateRecommendations('intermediate')"
+          >
+            💪 Есть базовый опыт
+          </button>
+          <button
+            class="demo-button"
+            onclick="generateRecommendations('advanced')"
+          >
+            🚀 Продвинутый разработчик
+          </button>
+          <button
+            class="demo-button"
+            onclick="generateRecommendations('entrepreneur')"
+          >
+            💼 Хочу создать бизнес
+          </button>
+
+          <div class="demo-result" id="recommendationResult">
+            Выберите свой уровень для получения персональных рекомендаций
+          </div>
+        </div>
+
+        <script>
+          function generateRecommendations(level) {
+            const recommendations = {
+              beginner: {
+                title: "🌱 Путь начинающего разработчика",
+                steps:
+                  "1️⃣ Создайте 3-5 простых игр для закрепления навыков\n2️⃣ Изучите фреймворки: React для веб-приложений\n3️⃣ Освойте Git и GitHub для управления версиями\n4️⃣ Найдите ментора или сообщество разработчиков\n5️⃣ Создайте портфолио на GitHub Pages",
+                timeline: "Временные рамки: 3-6 месяцев",
+                resources:
+                  "📚 Ресурсы: MDN Web Docs, FreeCodeCamp, YouTube каналы",
+              },
+              intermediate: {
+                title: "💪 Путь опытного разработчика",
+                steps:
+                  "1️⃣ Изучите продвинутые JS концепции (async/await, modules)\n2️⃣ Освойте один backend язык (Node.js, Python)\n3️⃣ Создайте игру с мультиплеером и базой данных\n4️⃣ Изучите DevOps: Docker, CI/CD\n5️⃣ Начните писать технические статьи",
+                timeline: "Временные рамки: 6-12 месяцев",
+                resources:
+                  "📚 Ресурсы: Advanced JS курсы, AWS/Google Cloud, Stack Overflow",
+              },
+              advanced: {
+                title: "🚀 Путь техлида",
+                steps:
+                  "1️⃣ Изучите архитектуру масштабируемых систем\n2️⃣ Освойте машинное обучение для игр (TensorFlow.js)\n3️⃣ Создайте игровую платформу с микросервисами\n4️⃣ Развивайте soft skills: управление командой\n5️⃣ Выступайте на конференциях",
+                timeline: "Временные рамки: 1-2 года",
+                resources:
+                  "📚 Ресурсы: System Design курсы, ML специализации, техконференции",
+              },
+              entrepreneur: {
+                title: "💼 Путь предпринимателя",
+                steps:
+                  "1️⃣ Изучите основы бизнеса и маркетинга\n2️⃣ Создайте MVP игры и протестируйте на пользователях\n3️⃣ Найдите co-founder или соберите команду\n4️⃣ Освойте основы привлечения инвестиций\n5️⃣ Создайте бизнес-план и pitch deck",
+                timeline: "Временные рамки: 6-18 месяцев до первого продукта",
+                resources:
+                  "📚 Ресурсы: Lean Startup, бизнес-акселераторы, networking события",
+              },
+            };
+
+            const rec = recommendations[level];
+            document.getElementById("recommendationResult").innerHTML = `
+                        <div style="text-align: left; line-height: 1.8;">
+                            <h3 style="margin-top: 0; color: #4caf50; text-align: center;">${
+                              rec.title
+                            }</h3>
+                            
+                            <strong>🎯 Пошаговый план:</strong><br>
+                            ${rec.steps.replace(/\n/g, "<br>")}<br><br>
+                            
+                            <strong>⏰ ${rec.timeline}</strong><br><br>
+                            
+                            <strong>${rec.resources}</strong>
+                        </div>
+                    `;
+          }
+        </script>
+      </div>
+
+      <div class="section">
+        <h2>💝 Заключение</h2>
+
+        <div class="tip">
+          <h3 style="margin-top: 0">Последние советы от автора курса:</h3>
+          <ul>
+            <li>
+              <strong>Практикуйтесь постоянно:</strong> Создавайте новые проекты
+              каждую неделю
+            </li>
+            <li>
+              <strong>Изучайте успешные игры:</strong> Анализируйте, как они
+              удерживают игроков
+            </li>
+            <li>
+              <strong>Тестируйте все:</strong> A/B тестирование должно стать
+              привычкой
+            </li>
+            <li>
+              <strong>Фокусируйтесь на игроках:</strong> Они - главное в любой
+              игре
+            </li>
+            <li>
+              <strong>Не бойтесь экспериментировать:</strong> Лучшие идеи
+              рождаются из экспериментов
+            </li>
+          </ul>
+        </div>
+
+        <div class="congratulations">
+          <h2>🎉 Удачи в ваших будущих проектах! 🎉</h2>
+          <p style="font-size: 1.2rem; margin-top: 20px">
+            Помните: каждый эксперт когда-то был новичком.<br />
+            Продолжайте учиться, создавать и вдохновлять других!
+          </p>
+        </div>
+      </div>
+
+      <div class="navigation">
+        <a href="guess-lesson-5d-part5.html" class="nav-button"
+          >← Предыдущий урок</a
+        >
+        <span style="color: white; font-weight: bold"
+          >🏆 КУРС ЗАВЕРШЕН! 🏆</span
+        >
+        <a href="index.html" class="nav-button">🏠 На главную</a>
+      </div>
+    </div>
+
+    <style>
+      .floating-menu {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #4caf50, #8bc34a);
+        border-radius: 50px;
+        padding: 15px 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+      }
+
+      .floating-menu a {
+        color: white;
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: bold;
+        transition: opacity 0.3s;
+      }
+
+      .floating-menu a:hover {
+        opacity: 0.8;
+      }
+    </style>
+
+    <div class="floating-menu">
+      <a href="index.html">🏠 Главная</a>
+      <a href="game/index.html">🎮 Играть</a>
+    </div>
+  </body>
+</html>

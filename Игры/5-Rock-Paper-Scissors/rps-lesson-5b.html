@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5b: Силы-апы и полировка</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "⚡🎁🏁";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #f39c12;
+      }
+
+      .section h2 {
+        color: #f39c12;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(243, 156, 18, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #f39c12;
+      }
+
+      .js-keyword {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .js-function {
+        color: #9b59b6;
+        font-weight: 600;
+      }
+
+      .js-string {
+        color: #2ecc71;
+      }
+
+      .js-number {
+        color: #e67e22;
+      }
+
+      .js-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .powerups-showcase {
+        background: linear-gradient(135deg, #ffe066, #ffd700);
+        border: 2px solid #f39c12;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .powerups-showcase h3 {
+        color: #b7950b;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .powerups-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .powerup {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #f39c12;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .powerup:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+      }
+
+      .powerup .powerup-icon {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .powerup h4 {
+        color: #b7950b;
+        margin-bottom: 5px;
+        font-size: 1rem;
+      }
+
+      .powerup p {
+        font-size: 0.85rem;
+        color: #996600;
+        margin: 0;
+        line-height: 1.3;
+      }
+
+      .powerup .powerup-cost {
+        background: #f39c12;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-top: 8px;
+        display: inline-block;
+      }
+
+      .audio-showcase {
+        background: linear-gradient(135deg, #ff9999, #ff6666);
+        border: 2px solid #e74c3c;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .audio-showcase h3 {
+        color: #921925;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .audio-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .audio-btn {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        padding: 12px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        font-size: 0.9rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .audio-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .audio-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .audio-btn:hover::before {
+        left: 100%;
+      }
+
+      .optimization-tips {
+        background: linear-gradient(135deg, #d5f4e6, #c8e6c9);
+        border: 2px solid #27ae60;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .optimization-tips h3 {
+        color: #1e8449;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .tip {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #27ae60;
+      }
+
+      .tip h4 {
+        color: #1e8449;
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .tip p {
+        font-size: 0.9rem;
+        color: #0d5d2b;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .final-demo {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+        text-align: center;
+      }
+
+      .final-demo h3 {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+      }
+
+      .demo-game-full {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 15px 0;
+        backdrop-filter: blur(10px);
+      }
+
+      .demo-stats-enhanced {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .demo-stat-enhanced {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 5px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 0.85rem;
+      }
+
+      .demo-powerups-bar {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 10px;
+        margin: 10px 0;
+      }
+
+      .demo-powerup-item {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.3);
+        padding: 5px 10px;
+        border-radius: 15px;
+        margin: 2px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .demo-powerup-item:hover {
+        background: rgba(255, 255, 255, 0.5);
+        transform: scale(1.1);
+      }
+
+      .completion-certificate {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        border: 3px solid #f39c12;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .completion-certificate::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: shine 3s infinite;
+      }
+
+      @keyframes shine {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .completion-certificate h3 {
+        color: #b7950b;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .completion-certificate p {
+        color: #996600;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "⚡";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .back-to-main {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .back-to-main:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .powerups-grid,
+        .tips-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .audio-controls {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>⚡ Урок 5b: Силы-апы и полировка</h1>
+        <p class="lesson-info">Завершаем создание профессиональной игры</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            Финальный урок! Добавляем систему сил-апов, звуковые эффекты,
+            полируем интерфейс и оптимизируем производительность игры.
+          </p>
+          <p>
+            После этого урока у тебя будет полнофункциональная, профессионально
+            выглядящая игра, готовая для публикации!
+          </p>
+        </div>
+
+        <div class="powerups-showcase">
+          <h3>⚡ Система сил-апов</h3>
+          <p>
+            Добавляем специальные способности, которые игрок может активировать:
+          </p>
+
+          <div class="powerups-grid">
+            <div class="powerup">
+              <div class="powerup-icon">🔮</div>
+              <h4>Предвидение</h4>
+              <p>Видишь следующий ход противника</p>
+              <div class="powerup-cost">5 монет</div>
+            </div>
+
+            <div class="powerup">
+              <div class="powerup-icon">🛡️</div>
+              <h4>Щит</h4>
+              <p>Ничья засчитывается как победа</p>
+              <div class="powerup-cost">3 монеты</div>
+            </div>
+
+            <div class="powerup">
+              <div class="powerup-icon">⚡</div>
+              <h4>Молния</h4>
+              <p>Автоматическая победа в раунде</p>
+              <div class="powerup-cost">10 монет</div>
+            </div>
+
+            <div class="powerup">
+              <div class="powerup-icon">🎲</div>
+              <h4>Удача</h4>
+              <p>Двойные очки за следующую победу</p>
+              <div class="powerup-cost">4 монеты</div>
+            </div>
+
+            <div class="powerup">
+              <div class="powerup-icon">🧠</div>
+              <h4>Замешательство</h4>
+              <p>ИИ делает случайный ход</p>
+              <div class="powerup-cost">6 монет</div>
+            </div>
+
+            <div class="powerup">
+              <div class="powerup-icon">⏰</div>
+              <h4>Замедление</h4>
+              <p>Больше времени на раздумья</p>
+              <div class="powerup-cost">2 монеты</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>⚡ Реализация системы сил-апов</h2>
+          <p>
+            Создадим полноценную систему сил-апов с экономикой, эффектами и
+            балансировкой.
+          </p>
+
+          <div class="code-title">⚡ Система PowerUps</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Система сил-апов</span>
+<span class="js-keyword">const</span> PowerUpSystem = {
+    coins: <span class="js-number">10</span>,        <span class="js-comment">// Стартовые монеты</span>
+    activePowerUps: [],   <span class="js-comment">// Активные эффекты</span>
+    
+    powerUps: {
+        foresight: {
+            name: <span class="js-string">'Предвидение'</span>,
+            cost: <span class="js-number">5</span>,
+            icon: <span class="js-string">'🔮'</span>,
+            description: <span class="js-string">'Видишь следующий ход противника'</span>,
+            duration: <span class="js-number">1</span> <span class="js-comment">// В раундах</span>
+        },
+        shield: {
+            name: <span class="js-string">'Щит'</span>,
+            cost: <span class="js-number">3</span>,
+            icon: <span class="js-string">'🛡️'</span>,
+            description: <span class="js-string">'Ничья засчитывается как победа'</span>,
+            duration: <span class="js-number">1</span>
+        },
+        lightning: {
+            name: <span class="js-string">'Молния'</span>,
+            cost: <span class="js-number">10</span>,
+            icon: <span class="js-string">'⚡'</span>,
+            description: <span class="js-string">'Автоматическая победа в раунде'</span>,
+            instant: <span class="js-keyword">true</span> <span class="js-comment">// Мгновенный эффект</span>
+        },
+        luck: {
+            name: <span class="js-string">'Удача'</span>,
+            cost: <span class="js-number">4</span>,
+            icon: <span class="js-string">'🎲'</span>,
+            description: <span class="js-string">'Двойные очки за следующую победу'</span>,
+            duration: <span class="js-number">1</span>
+        },
+        confusion: {
+            name: <span class="js-string">'Замешательство'</span>,
+            cost: <span class="js-number">6</span>,
+            icon: <span class="js-string">'🧠'</span>,
+            description: <span class="js-string">'ИИ делает случайный ход'</span>,
+            duration: <span class="js-number">1</span>
+        }
+    },
+    
+    <span class="js-comment">// Покупка силы-апа</span>
+    <span class="js-function">buyPowerUp</span>(powerUpId) {
+        <span class="js-keyword">const</span> powerUp = <span class="js-keyword">this</span>.powerUps[powerUpId];
+        
+        <span class="js-keyword">if</span> (!powerUp || <span class="js-keyword">this</span>.coins < powerUp.cost) {
+            <span class="js-function">showMessage</span>(<span class="js-string">'Недостаточно монет!'</span>, <span class="js-string">'error'</span>);
+            <span class="js-keyword">return false</span>;
+        }
+        
+        <span class="js-keyword">this</span>.coins -= powerUp.cost;
+        
+        <span class="js-keyword">if</span> (powerUp.instant) {
+            <span class="js-comment">// Мгновенные эффекты</span>
+            <span class="js-keyword">this</span>.<span class="js-function">applyInstantEffect</span>(powerUpId);
+        } <span class="js-keyword">else</span> {
+            <span class="js-comment">// Эффекты с длительностью</span>
+            <span class="js-keyword">this</span>.activePowerUps.<span class="js-function">push</span>({
+                id: powerUpId,
+                duration: powerUp.duration,
+                ...powerUp
+            });
+        }
+        
+        <span class="js-keyword">this</span>.<span class="js-function">updateUI</span>();
+        <span class="js-function">showMessage</span>(<span class="js-string">`Активирован ${powerUp.icon} ${powerUp.name}!`</span>, <span class="js-string">'success'</span>);
+        <span class="js-keyword">return true</span>;
+    },
+    
+    <span class="js-comment">// Мгновенные эффекты</span>
+    <span class="js-function">applyInstantEffect</span>(powerUpId) {
+        <span class="js-keyword">switch</span> (powerUpId) {
+            <span class="js-keyword">case</span> <span class="js-string">'lightning'</span>:
+                <span class="js-comment">// Автоматическая победа</span>
+                <span class="js-function">forceWin</span>();
+                <span class="js-keyword">break</span>;
+        }
+    },
+    
+    <span class="js-comment">// Проверка активных эффектов</span>
+    <span class="js-function">hasActivePowerUp</span>(powerUpId) {
+        <span class="js-keyword">return</span> <span class="js-keyword">this</span>.activePowerUps.<span class="js-function">some</span>(pu => pu.id === powerUpId);
+    },
+    
+    <span class="js-comment">// Обновление эффектов после раунда</span>
+    <span class="js-function">updateEffects</span>() {
+        <span class="js-keyword">this</span>.activePowerUps = <span class="js-keyword">this</span>.activePowerUps.<span class="js-function">filter</span>(powerUp => {
+            powerUp.duration--;
+            <span class="js-keyword">return</span> powerUp.duration > <span class="js-number">0</span>;
+        });
+        
+        <span class="js-keyword">this</span>.<span class="js-function">updateUI</span>();
+    },
+    
+    <span class="js-comment">// Заработать монеты</span>
+    <span class="js-function">earnCoins</span>(amount) {
+        <span class="js-keyword">this</span>.coins += amount;
+        <span class="js-keyword">this</span>.<span class="js-function">updateUI</span>();
+        
+        <span class="js-comment">// Анимация заработка</span>
+        AnimationSystem.<span class="js-function">coinEarnEffect</span>(amount);
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔊 Звуковая система</h2>
+          <p>
+            Звуки делают игру более захватывающей. Добавим звуковые эффекты для
+            всех ключевых событий.
+          </p>
+
+          <div class="code-title">🔊 Система звуков</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Система звуков</span>
+<span class="js-keyword">const</span> AudioSystem = {
+    enabled: <span class="js-keyword">true</span>,
+    volume: <span class="js-number">0.7</span>,
+    
+    <span class="js-comment">// Создание звука</span>
+    <span class="js-function">createSound</span>(frequency, duration, type = <span class="js-string">'sine'</span>) {
+        <span class="js-keyword">if</span> (!<span class="js-keyword">this</span>.enabled) <span class="js-keyword">return</span>;
+        
+        <span class="js-keyword">const</span> audioContext = <span class="js-keyword">new</span> (<span class="js-function">window.AudioContext</span> || <span class="js-function">window.webkitAudioContext</span>)();
+        <span class="js-keyword">const</span> oscillator = audioContext.<span class="js-function">createOscillator</span>();
+        <span class="js-keyword">const</span> gainNode = audioContext.<span class="js-function">createGain</span>();
+        
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+        
+        gainNode.gain.value = <span class="js-keyword">this</span>.volume;
+        gainNode.gain.<span class="js-function">exponentialRampToValueAtTime</span>(<span class="js-number">0.01</span>, audioContext.currentTime + duration);
+        
+        oscillator.<span class="js-function">connect</span>(gainNode);
+        gainNode.<span class="js-function">connect</span>(audioContext.destination);
+        
+        oscillator.<span class="js-function">start</span>(audioContext.currentTime);
+        oscillator.<span class="js-function">stop</span>(audioContext.currentTime + duration);
+    },
+    
+    <span class="js-comment">// Звуковые эффекты</span>
+    <span class="js-function">playWinSound</span>() {
+        <span class="js-comment">// Мелодичный звук победы</span>
+        <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">523</span>, <span class="js-number">0.2</span>); <span class="js-comment">// C5</span>
+        <span class="js-function">setTimeout</span>(() => <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">659</span>, <span class="js-number">0.2</span>), <span class="js-number">100</span>); <span class="js-comment">// E5</span>
+        <span class="js-function">setTimeout</span>(() => <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">784</span>, <span class="js-number">0.3</span>), <span class="js-number">200</span>); <span class="js-comment">// G5</span>
+    },
+    
+    <span class="js-function">playLoseSound</span>() {
+        <span class="js-comment">// Нисходящий звук поражения</span>
+        <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">200</span>, <span class="js-number">0.5</span>, <span class="js-string">'sawtooth'</span>);
+    },
+    
+    <span class="js-function">playDrawSound</span>() {
+        <span class="js-comment">// Нейтральный звук ничьей</span>
+        <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">400</span>, <span class="js-number">0.3</span>, <span class="js-string">'triangle'</span>);
+    },
+    
+    <span class="js-function">playClickSound</span>() {
+        <span class="js-comment">// Короткий клик</span>
+        <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">1000</span>, <span class="js-number">0.1</span>, <span class="js-string">'square'</span>);
+    },
+    
+    <span class="js-function">playPowerUpSound</span>() {
+        <span class="js-comment">// Магический звук силы-апа</span>
+        <span class="js-keyword">for</span> (<span class="js-keyword">let</span> i = <span class="js-number">0</span>; i < <span class="js-number">5</span>; i++) {
+            <span class="js-function">setTimeout</span>(() => {
+                <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">800</span> + i * <span class="js-number">100</span>, <span class="js-number">0.1</span>);
+            }, i * <span class="js-number">50</span>);
+        }
+    },
+    
+    <span class="js-function">playCoinSound</span>() {
+        <span class="js-comment">// Звук монеток</span>
+        <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">800</span>, <span class="js-number">0.1</span>);
+        <span class="js-function">setTimeout</span>(() => <span class="js-keyword">this</span>.<span class="js-function">createSound</span>(<span class="js-number">1000</span>, <span class="js-number">0.1</span>), <span class="js-number">50</span>);
+    },
+    
+    <span class="js-comment">// Переключение звука</span>
+    <span class="js-function">toggle</span>() {
+        <span class="js-keyword">this</span>.enabled = !<span class="js-keyword">this</span>.enabled;
+        <span class="js-function">localStorage.setItem</span>(<span class="js-string">'rps_audio_enabled'</span>, <span class="js-keyword">this</span>.enabled);
+        <span class="js-keyword">return</span> <span class="js-keyword">this</span>.enabled;
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="audio-showcase">
+          <h3>🔊 Демонстрация звуков</h3>
+          <p>Нажми кнопки для прослушивания звуковых эффектов:</p>
+
+          <div class="audio-controls">
+            <button class="audio-btn" onclick="demoWinSound()">
+              🎉 Победа
+            </button>
+            <button class="audio-btn" onclick="demoLoseSound()">
+              😞 Поражение
+            </button>
+            <button class="audio-btn" onclick="demoDrawSound()">
+              🤝 Ничья
+            </button>
+            <button class="audio-btn" onclick="demoClickSound()">
+              🖱️ Клик
+            </button>
+            <button class="audio-btn" onclick="demoPowerUpSound()">
+              ⚡ Сила-ап
+            </button>
+            <button class="audio-btn" onclick="demoCoinSound()">
+              🪙 Монеты
+            </button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>💾 Сохранение прогресса</h2>
+          <p>
+            Добавим систему сохранений, чтобы игрок не терял прогресс при
+            закрытии браузера.
+          </p>
+
+          <div class="code-title">💾 Система сохранений</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Система сохранений</span>
+<span class="js-keyword">const</span> SaveSystem = {
+    <span class="js-comment">// Сохранение данных</span>
+    <span class="js-function">save</span>() {
+        <span class="js-keyword">const</span> saveData = {
+            stats: gameStats,
+            coins: PowerUpSystem.coins,
+            achievements: AchievementSystem.unlockedAchievements,
+            settings: {
+                audioEnabled: AudioSystem.enabled,
+                difficulty: AISystem.difficulty
+            },
+            timestamp: <span class="js-keyword">Date</span>.<span class="js-function">now</span>()
+        };
+        
+        <span class="js-function">localStorage.setItem</span>(<span class="js-string">'rps_save_data'</span>, <span class="js-function">JSON.stringify</span>(saveData));
+        <span class="js-function">showMessage</span>(<span class="js-string">'Игра сохранена!'</span>, <span class="js-string">'success'</span>);
+    },
+    
+    <span class="js-comment">// Загрузка данных</span>
+    <span class="js-function">load</span>() {
+        <span class="js-keyword">const</span> saveData = <span class="js-function">localStorage.getItem</span>(<span class="js-string">'rps_save_data'</span>);
+        
+        <span class="js-keyword">if</span> (!saveData) {
+            <span class="js-comment">// Первый запуск игры</span>
+            <span class="js-keyword">this</span>.<span class="js-function">initializeFirstTime</span>();
+            <span class="js-keyword">return</span>;
+        }
+        
+        <span class="js-keyword">try</span> {
+            <span class="js-keyword">const</span> data = <span class="js-function">JSON.parse</span>(saveData);
+            
+            <span class="js-comment">// Восстанавливаем статистику</span>
+            <span class="js-function">Object.assign</span>(gameStats, data.stats);
+            
+            <span class="js-comment">// Восстанавливаем монеты</span>
+            PowerUpSystem.coins = data.coins || <span class="js-number">10</span>;
+            
+            <span class="js-comment">// Восстанавливаем достижения</span>
+            <span class="js-keyword">if</span> (data.achievements) {
+                AchievementSystem.unlockedAchievements = data.achievements;
+            }
+            
+            <span class="js-comment">// Восстанавливаем настройки</span>
+            <span class="js-keyword">if</span> (data.settings) {
+                AudioSystem.enabled = data.settings.audioEnabled;
+                AISystem.difficulty = data.settings.difficulty || <span class="js-string">'easy'</span>;
+            }
+            
+            <span class="js-function">showMessage</span>(<span class="js-string">'Прогресс загружен!'</span>, <span class="js-string">'info'</span>);
+            
+        } <span class="js-keyword">catch</span> (e) {
+            <span class="js-function">console.error</span>(<span class="js-string">'Ошибка загрузки сохранения:'</span>, e);
+            <span class="js-keyword">this</span>.<span class="js-function">initializeFirstTime</span>();
+        }
+    },
+    
+    <span class="js-comment">// Автосохранение каждые 30 секунд</span>
+    <span class="js-function">startAutoSave</span>() {
+        <span class="js-function">setInterval</span>(() => {
+            <span class="js-keyword">this</span>.<span class="js-function">save</span>();
+        }, <span class="js-number">30000</span>);
+    },
+    
+    <span class="js-comment">// Экспорт сохранения</span>
+    <span class="js-function">exportSave</span>() {
+        <span class="js-keyword">const</span> saveData = <span class="js-function">localStorage.getItem</span>(<span class="js-string">'rps_save_data'</span>);
+        <span class="js-keyword">if</span> (saveData) {
+            <span class="js-keyword">const</span> blob = <span class="js-keyword">new</span> <span class="js-function">Blob</span>([saveData], { type: <span class="js-string">'application/json'</span> });
+            <span class="js-keyword">const</span> url = <span class="js-function">URL.createObjectURL</span>(blob);
+            <span class="js-keyword">const</span> a = <span class="js-function">document.createElement</span>(<span class="js-string">'a'</span>);
+            a.href = url;
+            a.download = <span class="js-string">'rps_save.json'</span>;
+            a.<span class="js-function">click</span>();
+            <span class="js-function">URL.revokeObjectURL</span>(url);
+        }
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="optimization-tips">
+          <h3>⚡ Оптимизация производительности</h3>
+          <p>Важные советы для создания быстрой и отзывчивой игры:</p>
+
+          <div class="tips-grid">
+            <div class="tip">
+              <h4>🔧 Кэширование DOM</h4>
+              <p>
+                Сохраняй ссылки на часто используемые элементы в переменных,
+                вместо поиска их каждый раз.
+              </p>
+            </div>
+
+            <div class="tip">
+              <h4>⏱️ Дебаунсинг событий</h4>
+              <p>
+                Ограничивай частоту выполнения функций для событий resize,
+                scroll и input.
+              </p>
+            </div>
+
+            <div class="tip">
+              <h4>🎨 CSS вместо JS</h4>
+              <p>
+                Используй CSS анимации и переходы там, где это возможно - они
+                работают быстрее.
+              </p>
+            </div>
+
+            <div class="tip">
+              <h4>📦 Минификация кода</h4>
+              <p>
+                Сжимай CSS и JavaScript файлы для уменьшения времени загрузки.
+              </p>
+            </div>
+
+            <div class="tip">
+              <h4>🖼️ Оптимизация изображений</h4>
+              <p>
+                Используй подходящие форматы (WebP, SVG) и сжимай изображения.
+              </p>
+            </div>
+
+            <div class="tip">
+              <h4>🔄 Управление памятью</h4>
+              <p>
+                Удаляй обработчики событий и очищай интервалы при необходимости.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="final-demo">
+          <h3>🎮 Финальная демонстрация</h3>
+          <p>Вот как выглядит полная игра со всеми возможностями:</p>
+
+          <div class="demo-game-full">
+            <div class="demo-stats-enhanced">
+              <div class="demo-stat-enhanced">
+                <span>Победы</span><br /><strong>47</strong>
+              </div>
+              <div class="demo-stat-enhanced">
+                <span>Поражения</span><br /><strong>23</strong>
+              </div>
+              <div class="demo-stat-enhanced">
+                <span>Ничьи</span><br /><strong>12</strong>
+              </div>
+              <div class="demo-stat-enhanced">
+                <span>Серия</span><br /><strong>8</strong>
+              </div>
+              <div class="demo-stat-enhanced">
+                <span>Монеты</span><br /><strong>🪙 15</strong>
+              </div>
+              <div class="demo-stat-enhanced">
+                <span>Достижения</span><br /><strong>🏆 7/12</strong>
+              </div>
+            </div>
+
+            <div class="demo-powerups-bar">
+              <strong>Силы-апы:</strong>
+              <div class="demo-powerup-item">🔮 Предвидение (5🪙)</div>
+              <div class="demo-powerup-item">🛡️ Щит (3🪙)</div>
+              <div class="demo-powerup-item">⚡ Молния (10🪙)</div>
+              <div class="demo-powerup-item">🎲 Удача (4🪙)</div>
+            </div>
+
+            <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.9">
+              ✨ Полнофункциональная игра с ИИ, анимациями, звуками и
+              прогрессией!
+            </p>
+          </div>
+        </div>
+
+        <div class="completion-certificate">
+          <h3>🏆 Поздравляем с завершением курса!</h3>
+          <p>Ты успешно создал продвинутую игру "Камень-ножницы-бумага"</p>
+          <p>
+            Освоенные технологии: HTML5, CSS3, JavaScript ES6+, Анимации, Web
+            Audio API
+          </p>
+          <p><strong>Уровень:</strong> Продвинутый веб-разработчик 🚀</p>
+        </div>
+
+        <div class="task-section">
+          <h3>⚡ Финальное задание</h3>
+          <p>Завершаем создание профессиональной игры:</p>
+
+          <ol class="task-list">
+            <li>
+              Реализуй полную систему сил-апов с покупкой и использованием
+            </li>
+            <li>Добавь звуковые эффекты для всех игровых событий</li>
+            <li>Создай систему сохранения прогресса в localStorage</li>
+            <li>Оптимизируй код для лучшей производительности</li>
+            <li>Добавь экспорт/импорт сохранений</li>
+            <li>Создай настройки игры (звук, сложность, анимации)</li>
+            <li>Протестируй игру на разных устройствах</li>
+            <li>Опубликуй игру и поделись с друзьями!</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Теперь у тебя есть все навыки для создания современных веб-игр!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="index.html" class="back-to-main">
+            🏠 Вернуться к обзору курса
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Простая реализация звуков для демо
+      function createDemoSound(frequency, duration, type = "sine") {
+        try {
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.type = type;
+          oscillator.frequency.value = frequency;
+
+          gainNode.gain.value = 0.3;
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + duration
+          );
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch (e) {
+          console.log("Audio not supported");
+        }
+      }
+
+      function demoWinSound() {
+        createDemoSound(523, 0.2);
+        setTimeout(() => createDemoSound(659, 0.2), 100);
+        setTimeout(() => createDemoSound(784, 0.3), 200);
+      }
+
+      function demoLoseSound() {
+        createDemoSound(200, 0.5, "sawtooth");
+      }
+
+      function demoDrawSound() {
+        createDemoSound(400, 0.3, "triangle");
+      }
+
+      function demoClickSound() {
+        createDemoSound(1000, 0.1, "square");
+      }
+
+      function demoPowerUpSound() {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            createDemoSound(800 + i * 100, 0.1);
+          }, i * 50);
+        }
+      }
+
+      function demoCoinSound() {
+        createDemoSound(800, 0.1);
+        setTimeout(() => createDemoSound(1000, 0.1), 50);
+      }
+
+      // Анимация появления при загрузке
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .powerups-showcase, .audio-showcase, .optimization-tips, .final-demo, .completion-certificate, .task-section"
+        );
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

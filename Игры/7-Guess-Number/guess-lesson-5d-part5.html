@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5d-5: Win-back стратегии и анализ оттока | Угадай число</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        overflow-x: hidden;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.1) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(255, 255, 255, 0.1) 75%
+        );
+        background-size: 20px 20px;
+        animation: headerPattern 20s linear infinite;
+      }
+
+      @keyframes headerPattern {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(20px);
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: white;
+        font-size: 2.5rem;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.5rem;
+        font-size: 1.2rem;
+      }
+
+      .lesson-content {
+        background: white;
+        margin: 2rem auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-width: 1000px;
+        position: relative;
+      }
+
+      .section {
+        padding: 40px 50px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-left: 20px;
+      }
+
+      .section h2::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ecf0f1;
+      }
+
+      .theory {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 5px solid #667eea;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 10px;
+        position: relative;
+      }
+
+      .theory::before {
+        content: "🔄";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #667eea;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .practice {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        position: relative;
+      }
+
+      .practice::before {
+        content: "💡";
+        position: absolute;
+        top: -15px;
+        right: 30px;
+        background: #4caf50;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .example {
+        background: linear-gradient(135deg, #fff9e6 0%, #ffeaa7 100%);
+        border: 2px solid #fdcb6e;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        position: relative;
+      }
+
+      .example::before {
+        content: "📝";
+        position: absolute;
+        top: -15px;
+        left: 20px;
+        background: #fdcb6e;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        position: relative;
+        overflow-x: auto;
+      }
+
+      .code-block::before {
+        content: "JS";
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: #4299e1;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 50px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      }
+
+      .nav-button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .nav-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .progress-bar {
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 83%, #e9ecef 83%);
+        margin-bottom: 20px;
+      }
+
+      .winback-stage {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .winback-stage:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .stage-day {
+        background: #667eea;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+
+      .churn-analysis {
+        background: linear-gradient(135deg, #ffe8e8 0%, #ffcdd2 100%);
+        border-left: 5px solid #f44336;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+      }
+
+      .cohort-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .cohort-table th,
+      .cohort-table td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+      }
+
+      .cohort-table th {
+        background: #667eea;
+        color: white;
+        font-weight: bold;
+      }
+
+      .cohort-cell {
+        position: relative;
+        background: linear-gradient(135deg, #4caf50, #8bc34a);
+        color: white;
+        font-weight: bold;
+        border-radius: 4px;
+      }
+
+      .cohort-cell.low {
+        background: linear-gradient(135deg, #f44336, #e57373);
+      }
+
+      .cohort-cell.medium {
+        background: linear-gradient(135deg, #ff9800, #ffb74d);
+      }
+
+      ul {
+        padding-left: 30px;
+      }
+
+      li {
+        margin: 10px 0;
+        padding: 5px 0;
+      }
+
+      strong {
+        color: #2c3e50;
+      }
+
+      .highlight {
+        background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .metric-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .metric-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .metric-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .metric-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      @media (max-width: 768px) {
+        .section {
+          padding: 20px 25px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .cohort-table {
+          font-size: 0.8rem;
+        }
+      }
+
+      .tip {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-left: 5px solid #2196f3;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 5px;
+        position: relative;
+      }
+
+      .tip::before {
+        content: "💡";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #2196f3;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .warning {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+        border-left: 5px solid #ff9800;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 5px;
+        position: relative;
+      }
+
+      .warning::before {
+        content: "⚠️";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #ff9800;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .interactive-demo {
+        background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+      }
+
+      .demo-button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .demo-button:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .demo-result {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        border: 2px solid #4caf50;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="container">
+        <h1>Урок 5d-5: Win-back стратегии и анализ оттока</h1>
+        <p class="subtitle">Углубленные стратегии удержания игроков</p>
+      </div>
+    </div>
+
+    <div class="lesson-content">
+      <div class="progress-bar"></div>
+
+      <div class="section">
+        <h2>🎯 Цели урока</h2>
+        <p>
+          В этом уроке мы изучим win-back стратегии для возврата неактивных
+          игроков и настроим систему анализа оттока для предотвращения потери
+          пользователей.
+        </p>
+
+        <div class="metrics">
+          <div class="metric-card">
+            <div class="metric-number">28%</div>
+            <div class="metric-label">Успех win-back кампаний</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-number">65%</div>
+            <div class="metric-label">Снижение оттока</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-number">2.3x</div>
+            <div class="metric-label">ROI предиктивной аналитики</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🔄 Win-back стратегии</h2>
+
+        <div class="theory">
+          <h3>Что такое win-back кампании?</h3>
+          <p>
+            Win-back кампании - это специальные серии email, направленные на
+            возврат неактивных игроков. Они основаны на понимании причин ухода и
+            предлагают мотивирующие стимулы для возвращения.
+          </p>
+
+          <ul>
+            <li>
+              <strong>Nostalgic approach:</strong> Напоминание о достижениях
+            </li>
+            <li>
+              <strong>Value proposition:</strong> Новые возможности в игре
+            </li>
+            <li><strong>Social proof:</strong> Активность сообщества</li>
+            <li>
+              <strong>Incentives:</strong> Бонусы и специальные предложения
+            </li>
+            <li><strong>FOMO:</strong> Упущенные возможности</li>
+          </ul>
+        </div>
+
+        <div class="example">
+          <h4>Трехэтапная win-back кампания:</h4>
+
+          <div class="winback-stage">
+            <div class="stage-day">7 дней</div>
+            <strong>Тема:</strong> 🤔 Скучаешь по "Угадай число"?<br />
+            <strong>Подход:</strong> Мягкое напоминание + личная статистика<br />
+            <strong>CTA:</strong> "Сыграть одну быструю игру"
+          </div>
+
+          <div class="winback-stage">
+            <div class="stage-day">14 дней</div>
+            <strong>Тема:</strong> 🎁 Специальное предложение для возвращения<br />
+            <strong>Подход:</strong> Бонусы + новые функции<br />
+            <strong>CTA:</strong> "Получить бонус и вернуться"
+          </div>
+
+          <div class="winback-stage">
+            <div class="stage-day">30 дней</div>
+            <strong>Тема:</strong> 😢 Последний шанс - мы удаляем твой
+            аккаунт<br />
+            <strong>Подход:</strong> Ургентность + сохранение данных<br />
+            <strong>CTA:</strong> "Сохранить прогресс"
+          </div>
+        </div>
+
+        <div class="practice">
+          <h4>Система win-back кампаний</h4>
+
+          <div class="code-block">
+            class WinBackSystem { constructor() { this.winbackStages = [ { days:
+            7, template: 'gentle_reminder', approach: 'nostalgic', incentive:
+            null }, { days: 14, template: 'value_proposition', approach:
+            'benefits', incentive: 'bonus_points' }, { days: 30, template:
+            'final_warning', approach: 'urgency', incentive: 'premium_trial' }
+            ]; } checkInactiveUsers() { const allPlayers = this.getAllPlayers();
+            allPlayers.forEach(player => { const daysSinceLastGame =
+            this.getDaysSinceLastGame(player); this.winbackStages.forEach(stage
+            => { if (daysSinceLastGame === stage.days) {
+            this.triggerWinBackEmail(player, stage); } }); }); }
+            triggerWinBackEmail(player, stage) { // Проверяем, не отправляли ли
+            уже этот email if (this.hasReceivedWinbackEmail(player.id,
+            stage.days)) { return; } const email =
+            this.generateWinBackEmail(player, stage); this.sendEmail(player.id,
+            email); this.logWinBackAttempt(player.id, stage); }
+            generateWinBackEmail(player, stage) { const templates = {
+            gentle_reminder: this.createGentleReminder(player),
+            value_proposition: this.createValueProposition(player,
+            stage.incentive), final_warning: this.createFinalWarning(player) };
+            return templates[stage.template]; } createGentleReminder(player) {
+            return { subject: `🤔 Скучаешь по игре, ${player.name}?`, body: `
+            Привет, ${player.name}! Заметили, что тебя не было неделю. Возможно,
+            жизнь стала слишком насыщенной? 📊 Твои достижения ждут: • Лучший
+            результат: ${player.bestScore} попыток • Всего игр:
+            ${player.totalGames} • Место в рейтинге: ${player.ranking} Один
+            быстрый раунд займет всего минуту! `, cta: "Сыграть быструю игру" };
+            } analyzeWinBackEffectiveness() { const winbackStats =
+            this.getWinBackStats(); return { stage1_success:
+            winbackStats.gentle_reminder.conversion, stage2_success:
+            winbackStats.value_proposition.conversion, stage3_success:
+            winbackStats.final_warning.conversion, overall_recovery:
+            winbackStats.total_recovered / winbackStats.total_churned }; } }
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📊 Анализ оттока</h2>
+
+        <div class="theory">
+          <h3>Ключевые метрики оттока</h3>
+          <p>
+            Для эффективного предотвращения оттока необходимо отслеживать
+            правильные метрики и понимать паттерны поведения игроков перед
+            уходом.
+          </p>
+        </div>
+
+        <div class="churn-analysis">
+          <h4>Основные индикаторы оттока:</h4>
+          <ul>
+            <li><strong>Снижение частоты игр:</strong> Играет реже обычного</li>
+            <li>
+              <strong>Ухудшение результатов:</strong> Больше попыток на
+              угадывание
+            </li>
+            <li><strong>Короткие сессии:</strong> Быстро выходит из игры</li>
+            <li>
+              <strong>Отсутствие прогресса:</strong> Не улучшает свои показатели
+            </li>
+            <li>
+              <strong>Игнорирование функций:</strong> Не использует новые
+              возможности
+            </li>
+          </ul>
+        </div>
+
+        <div class="practice">
+          <h4>Система предиктивного анализа оттока</h4>
+
+          <div class="code-block">
+            class ChurnPredictionSystem { constructor() { this.churnIndicators =
+            { frequency_drop: { weight: 0.3, threshold: 0.5 },
+            performance_decline: { weight: 0.25, threshold: 0.6 },
+            session_length_drop: { weight: 0.2, threshold: 0.4 },
+            feature_abandonment: { weight: 0.15, threshold: 0.7 },
+            social_disengagement: { weight: 0.1, threshold: 0.8 } }; }
+            analyzePlayer(playerId) { const player =
+            this.getPlayerData(playerId); const history =
+            this.getPlayerHistory(playerId, 30); // 30 дней const indicators = {
+            frequency_drop: this.analyzeFrequencyDrop(history),
+            performance_decline: this.analyzePerformanceDecline(history),
+            session_length_drop: this.analyzeSessionLength(history),
+            feature_abandonment: this.analyzeFeatureUsage(player),
+            social_disengagement: this.analyzeSocialActivity(player) }; return
+            this.calculateChurnRisk(indicators); }
+            calculateChurnRisk(indicators) { let riskScore = 0;
+            Object.entries(indicators).forEach(([indicator, value]) => { const
+            config = this.churnIndicators[indicator]; if (value >=
+            config.threshold) { riskScore += config.weight * value; } }); return
+            { score: riskScore, level: this.getRiskLevel(riskScore),
+            recommendations: this.getRetentionRecommendations(riskScore,
+            indicators) }; } analyzeFrequencyDrop(history) { const recentWeek =
+            history.slice(-7); const previousWeek = history.slice(-14, -7);
+            const recentFreq = recentWeek.length; const previousFreq =
+            previousWeek.length; return previousFreq > 0 ? Math.max(0, 1 -
+            (recentFreq / previousFreq)) : 0; }
+            analyzePerformanceDecline(history) { if (history.length < 10) return
+            0; const recent = history.slice(-5); const previous =
+            history.slice(-10, -5); const recentAvg = recent.reduce((sum, game)
+            => sum + game.guesses, 0) / recent.length; const previousAvg =
+            previous.reduce((sum, game) => sum + game.guesses, 0) /
+            previous.length; return Math.max(0, (recentAvg - previousAvg) /
+            previousAvg); } getRetentionActions(playerId, riskLevel) { const
+            actions = { low: ['weekly_summary_email'], medium:
+            ['personalized_tip_email', 'achievement_reminder'], high:
+            ['immediate_engagement_email', 'special_incentive'], critical:
+            ['urgent_winback_email', 'personal_outreach'] }; return
+            actions[riskLevel] || []; } } // Ежедневный анализ всех игроков
+            const churnPredictor = new ChurnPredictionSystem(); function
+            dailyChurnAnalysis() { const allPlayers = getAllActivePlayers();
+            allPlayers.forEach(player => { const churnRisk =
+            churnPredictor.analyzePlayer(player.id); if (churnRisk.level ===
+            'high' || churnRisk.level === 'critical') {
+            triggerRetentionCampaign(player.id, churnRisk); } }); } // Запускаем
+            анализ каждый день setInterval(dailyChurnAnalysis, 24 * 60 * 60 *
+            1000);
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📈 Когортный анализ</h2>
+
+        <div class="theory">
+          <h3>Зачем нужен когортный анализ?</h3>
+          <p>
+            Когортный анализ позволяет отслеживать retention игроков,
+            зарегистрировавшихся в определенный период, и сравнивать
+            эффективность различных стратегий удержания.
+          </p>
+        </div>
+
+        <div class="example">
+          <h4>Пример когортной таблицы (retention rate):</h4>
+
+          <table class="cohort-table">
+            <thead>
+              <tr>
+                <th>Когорта</th>
+                <th>День 1</th>
+                <th>День 7</th>
+                <th>День 14</th>
+                <th>День 30</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Январь 2024</strong></td>
+                <td><span class="cohort-cell">85%</span></td>
+                <td><span class="cohort-cell">42%</span></td>
+                <td><span class="cohort-cell medium">28%</span></td>
+                <td><span class="cohort-cell low">15%</span></td>
+              </tr>
+              <tr>
+                <td><strong>Февраль 2024</strong></td>
+                <td><span class="cohort-cell">88%</span></td>
+                <td><span class="cohort-cell">45%</span></td>
+                <td><span class="cohort-cell">32%</span></td>
+                <td><span class="cohort-cell medium">22%</span></td>
+              </tr>
+              <tr>
+                <td><strong>Март 2024</strong></td>
+                <td><span class="cohort-cell">91%</span></td>
+                <td><span class="cohort-cell">52%</span></td>
+                <td><span class="cohort-cell">38%</span></td>
+                <td><span class="cohort-cell">28%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="practice">
+          <h4>Система когортного анализа</h4>
+
+          <div class="code-block">
+            class CohortAnalysis { constructor() { this.cohorts = {}; }
+            createCohort(month, year) { const cohortId =
+            `${year}-${month.toString().padStart(2, '0')}`; if
+            (!this.cohorts[cohortId]) { this.cohorts[cohortId] = { id: cohortId,
+            registrationDate: new Date(year, month - 1, 1), users: [],
+            retentionData: {} }; } return this.cohorts[cohortId]; }
+            addUserToCohort(userId, registrationDate) { const month =
+            registrationDate.getMonth() + 1; const year =
+            registrationDate.getFullYear(); const cohort =
+            this.createCohort(month, year); cohort.users.push({ userId,
+            registrationDate, lastActivity: registrationDate }); }
+            calculateRetention(cohortId, days) { const cohort =
+            this.cohorts[cohortId]; if (!cohort) return 0; const targetDate =
+            new Date(cohort.registrationDate);
+            targetDate.setDate(targetDate.getDate() + days); const activeUsers =
+            cohort.users.filter(user => { const lastActivity = new
+            Date(user.lastActivity); return lastActivity >= targetDate; });
+            return (activeUsers.length / cohort.users.length) * 100; }
+            generateCohortReport() { const report = { cohorts: [],
+            averageRetention: {}, trends: {} };
+            Object.entries(this.cohorts).forEach(([cohortId, cohort]) => { const
+            retentionData = { cohort: cohortId, size: cohort.users.length, day1:
+            this.calculateRetention(cohortId, 1), day7:
+            this.calculateRetention(cohortId, 7), day14:
+            this.calculateRetention(cohortId, 14), day30:
+            this.calculateRetention(cohortId, 30) };
+            report.cohorts.push(retentionData); }); // Вычисляем средние
+            показатели report.averageRetention =
+            this.calculateAverageRetention(report.cohorts); // Анализируем
+            тренды report.trends = this.analyzeTrends(report.cohorts); return
+            report; } calculateAverageRetention(cohorts) { const totals = {
+            day1: 0, day7: 0, day14: 0, day30: 0 }; cohorts.forEach(cohort => {
+            totals.day1 += cohort.day1; totals.day7 += cohort.day7; totals.day14
+            += cohort.day14; totals.day30 += cohort.day30; }); const count =
+            cohorts.length; return { day1: (totals.day1 / count).toFixed(1),
+            day7: (totals.day7 / count).toFixed(1), day14: (totals.day14 /
+            count).toFixed(1), day30: (totals.day30 / count).toFixed(1) }; }
+            analyzeTrends(cohorts) { if (cohorts.length < 2) return { trend:
+            'insufficient_data' }; const recent = cohorts.slice(-3); const
+            previous = cohorts.slice(-6, -3); const recentAvg =
+            recent.reduce((sum, c) => sum + c.day30, 0) / recent.length; const
+            previousAvg = previous.reduce((sum, c) => sum + c.day30, 0) /
+            previous.length; const change = ((recentAvg - previousAvg) /
+            previousAvg) * 100; return { trend: change > 5 ? 'improving' :
+            change < -5 ? 'declining' : 'stable', change: change.toFixed(1) +
+            '%', recommendation: this.getTrendRecommendation(change) }; }
+            getTrendRecommendation(change) { if (change > 10) return 'Отличная
+            динамика! Масштабируйте успешные стратегии.'; if (change > 5) return
+            'Хорошие результаты. Продолжайте текущий курс.'; if (change > -5)
+            return 'Стабильные показатели. Тестируйте новые подходы.'; if
+            (change > -10) return 'Небольшое снижение. Проанализируйте recent
+            changes.'; return 'Критическое снижение. Требуются срочные меры!'; }
+            } // Использование const cohortAnalysis = new CohortAnalysis(); //
+            При регистрации нового игрока function onPlayerRegistered(playerId)
+            { cohortAnalysis.addUserToCohort(playerId, new Date()); } //
+            Еженедельный отчет function generateWeeklyReport() { const report =
+            cohortAnalysis.generateCohortReport(); console.log('Когортный
+            анализ:', report); // Отправляем отчет команде
+            sendReportToTeam(report); }
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📊 Интерактивная демонстрация</h2>
+
+        <div class="interactive-demo">
+          <h3>Анализатор риска оттока</h3>
+          <p>Проанализируйте риск оттока для разных профилей игроков:</p>
+
+          <button class="demo-button" onclick="analyzeChurnRisk('declining')">
+            📉 Ухудшающийся игрок
+          </button>
+          <button class="demo-button" onclick="analyzeChurnRisk('inactive')">
+            😴 Неактивный игрок
+          </button>
+          <button class="demo-button" onclick="analyzeChurnRisk('struggling')">
+            🆘 Испытывающий трудности
+          </button>
+          <button class="demo-button" onclick="analyzeChurnRisk('stable')">
+            ✅ Стабильный игрок
+          </button>
+
+          <div class="demo-result" id="churnResult">
+            Выберите профиль игрока для анализа риска оттока
+          </div>
+        </div>
+
+        <script>
+          function analyzeChurnRisk(profile) {
+            const profiles = {
+              declining: {
+                risk: "ВЫСОКИЙ (78%)",
+                color: "#f44336",
+                indicators:
+                  "• Частота игр снизилась на 60%\n• Результаты ухудшились на 40%\n• Не использует новые функции\n• Игнорирует email уведомления",
+                actions:
+                  "🚨 НЕМЕДЛЕННЫЕ ДЕЙСТВИЯ:\n• Персональное email с бонусом\n• Предложение помощи от службы поддержки\n• Временный доступ к премиум функциям",
+                timeline: "Действовать в течение 24 часов",
+              },
+              inactive: {
+                risk: "КРИТИЧЕСКИЙ (92%)",
+                color: "#d32f2f",
+                indicators:
+                  "• Не играл 14 дней\n• Не открывал email 7 дней\n• Последняя сессия длилась 30 секунд\n• Не реагирует на уведомления",
+                actions:
+                  "🆘 ЭКСТРЕННЫЕ МЕРЫ:\n• Финальное предупреждение об удалении\n• Максимальные бонусы для возвращения\n• SMS уведомление (если доступно)\n• Персональный звонок (VIP клиенты)",
+                timeline: "Последний шанс - 72 часа",
+              },
+              struggling: {
+                risk: "СРЕДНИЙ (45%)",
+                color: "#ff9800",
+                indicators:
+                  "• Результаты стабильно плохие\n• Играет, но не улучшается\n• Короткие сессии (1-2 игры)\n• Не изучает обучающие материалы",
+                actions:
+                  "📚 ОБУЧАЮЩИЕ МЕРЫ:\n• Серия email с продвинутыми советами\n• Индивидуальный план улучшения\n• Доступ к видео-урокам\n• Наставник из сообщества",
+                timeline: "Программа на 2 недели",
+              },
+              stable: {
+                risk: "НИЗКИЙ (8%)",
+                color: "#4caf50",
+                indicators:
+                  "• Регулярная активность\n• Стабильные или улучшающиеся результаты\n• Использует различные функции\n• Отвечает на email кампании",
+                actions:
+                  "🌟 ПОДДЕРЖАНИЕ АКТИВНОСТИ:\n• Еженедельные сводки прогресса\n• Вызовы и турниры\n• Ранний доступ к новым функциям\n• Программа лояльности",
+                timeline: "Долгосрочное развитие",
+              },
+            };
+
+            const analysis = profiles[profile];
+            document.getElementById("churnResult").innerHTML = `
+                        <div style="text-align: left; line-height: 1.6;">
+                            <div style="background: ${
+                              analysis.color
+                            }; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold;">
+                                РИСК ОТТОКА: ${analysis.risk}
+                            </div>
+                            
+                            <strong>🔍 Индикаторы:</strong><br>
+                            ${analysis.indicators.replace(
+                              /\n/g,
+                              "<br>"
+                            )}<br><br>
+                            
+                            <strong>⚡ Рекомендуемые действия:</strong><br>
+                            ${analysis.actions.replace(/\n/g, "<br>")}<br><br>
+                            
+                            <strong>⏰ Временные рамки:</strong><br>
+                            <em>${analysis.timeline}</em>
+                        </div>
+                    `;
+          }
+        </script>
+      </div>
+
+      <div class="section">
+        <h2>🎯 Практическое задание</h2>
+
+        <div class="practice">
+          <h3>Создайте систему анализа и предотвращения оттока</h3>
+          <p>Реализуйте комплексную систему для своей игры:</p>
+
+          <ol>
+            <li>
+              <strong>Win-back кампанию:</strong> 3-этапную серию для возврата
+              игроков
+            </li>
+            <li>
+              <strong>Churn prediction:</strong> Система предсказания оттока
+            </li>
+            <li>
+              <strong>Cohort analysis:</strong> Отслеживание retention по
+              когортам
+            </li>
+            <li>
+              <strong>Automated alerts:</strong> Уведомления о рискованных
+              игроках
+            </li>
+            <li>
+              <strong>Dashboard:</strong> Визуализация ключевых метрик оттока
+            </li>
+          </ol>
+
+          <div class="code-block">
+            // Ваша система предотвращения оттока class ChurnPreventionSystem {
+            constructor() { // TODO: Инициализация win-back кампаний // TODO:
+            Настройка predictive модели // TODO: Конфигурация когортного анализа
+            } detectAtRiskPlayers() { // TODO: Алгоритм поиска игроков в зоне
+            риска } triggerRetentionCampaign(playerId, riskLevel) { // TODO:
+            Запуск соответствующей retention кампании } analyzeChurnFactors() {
+            // TODO: Анализ основных причин оттока } optimizeRetentionStrategy()
+            { // TODO: Оптимизация стратегии на основе данных }
+            generateExecutiveReport() { // TODO: Создание отчета для руководства
+            } }
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>Совет:</strong> Фокусируйтесь на предотвращении оттока, а не
+          только на возврате ушедших игроков. Удержать существующего игрока в
+          5-10 раз дешевле, чем вернуть ушедшего.
+        </div>
+      </div>
+
+      <div class="navigation">
+        <a href="guess-lesson-5d-part4.html" class="nav-button"
+          >← Предыдущий урок</a
+        >
+        <span>Урок 5d-5 из 6</span>
+        <a href="guess-lesson-5d-part6.html" class="nav-button"
+          >Следующий урок →</a
+        >
+      </div>
+    </div>
+
+    <style>
+      .floating-menu {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50px;
+        padding: 15px 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+      }
+
+      .floating-menu a {
+        color: white;
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: bold;
+        transition: opacity 0.3s;
+      }
+
+      .floating-menu a:hover {
+        opacity: 0.8;
+      }
+    </style>
+
+    <div class="floating-menu">
+      <a href="index.html">🏠 Главная</a>
+      <a href="game/index.html">🎮 Играть</a>
+    </div>
+  </body>
+</html>

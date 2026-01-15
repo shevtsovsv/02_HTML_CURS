@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Курс: Камень-ножницы-бумага - Турнир чемпионов</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .back-to-games {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-games:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        backdrop-filter: blur(15px);
+        border: 3px solid rgba(102, 126, 234, 0.3);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 50px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "✊✋✌️";
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 2rem;
+        opacity: 0.3;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      .header .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        margin-bottom: 20px;
+      }
+
+      .header .description {
+        font-size: 1.1rem;
+        opacity: 0.85;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .content {
+        padding: 50px 40px;
+      }
+
+      .course-overview {
+        background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        border-radius: 25px;
+        padding: 40px;
+        margin-bottom: 50px;
+        border: 3px solid #e17055;
+        text-align: center;
+      }
+
+      .course-overview h2 {
+        color: #d63031;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+      }
+
+      .course-overview p {
+        font-size: 1.2rem;
+        color: #2d3436;
+        line-height: 1.7;
+        max-width: 800px;
+        margin: 0 auto 30px;
+      }
+
+      .demo-game {
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        border-radius: 25px;
+        padding: 40px;
+        margin: 40px 0;
+        border: 3px solid #fd79a8;
+        text-align: center;
+      }
+
+      .demo-game h3 {
+        color: #e84393;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+      }
+
+      .demo-game-interface {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px 0;
+        border: 2px solid #fd79a8;
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .demo-stat {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        border-radius: 15px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .demo-stat-number {
+        font-size: 1.5rem;
+        display: block;
+      }
+
+      .demo-stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .demo-vs-section {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 25px;
+        align-items: center;
+        margin: 25px 0;
+      }
+
+      .demo-player-side,
+      .demo-computer-side {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        border: 2px solid #ddd;
+      }
+
+      .demo-choice {
+        font-size: 4rem;
+        margin: 15px 0;
+      }
+
+      .demo-vs {
+        font-size: 2rem;
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .demo-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 25px 0;
+      }
+
+      .demo-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 20px 15px;
+        font-size: 2.5rem;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .demo-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .demo-btn span {
+        display: block;
+        font-size: 0.8rem;
+        margin-top: 8px;
+        font-weight: bold;
+      }
+
+      .demo-result {
+        background: #74b9ff;
+        color: white;
+        padding: 15px;
+        border-radius: 15px;
+        margin: 20px 0;
+        font-weight: bold;
+        font-size: 1.1rem;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .lessons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin: 50px 0;
+      }
+
+      .lesson-card {
+        background: linear-gradient(135deg, #e17055, #d63031);
+        color: white;
+        border-radius: 25px;
+        padding: 35px;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        border: 3px solid #fab1a0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .lesson-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transform: rotate(45deg);
+        transition: all 0.6s ease;
+        opacity: 0;
+      }
+
+      .lesson-card:hover::before {
+        animation: shine 0.6s ease-in-out;
+      }
+
+      @keyframes shine {
+        0% {
+          transform: translateX(-100%) translateY(-100%) rotate(45deg);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(100%) translateY(100%) rotate(45deg);
+          opacity: 0;
+        }
+      }
+
+      .lesson-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(230, 126, 96, 0.4);
+      }
+
+      .lesson-number {
+        background: rgba(255, 255, 255, 0.2);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .lesson-card h3 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+      }
+
+      .lesson-card p {
+        opacity: 0.9;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .lesson-skills {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 15px;
+        margin-top: 20px;
+      }
+
+      .lesson-skills h4 {
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+
+      .skill-tag {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin: 3px;
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .features-showcase {
+        background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+        border-radius: 25px;
+        padding: 40px;
+        margin: 50px 0;
+        color: white;
+        text-align: center;
+      }
+
+      .features-showcase h2 {
+        font-size: 2rem;
+        margin-bottom: 30px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+      }
+
+      .feature-item {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 25px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        display: block;
+      }
+
+      .feature-item h4 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+      }
+
+      .feature-item p {
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+
+      .play-button {
+        background: linear-gradient(135deg, #00b894, #00a085);
+        color: white;
+        text-decoration: none;
+        padding: 20px 40px;
+        border-radius: 50px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s ease;
+        margin: 30px auto;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+      }
+
+      .play-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 30px rgba(0, 184, 148, 0.4);
+      }
+
+      .difficulty-levels {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 30px 0;
+        border: 3px solid #74b9ff;
+      }
+
+      .difficulty-levels h4 {
+        color: #0984e3;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .difficulty-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+
+      .difficulty-card {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .difficulty-card h5 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+
+      .difficulty-card p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2.2rem;
+        }
+
+        .header .subtitle {
+          font-size: 1.1rem;
+        }
+
+        .content {
+          padding: 30px 20px;
+        }
+
+        .course-overview h2 {
+          font-size: 1.8rem;
+        }
+
+        .lessons-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .demo-vs-section {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        .demo-vs {
+          order: 2;
+          margin: 10px 0;
+        }
+
+        .difficulty-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../index.html" class="back-to-games">← Вернуться к играм</a>
+    <div class="container">
+      <div class="header">
+        <h1>✂️ Камень-ножницы-бумага</h1>
+        <p class="subtitle">Создай турнир чемпионов с ИИ и спецэффектами!</p>
+        <p class="description">
+          Изучи создание интерактивных игр с продвинутой логикой, турнирными
+          режимами и профессиональными анимациями
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="course-overview">
+          <h2>🎯 О курсе</h2>
+          <p>
+            Этот курс научит тебя создавать профессиональную версию классической
+            игры "Камень-ножницы-бумага" с турнирными режимами, ИИ разной
+            сложности и продвинутыми игровыми механиками.
+          </p>
+          <p>
+            Ты освоишь создание сложных игровых интерфейсов, анимации, систему
+            достижений и научишься программировать умных противников!
+          </p>
+        </div>
+
+        <div class="demo-game">
+          <h3>🎮 Попробуй прямо сейчас!</h3>
+          <p>Интерактивная демонстрация того, что ты создашь:</p>
+
+          <div class="demo-game-interface">
+            <div class="demo-stats">
+              <div class="demo-stat">
+                <span class="demo-stat-number" id="demoWins">0</span>
+                <span class="demo-stat-label">Победы</span>
+              </div>
+              <div class="demo-stat">
+                <span class="demo-stat-number" id="demoLosses">0</span>
+                <span class="demo-stat-label">Поражения</span>
+              </div>
+              <div class="demo-stat">
+                <span class="demo-stat-number" id="demoDraws">0</span>
+                <span class="demo-stat-label">Ничьи</span>
+              </div>
+              <div class="demo-stat">
+                <span class="demo-stat-number" id="demoStreak">0</span>
+                <span class="demo-stat-label">Серия</span>
+              </div>
+            </div>
+
+            <div class="demo-vs-section">
+              <div class="demo-player-side">
+                <h4 style="color: #2980b9; margin-bottom: 10px">👤 Ты</h4>
+                <div class="demo-choice" id="demoPlayerChoice">❓</div>
+              </div>
+              <div class="demo-vs">VS</div>
+              <div class="demo-computer-side">
+                <h4 style="color: #e74c3c; margin-bottom: 10px">🤖 ИИ</h4>
+                <div class="demo-choice" id="demoComputerChoice">❓</div>
+              </div>
+            </div>
+
+            <div class="demo-buttons">
+              <button class="demo-btn" onclick="demoPlay('rock')">
+                ✊
+                <span>Камень</span>
+              </button>
+              <button class="demo-btn" onclick="demoPlay('paper')">
+                ✋
+                <span>Бумага</span>
+              </button>
+              <button class="demo-btn" onclick="demoPlay('scissors')">
+                ✌️
+                <span>Ножницы</span>
+              </button>
+            </div>
+
+            <div class="demo-result" id="demoResult">Выбери свой ход!</div>
+          </div>
+
+          <div class="difficulty-levels">
+            <h4>🎚️ Уровни сложности ИИ</h4>
+            <div class="difficulty-grid">
+              <div class="difficulty-card">
+                <h5>😊 Новичок</h5>
+                <p>Случайные ходы</p>
+              </div>
+              <div class="difficulty-card">
+                <h5>🤔 Опытный</h5>
+                <p>Анализирует паттерны</p>
+              </div>
+              <div class="difficulty-card">
+                <h5>🧠 Мастер</h5>
+                <p>Предсказывает ходы</p>
+              </div>
+            </div>
+          </div>
+
+          <a href="game/index.html" class="play-button" target="_blank">
+            🎮 Играть в полную версию
+          </a>
+        </div>
+
+        <div class="features-showcase">
+          <h2>🚀 Что ты создашь</h2>
+          <p>Твоя игра будет включать все эти профессиональные функции:</p>
+
+          <div class="features-grid">
+            <div class="feature-item">
+              <span class="feature-icon">🏆</span>
+              <h4>Турнирный режим</h4>
+              <p>Соревнования до 5 побед с прогресс-баром</p>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">⚔️</span>
+              <h4>Режим выживания</h4>
+              <p>Одно поражение = конец игры!</p>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🧠</span>
+              <h4>Умный ИИ</h4>
+              <p>3 уровня сложности с адаптивным поведением</p>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🏅</span>
+              <h4>Система достижений</h4>
+              <p>Разблокируемые награды за особые заслуги</p>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">⚡</span>
+              <h4>Силы-апы</h4>
+              <p>Особые способности при длинных сериях</p>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">✨</span>
+              <h4>Анимации</h4>
+              <p>Красивые эффекты и переходы</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="lessons-grid">
+          <a href="rps-lesson-1.html" class="lesson-card">
+            <div class="lesson-number">1</div>
+            <h3>HTML структура</h3>
+            <p>
+              Создадим семантическую разметку игрового интерфейса с кнопками
+              выбора, областью результатов и панелью статистики.
+            </p>
+            <div class="lesson-skills">
+              <h4>Изучишь:</h4>
+              <span class="skill-tag">HTML5 семантика</span>
+              <span class="skill-tag">Игровой интерфейс</span>
+              <span class="skill-tag">Доступность</span>
+              <span class="skill-tag">Структура данных</span>
+            </div>
+          </a>
+
+          <a href="rps-lesson-2.html" class="lesson-card">
+            <div class="lesson-number">2</div>
+            <h3>CSS стилизация</h3>
+            <p>
+              Создадим современный дизайн с градиентами, анимациями кнопок и
+              адаптивным интерфейсом для всех устройств.
+            </p>
+            <div class="lesson-skills">
+              <h4>Изучишь:</h4>
+              <span class="skill-tag">CSS Grid</span>
+              <span class="skill-tag">Градиенты</span>
+              <span class="skill-tag">Анимации</span>
+              <span class="skill-tag">Responsive</span>
+            </div>
+          </a>
+
+          <a href="rps-lesson-3.html" class="lesson-card">
+            <div class="lesson-number">3</div>
+            <h3>Игровая логика</h3>
+            <p>
+              Программируем основную механику: определение победителя, подсчёт
+              статистики и создание простого ИИ противника.
+            </p>
+            <div class="lesson-skills">
+              <h4>Изучишь:</h4>
+              <span class="skill-tag">Игровая логика</span>
+              <span class="skill-tag">Объекты JS</span>
+              <span class="skill-tag">Условия</span>
+              <span class="skill-tag">Счётчики</span>
+            </div>
+          </a>
+
+          <a href="rps-lesson-4.html" class="lesson-card">
+            <div class="lesson-number">4</div>
+            <h3>Продвинутые режимы</h3>
+            <p>
+              Добавляем турнирный режим, выживание, умный ИИ разной сложности и
+              систему достижений с разблокируемыми наградами.
+            </p>
+            <div class="lesson-skills">
+              <h4>Изучишь:</h4>
+              <span class="skill-tag">Режимы игры</span>
+              <span class="skill-tag">Алгоритмы ИИ</span>
+              <span class="skill-tag">Достижения</span>
+              <span class="skill-tag">Прогресс</span>
+            </div>
+          </a>
+
+          <a href="rps-lesson-5a.html" class="lesson-card">
+            <div class="lesson-number">5a</div>
+            <h3>Анимационные эффекты</h3>
+            <p>
+              Оживляем игру с помощью CSS анимаций, эффектов частиц и
+              интерактивных переходов для профессионального вида.
+            </p>
+            <div class="lesson-skills">
+              <h4>Изучишь:</h4>
+              <span class="skill-tag">CSS @keyframes</span>
+              <span class="skill-tag">Частицы</span>
+              <span class="skill-tag">Эффекты</span>
+              <span class="skill-tag">Интерактивность</span>
+            </div>
+          </a>
+
+          <a href="rps-lesson-5b.html" class="lesson-card">
+            <div class="lesson-number">5b</div>
+            <h3>Силы-апы и полировка</h3>
+            <p>
+              Финальная полировка: система сил-апов, звуковые эффекты,
+              сохранения и оптимизация для завершённой игры.
+            </p>
+            <div class="lesson-skills">
+              <h4>Изучишь:</h4>
+              <span class="skill-tag">Power-ups</span>
+              <span class="skill-tag">Web Audio</span>
+              <span class="skill-tag">Сохранения</span>
+              <span class="skill-tag">Оптимизация</span>
+            </div>
+          </a>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0">
+          <h2 style="color: #667eea; margin-bottom: 20px">
+            🎯 Готов стать чемпионом?
+          </h2>
+          <p style="font-size: 1.2rem; margin-bottom: 30px; color: #555">
+            Начни с первого урока и создай свою версию легендарной игры!
+          </p>
+          <a href="rps-lesson-1.html" class="play-button">
+            🚀 Начать обучение
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо-версия игры для главной страницы
+      let demoStats = {
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        streak: 0,
+      };
+
+      const choices = {
+        rock: { emoji: "✊", name: "Камень" },
+        paper: { emoji: "✋", name: "Бумага" },
+        scissors: { emoji: "✌️", name: "Ножницы" },
+      };
+
+      function demoPlay(playerChoice) {
+        const computerChoice = getRandomChoice();
+
+        // Показать выборы
+        document.getElementById("demoPlayerChoice").textContent =
+          choices[playerChoice].emoji;
+        document.getElementById("demoComputerChoice").textContent =
+          choices[computerChoice].emoji;
+
+        // Определить результат
+        const result = determineWinner(playerChoice, computerChoice);
+
+        // Обновить статистику
+        updateDemoStats(result);
+
+        // Показать результат
+        showDemoResult(result, playerChoice, computerChoice);
+      }
+
+      function getRandomChoice() {
+        const choiceKeys = Object.keys(choices);
+        return choiceKeys[Math.floor(Math.random() * choiceKeys.length)];
+      }
+
+      function determineWinner(player, computer) {
+        if (player === computer) return "draw";
+
+        const winConditions = {
+          rock: "scissors",
+          paper: "rock",
+          scissors: "paper",
+        };
+
+        return winConditions[player] === computer ? "win" : "lose";
+      }
+
+      function updateDemoStats(result) {
+        switch (result) {
+          case "win":
+            demoStats.wins++;
+            demoStats.streak++;
+            break;
+          case "lose":
+            demoStats.losses++;
+            demoStats.streak = 0;
+            break;
+          case "draw":
+            demoStats.draws++;
+            break;
+        }
+
+        // Обновить отображение
+        document.getElementById("demoWins").textContent = demoStats.wins;
+        document.getElementById("demoLosses").textContent = demoStats.losses;
+        document.getElementById("demoDraws").textContent = demoStats.draws;
+        document.getElementById("demoStreak").textContent = demoStats.streak;
+      }
+
+      function showDemoResult(result, playerChoice, computerChoice) {
+        const resultElement = document.getElementById("demoResult");
+        const playerName = choices[playerChoice].name;
+        const computerName = choices[computerChoice].name;
+
+        switch (result) {
+          case "win":
+            resultElement.textContent = `🎉 Победа! ${playerName} бьёт ${computerName}!`;
+            resultElement.style.background =
+              "linear-gradient(135deg, #00b894, #00a085)";
+            break;
+          case "lose":
+            resultElement.textContent = `😔 Поражение! ${computerName} бьёт ${playerName}!`;
+            resultElement.style.background =
+              "linear-gradient(135deg, #e17055, #d63031)";
+            break;
+          case "draw":
+            resultElement.textContent = `🤝 Ничья! Оба выбрали ${playerName}!`;
+            resultElement.style.background =
+              "linear-gradient(135deg, #fdcb6e, #e17055)";
+            break;
+        }
+
+        // Эффект серии
+        if (demoStats.streak >= 3) {
+          setTimeout(() => {
+            resultElement.textContent += ` 🔥 СЕРИЯ x${demoStats.streak}!`;
+          }, 1000);
+        }
+      }
+
+      // Анимация появления элементов
+      document.addEventListener("DOMContentLoaded", function () {
+        const cards = document.querySelectorAll(".lesson-card");
+        const features = document.querySelectorAll(".feature-item");
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        [...cards, ...features].forEach((element, index) => {
+          element.style.opacity = "0";
+          element.style.transform = "translateY(20px)";
+          element.style.transition = `all 0.6s ease ${index * 0.1}s`;
+          observer.observe(element);
+        });
+      });
+    </script>
+  </body>
+</html>

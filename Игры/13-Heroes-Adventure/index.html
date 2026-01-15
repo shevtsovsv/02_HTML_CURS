@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚔️ Heroes Adventure - Урок в разработке</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 60px;
+        text-align: center;
+        max-width: 800px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        transform: scale(0.8);
+        animation: fadeInScale 1s ease-out forwards;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.8s;
+      }
+
+      .container:hover::before {
+        left: 100%;
+      }
+
+      .icon {
+        font-size: 5rem;
+        margin-bottom: 30px;
+        animation: bounce 2s infinite ease-in-out;
+        display: block;
+        cursor: pointer;
+      }
+
+      h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 1.3rem;
+        margin-bottom: 30px;
+      }
+
+      .status-badge {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 30px;
+        animation: pulse 2s infinite;
+      }
+
+      .description {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 40px;
+        font-size: 1.1rem;
+      }
+
+      .features {
+        text-align: left;
+        margin: 30px 0;
+        background: rgba(44, 62, 80, 0.1);
+        padding: 25px;
+        border-radius: 15px;
+        border-left: 4px solid #2c3e50;
+      }
+
+      .features h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+      }
+
+      .features ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .features li {
+        margin-bottom: 8px;
+        padding-left: 25px;
+        position: relative;
+        color: #555;
+      }
+
+      .features li::before {
+        content: "⚔️";
+        position: absolute;
+        left: 0;
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .progress-container {
+        background: #ecf0f1;
+        border-radius: 20px;
+        padding: 8px;
+        margin: 30px 0;
+        position: relative;
+      }
+
+      .progress-bar {
+        height: 20px;
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        border-radius: 15px;
+        width: 0%;
+        transition: width 0.5s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-bar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 70%
+        );
+        animation: shimmer 2s infinite;
+      }
+
+      .progress-text {
+        text-align: center;
+        margin-top: 10px;
+        color: #666;
+        font-weight: bold;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #2c3e50, #34495e);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(45deg, #34495e, #2c3e50);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(44, 62, 80, 0.4);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: linear-gradient(45deg, #c0392b, #a93226);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+      }
+
+      .floating-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 8s ease-in-out infinite;
+      }
+
+      .shape1 {
+        width: 60px;
+        height: 60px;
+        background: #e74c3c;
+        border-radius: 50%;
+        top: 20%;
+        left: 15%;
+        animation-delay: 0s;
+      }
+
+      .shape2 {
+        width: 40px;
+        height: 40px;
+        background: #f39c12;
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        top: 60%;
+        right: 20%;
+        animation-delay: 2s;
+      }
+
+      .shape3 {
+        width: 80px;
+        height: 80px;
+        background: #8e44ad;
+        border-radius: 50%;
+        bottom: 30%;
+        left: 20%;
+        animation-delay: 4s;
+      }
+
+      .shape4 {
+        width: 50px;
+        height: 50px;
+        background: #3498db;
+        clip-path: polygon(
+          20% 0%,
+          80% 0%,
+          100% 20%,
+          100% 80%,
+          80% 100%,
+          20% 100%,
+          0% 80%,
+          0% 20%
+        );
+        top: 15%;
+        right: 15%;
+        animation-delay: 1s;
+      }
+
+      .shape5 {
+        width: 35px;
+        height: 35px;
+        background: #27ae60;
+        transform: rotate(45deg);
+        bottom: 20%;
+        right: 30%;
+        animation-delay: 3s;
+      }
+
+      .shape6 {
+        width: 70px;
+        height: 70px;
+        background: #e67e22;
+        border-radius: 50%;
+        top: 80%;
+        left: 80%;
+        animation-delay: 5s;
+      }
+
+      @keyframes fadeInScale {
+        to {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-30px) rotate(180deg);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(200%);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 40px 30px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .icon {
+          font-size: 4rem;
+        }
+
+        .buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .btn {
+          width: 100%;
+          max-width: 250px;
+        }
+      }
+
+      .hero-stats {
+        background: rgba(52, 152, 219, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border: 1px solid #3498db;
+      }
+
+      .hero-stats h3 {
+        color: #3498db;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+      }
+
+      .stat-label {
+        color: #555;
+        font-weight: bold;
+      }
+
+      .stat-value {
+        color: #2c3e50;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="floating-shapes">
+      <div class="shape shape1"></div>
+      <div class="shape shape2"></div>
+      <div class="shape shape3"></div>
+      <div class="shape shape4"></div>
+      <div class="shape shape5"></div>
+      <div class="shape shape6"></div>
+    </div>
+
+    <div class="container">
+      <div class="icon">⚔️</div>
+      <h1>Heroes Adventure</h1>
+      <div class="subtitle">
+        Стратегическая RPG в стиле Heroes of Might and Magic
+      </div>
+
+      <div class="status-badge">🏆 Урок завершен</div>
+
+      <p class="description">
+        Погрузитесь в мир стратегических RPG! Создайте собственную версию
+        легендарной игры Heroes of Might and Magic с помощью продвинутого HTML5
+        Canvas и JavaScript. Изучите процедурную генерацию карт, A* алгоритм
+        поиска пути, систему ресурсов и строительства.
+      </p>
+
+      <div class="features">
+        <h3>🎮 Что вы изучите:</h3>
+        <ul>
+          <li>Продвинутая работа с HTML5 Canvas API</li>
+          <li>Процедурная генерация игровых карт</li>
+          <li>A* алгоритм поиска кратчайшего пути</li>
+          <li>Система ресурсов и экономики</li>
+          <li>Строительство зданий и найм армии</li>
+          <li>Туман войны и исследование мира</li>
+          <li>Система квестов и достижений</li>
+          <li>Сохранение состояния игры</li>
+        </ul>
+      </div>
+
+      <div class="hero-stats">
+        <h3>🦸‍♂️ Статистика героя</h3>
+        <div class="stat-row">
+          <span class="stat-label">💰 Ресурсы:</span>
+          <span class="stat-value">Золото, Камень, Дерево, Кристаллы</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">🏗️ Строительство:</span>
+          <span class="stat-value">Башни, Шахты, Святилища</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">🛡️ Армия:</span>
+          <span class="stat-value">Воины, Лучники, Маги</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">🔮 Магия:</span>
+          <span class="stat-value">Телепортация, Видение карты</span>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar"></div>
+        <div class="progress-text">Прогресс разработки: 100%</div>
+      </div>
+
+      <div class="buttons">
+        <a href="../index.html" class="btn btn-primary">
+          ← Вернуться к играм
+        </a>
+        <a href="game/index.html" class="btn btn-secondary">
+          ⚔️ Играть в Heroes Adventure
+        </a>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Анимация счетчика прогресса
+        const progressBar = document.querySelector(".progress-bar");
+        let currentWidth = 0;
+        const targetWidth = 100;
+
+        const animateProgress = () => {
+          if (currentWidth < targetWidth) {
+            currentWidth += 2;
+            progressBar.style.width = currentWidth + "%";
+            setTimeout(animateProgress, 50);
+          }
+        };
+
+        setTimeout(animateProgress, 1000);
+
+        // Эффект наведения для кнопок
+        document.querySelectorAll(".btn").forEach((btn) => {
+          btn.addEventListener("mouseenter", function () {
+            if (navigator.vibrate) {
+              navigator.vibrate(50);
+            }
+          });
+        });
+
+        // Интерактивная иконка героя
+        const icon = document.querySelector(".icon");
+        let clickCount = 0;
+        const heroEmojis = ["⚔️", "🛡️", "🏰", "🐉", "👑"];
+
+        icon.addEventListener("click", function () {
+          clickCount++;
+          this.style.transform = "scale(1.2) rotate(10deg)";
+
+          // Меняем эмодзи каждые 2 клика
+          const emojiIndex = Math.floor(clickCount / 2) % heroEmojis.length;
+          this.textContent = heroEmojis[emojiIndex];
+
+          if (clickCount >= 10) {
+            this.textContent = "🏆";
+            document.querySelector(".status-badge").innerHTML =
+              "🎉 Легендарный герой!";
+            // Добавляем эффект конфетти
+            createConfetti();
+            clickCount = 0;
+          }
+
+          setTimeout(() => {
+            this.style.transform = "scale(1) rotate(0deg)";
+            if (this.textContent === "🏆") {
+              setTimeout(() => {
+                this.textContent = "⚔️";
+                document.querySelector(".status-badge").innerHTML =
+                  "🏆 Урок завершен";
+              }, 3000);
+            }
+          }, 300);
+        });
+
+        // Эффект конфетти
+        function createConfetti() {
+          const colors = [
+            "#E74C3C",
+            "#F39C12",
+            "#8E44AD",
+            "#3498DB",
+            "#27AE60",
+          ];
+          for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement("div");
+            confetti.style.cssText = `
+              position: fixed;
+              width: 10px;
+              height: 10px;
+              background: ${colors[Math.floor(Math.random() * colors.length)]};
+              left: 50%;
+              top: 50%;
+              transform: translate(-50%, -50%);
+              border-radius: 50%;
+              pointer-events: none;
+              z-index: 1000;
+            `;
+            document.body.appendChild(confetti);
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 10 + 5;
+            const gravity = 0.3;
+            let vx = Math.cos(angle) * velocity;
+            let vy = Math.sin(angle) * velocity;
+            let x = 0;
+            let y = 0;
+
+            const animate = () => {
+              x += vx;
+              y += vy;
+              vy += gravity;
+              confetti.style.transform = `translate(${x}px, ${y}px)`;
+              confetti.style.opacity = Math.max(
+                0,
+                confetti.style.opacity - 0.02
+              );
+
+              if (y < window.innerHeight && confetti.style.opacity > 0) {
+                requestAnimationFrame(animate);
+              } else {
+                confetti.remove();
+              }
+            };
+            animate();
+          }
+        }
+
+        // Parallax эффект для фигур
+        window.addEventListener("mousemove", function (e) {
+          const shapes = document.querySelectorAll(".shape");
+          const mouseX = e.clientX / window.innerWidth;
+          const mouseY = e.clientY / window.innerHeight;
+
+          shapes.forEach((shape, index) => {
+            const speed = (index + 1) * 0.5;
+            const x = mouseX * speed * 10;
+            const y = mouseY * speed * 10;
+            shape.style.transform = `translate(${x}px, ${y}px) rotate(${
+              x + y
+            }deg)`;
+          });
+        });
+
+        // Случайное изменение цвета фигур
+        setInterval(() => {
+          const shapes = document.querySelectorAll(".shape");
+          const colors = [
+            "#E74C3C",
+            "#F39C12",
+            "#8E44AD",
+            "#3498DB",
+            "#27AE60",
+            "#E67E22",
+          ];
+          shapes.forEach((shape) => {
+            const randomColor =
+              colors[Math.floor(Math.random() * colors.length)];
+            shape.style.background = randomColor;
+          });
+        }, 5000);
+
+        // Анимация статистики героя
+        const statValues = document.querySelectorAll(".stat-value");
+        statValues.forEach((stat, index) => {
+          stat.style.opacity = "0";
+          stat.style.transform = "translateX(20px)";
+          setTimeout(() => {
+            stat.style.transition = "all 0.5s ease";
+            stat.style.opacity = "1";
+            stat.style.transform = "translateX(0)";
+          }, 1500 + index * 200);
+        });
+      });
+    </script>
+  </body>
+</html>

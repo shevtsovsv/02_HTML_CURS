@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 1: HTML структура игры</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "✊✋✌️";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #667eea;
+      }
+
+      .section h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(102, 126, 234, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .html-tag {
+        color: #e74c3c;
+      }
+
+      .html-attr {
+        color: #f39c12;
+      }
+
+      .html-value {
+        color: #2ecc71;
+      }
+
+      .html-text {
+        color: #ecf0f1;
+      }
+
+      .demo-container {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-container h3 {
+        color: #155724;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .demo-interface {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 2px solid #28a745;
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .demo-stat {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px 10px;
+        border-radius: 10px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .demo-stat-number {
+        font-size: 1.3rem;
+        display: block;
+      }
+
+      .demo-stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+      }
+
+      .demo-battle {
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid #ddd;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .demo-choice {
+        font-size: 3rem;
+        margin: 10px 0;
+        text-align: center;
+      }
+
+      .demo-vs {
+        font-size: 1.5rem;
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .demo-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .demo-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 10px;
+        font-size: 2rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .demo-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .demo-btn span {
+        display: block;
+        font-size: 0.7rem;
+        margin-top: 5px;
+        font-weight: bold;
+      }
+
+      .demo-result {
+        background: #74b9ff;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-weight: bold;
+        text-align: center;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .structure-showcase {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .structure-showcase h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .structure-tree {
+        font-family: "Consolas", monospace;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        overflow-x: auto;
+        margin: 15px 0;
+        border: 1px solid #dee2e6;
+      }
+
+      .tree-line {
+        display: block;
+        padding: 2px 0;
+        color: #495057;
+      }
+
+      .tree-element {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .tree-comment {
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "🎯";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .accessibility-section {
+        background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
+        border: 2px solid #0288d1;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .accessibility-section h3 {
+        color: #01579b;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .accessibility-tip {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #0288d1;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .demo-battle {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .demo-vs {
+          order: 2;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>✊ Урок 1: HTML структура</h1>
+        <p class="lesson-info">
+          Создаём семантическую разметку игрового интерфейса
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы создадим семантическую HTML структуру для игры
+            "Камень-ножницы-бумага". Ты научишься правильно размечать игровой
+            интерфейс, создавать доступные кнопки и организовывать контент.
+          </p>
+          <p>
+            Мы заложим прочный фундамент для будущего стилизования и добавления
+            JavaScript логики.
+          </p>
+        </div>
+
+        <div class="demo-container">
+          <h3>Как будет выглядеть структура</h3>
+          <p>Посмотри на итоговый интерфейс, который мы создадим:</p>
+
+          <div class="demo-interface">
+            <div class="demo-stats">
+              <div class="demo-stat">
+                <span class="demo-stat-number">0</span>
+                <span class="demo-stat-label">Победы</span>
+              </div>
+              <div class="demo-stat">
+                <span class="demo-stat-number">0</span>
+                <span class="demo-stat-label">Поражения</span>
+              </div>
+              <div class="demo-stat">
+                <span class="demo-stat-number">0</span>
+                <span class="demo-stat-label">Ничьи</span>
+              </div>
+              <div class="demo-stat">
+                <span class="demo-stat-number">0</span>
+                <span class="demo-stat-label">Серия</span>
+              </div>
+            </div>
+
+            <div class="demo-battle">
+              <div>
+                <h4>👤 Игрок</h4>
+                <div class="demo-choice">❓</div>
+              </div>
+              <div class="demo-vs">VS</div>
+              <div>
+                <h4>🤖 Компьютер</h4>
+                <div class="demo-choice">❓</div>
+              </div>
+            </div>
+
+            <div class="demo-buttons">
+              <button class="demo-btn">
+                ✊
+                <span>Камень</span>
+              </button>
+              <button class="demo-btn">
+                ✋
+                <span>Бумага</span>
+              </button>
+              <button class="demo-btn">
+                ✌️
+                <span>Ножницы</span>
+              </button>
+            </div>
+
+            <div class="demo-result">Выбери свой ход!</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📋 Основная HTML структура</h2>
+          <p>
+            Начнём с создания базовой HTML структуры. Используем семантические
+            элементы для лучшей доступности и SEO.
+          </p>
+
+          <div class="code-title">📋 Базовая структура документа</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="html-tag">&lt;html <span class="html-attr">lang</span>=<span class="html-value">"ru"</span>&gt;</span>
+<span class="html-tag">&lt;head&gt;</span>
+    <span class="html-tag">&lt;meta <span class="html-attr">charset</span>=<span class="html-value">"UTF-8"</span>&gt;</span>
+    <span class="html-tag">&lt;meta <span class="html-attr">name</span>=<span class="html-value">"viewport"</span> <span class="html-attr">content</span>=<span class="html-value">"width=device-width, initial-scale=1.0"</span>&gt;</span>
+    <span class="html-tag">&lt;title&gt;</span>Камень-Ножницы-Бумага<span class="html-tag">&lt;/title&gt;</span>
+<span class="html-tag">&lt;/head&gt;</span>
+<span class="html-tag">&lt;body&gt;</span>
+    <span class="html-tag">&lt;main <span class="html-attr">class</span>=<span class="html-value">"game-container"</span>&gt;</span>
+        <span class="html-text"><!-- Здесь будет наша игра --></span>
+    <span class="html-tag">&lt;/main&gt;</span>
+<span class="html-tag">&lt;/body&gt;</span>
+<span class="html-tag">&lt;/html&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">lang="ru"</span> указывает язык страницы для
+            поисковиков и скринридеров.
+            <span class="highlight">&lt;main&gt;</span> обозначает основное
+            содержимое страницы.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>📊 Заголовок и статистика игры</h2>
+          <p>
+            Создадим заголовок игры и панель статистики, которая будет
+            показывать количество побед, поражений и текущую серию.
+          </p>
+
+          <div class="code-title">📊 Заголовок и статистика</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;main <span class="html-attr">class</span>=<span class="html-value">"game-container"</span>&gt;</span>
+    <span class="html-tag">&lt;header <span class="html-attr">class</span>=<span class="html-value">"game-header"</span>&gt;</span>
+        <span class="html-tag">&lt;h1&gt;</span>✂️ Камень-Ножницы-Бумага ✂️<span class="html-tag">&lt;/h1&gt;</span>
+        <span class="html-tag">&lt;p <span class="html-attr">class</span>=<span class="html-value">"subtitle"</span>&gt;</span>Классическая игра на ловкость!<span class="html-tag">&lt;/p&gt;</span>
+    <span class="html-tag">&lt;/header&gt;</span>
+
+    <span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"game-stats"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Игровая статистика"</span>&gt;</span>
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"stat-card"</span>&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-number"</span> <span class="html-attr">id</span>=<span class="html-value">"wins"</span>&gt;</span>0<span class="html-tag">&lt;/span&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-label"</span>&gt;</span>Победы<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+        
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"stat-card"</span>&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-number"</span> <span class="html-attr">id</span>=<span class="html-value">"losses"</span>&gt;</span>0<span class="html-tag">&lt;/span&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-label"</span>&gt;</span>Поражения<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+        
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"stat-card"</span>&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-number"</span> <span class="html-attr">id</span>=<span class="html-value">"draws"</span>&gt;</span>0<span class="html-tag">&lt;/span&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-label"</span>&gt;</span>Ничьи<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+        
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"stat-card"</span>&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-number"</span> <span class="html-attr">id</span>=<span class="html-value">"streak"</span>&gt;</span>0<span class="html-tag">&lt;/span&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"stat-label"</span>&gt;</span>Серия<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+    <span class="html-tag">&lt;/section&gt;</span>
+<span class="html-tag">&lt;/main&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">aria-label</span> делает контент доступным
+            для людей с нарушениями зрения. ID элементы понадобятся для
+            обновления статистики через JavaScript.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>⚔️ Боевая арена</h2>
+          <p>
+            Создадим центральную часть игры - боевую арену, где будут
+            отображаться выборы игрока и компьютера.
+          </p>
+
+          <div class="code-title">⚔️ Боевая арена</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"battle-arena"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Игровое поле"</span>&gt;</span>
+    <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"vs-section"</span>&gt;</span>
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"player-side"</span>&gt;</span>
+            <span class="html-tag">&lt;h3&gt;</span>👤 Игрок<span class="html-tag">&lt;/h3&gt;</span>
+            <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"choice-display"</span> <span class="html-attr">id</span>=<span class="html-value">"playerChoice"</span> 
+                 <span class="html-attr">aria-live</span>=<span class="html-value">"polite"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Выбор игрока"</span>&gt;</span>
+                ❓
+            <span class="html-tag">&lt;/div&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+        
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"vs-divider"</span>&gt;</span>
+            <span class="html-tag">&lt;span <span class="html-attr">aria-hidden</span>=<span class="html-value">"true"</span>&gt;</span>VS<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+        
+        <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"computer-side"</span>&gt;</span>
+            <span class="html-tag">&lt;h3&gt;</span>🤖 Компьютер<span class="html-tag">&lt;/h3&gt;</span>
+            <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"choice-display"</span> <span class="html-attr">id</span>=<span class="html-value">"computerChoice"</span> 
+                 <span class="html-attr">aria-live</span>=<span class="html-value">"polite"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Выбор компьютера"</span>&gt;</span>
+                ❓
+            <span class="html-tag">&lt;/div&gt;</span>
+        <span class="html-tag">&lt;/div&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">aria-live="polite"</span> сообщает
+            скринридеру об изменениях содержимого.
+            <span class="highlight">aria-hidden="true"</span>
+            скрывает декоративный элемент от программ чтения экрана.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Кнопки выбора</h2>
+          <p>
+            Создадим интерактивные кнопки для выбора хода. Важно правильно их
+            разметить для удобства использования и доступности.
+          </p>
+
+          <div class="code-title">🎮 Кнопки игрового выбора</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"choice-buttons"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Выбор хода"</span>&gt;</span>
+    <span class="html-tag">&lt;button <span class="html-attr">class</span>=<span class="html-value">"choice-btn"</span> <span class="html-attr">id</span>=<span class="html-value">"rock-btn"</span> <span class="html-attr">type</span>=<span class="html-value">"button"</span>
+            <span class="html-attr">onclick</span>=<span class="html-value">"makeChoice('rock')"</span>
+            <span class="html-attr">aria-label</span>=<span class="html-value">"Выбрать камень"</span>&gt;</span>
+        <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"choice-emoji"</span> <span class="html-attr">aria-hidden</span>=<span class="html-value">"true"</span>&gt;</span>✊<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"choice-label"</span>&gt;</span>Камень<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;button <span class="html-attr">class</span>=<span class="html-value">"choice-btn"</span> <span class="html-attr">id</span>=<span class="html-value">"paper-btn"</span> <span class="html-attr">type</span>=<span class="html-value">"button"</span>
+            <span class="html-attr">onclick</span>=<span class="html-value">"makeChoice('paper')"</span>
+            <span class="html-attr">aria-label</span>=<span class="html-value">"Выбрать бумагу"</span>&gt;</span>
+        <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"choice-emoji"</span> <span class="html-attr">aria-hidden</span>=<span class="html-value">"true"</span>&gt;</span>✋<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"choice-label"</span>&gt;</span>Бумага<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;button <span class="html-attr">class</span>=<span class="html-value">"choice-btn"</span> <span class="html-attr">id</span>=<span class="html-value">"scissors-btn"</span> <span class="html-attr">type</span>=<span class="html-value">"button"</span>
+            <span class="html-attr">onclick</span>=<span class="html-value">"makeChoice('scissors')"</span>
+            <span class="html-attr">aria-label</span>=<span class="html-value">"Выбрать ножницы"</span>&gt;</span>
+        <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"choice-emoji"</span> <span class="html-attr">aria-hidden</span>=<span class="html-value">"true"</span>&gt;</span>✌️<span class="html-tag">&lt;/span&gt;</span>
+        <span class="html-tag">&lt;span <span class="html-attr">class</span>=<span class="html-value">"choice-label"</span>&gt;</span>Ножницы<span class="html-tag">&lt;/span&gt;</span>
+    <span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">type="button"</span> предотвращает отправку
+            формы. Отдельные span элементы позволяют гибко стилизовать эмодзи и
+            текст.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>📋 Область результатов</h2>
+          <p>
+            Добавим область для отображения результатов игры и дополнительных
+            элементов интерфейса.
+          </p>
+
+          <div class="code-title">📋 Результаты и управление</div>
+          <div class="code-example">
+            <pre><span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"result-section"</span>&gt;</span>
+    <span class="html-tag">&lt;div <span class="html-attr">class</span>=<span class="html-value">"result-display"</span> <span class="html-attr">id</span>=<span class="html-value">"gameResult"</span> 
+         <span class="html-attr">aria-live</span>=<span class="html-value">"assertive"</span> <span class="html-attr">aria-label</span>=<span class="html-value">"Результат игры"</span>&gt;</span>
+        <span class="html-tag">&lt;p <span class="html-attr">class</span>=<span class="html-value">"result-text"</span>&gt;</span>Выбери свой ход!<span class="html-tag">&lt;/p&gt;</span>
+    <span class="html-tag">&lt;/div&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span>
+
+<span class="html-tag">&lt;section <span class="html-attr">class</span>=<span class="html-value">"game-controls"</span>&gt;</span>
+    <span class="html-tag">&lt;button <span class="html-attr">class</span>=<span class="html-value">"control-btn reset-btn"</span> <span class="html-attr">type</span>=<span class="html-value">"button"</span>
+            <span class="html-attr">onclick</span>=<span class="html-value">"resetGame()"</span>
+            <span class="html-attr">aria-label</span>=<span class="html-value">"Сбросить статистику игры"</span>&gt;</span>
+        🔄 Сброс
+    <span class="html-tag">&lt;/button&gt;</span>
+    
+    <span class="html-tag">&lt;button <span class="html-attr">class</span>=<span class="html-value">"control-btn rules-btn"</span> <span class="html-attr">type</span>=<span class="html-value">"button"</span>
+            <span class="html-attr">onclick</span>=<span class="html-value">"showRules()"</span>
+            <span class="html-attr">aria-label</span>=<span class="html-value">"Показать правила игры"</span>&gt;</span>
+        📖 Правила
+    <span class="html-tag">&lt;/button&gt;</span>
+<span class="html-tag">&lt;/section&gt;</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">aria-live="assertive"</span> немедленно
+            сообщает об изменениях результата, что важно для доступности.
+          </p>
+        </div>
+
+        <div class="structure-showcase">
+          <h3>🏗️ Общая структура HTML</h3>
+          <p>Посмотри на полную иерархию элементов нашей игры:</p>
+
+          <div class="structure-tree">
+            <span class="tree-line"
+              ><span class="tree-element"
+                >&lt;main class="game-container"&gt;</span
+              ></span
+            >
+            <span class="tree-line">
+              ├─
+              <span class="tree-element"
+                >&lt;header class="game-header"&gt;</span
+              >
+              <span class="tree-comment">// Заголовок</span></span
+            >
+            <span class="tree-line">
+              │ ├─ <span class="tree-element">&lt;h1&gt;</span> Название
+              игры</span
+            >
+            <span class="tree-line">
+              │ └─
+              <span class="tree-element">&lt;p&gt;</span> Подзаголовок</span
+            >
+            <span class="tree-line">
+              ├─
+              <span class="tree-element"
+                >&lt;section class="game-stats"&gt;</span
+              >
+              <span class="tree-comment">// Статистика</span></span
+            >
+            <span class="tree-line">
+              │ ├─
+              <span class="tree-element">&lt;div class="stat-card"&gt;</span>
+              Победы</span
+            >
+            <span class="tree-line">
+              │ ├─
+              <span class="tree-element">&lt;div class="stat-card"&gt;</span>
+              Поражения</span
+            >
+            <span class="tree-line">
+              │ ├─
+              <span class="tree-element">&lt;div class="stat-card"&gt;</span>
+              Ничьи</span
+            >
+            <span class="tree-line">
+              │ └─
+              <span class="tree-element">&lt;div class="stat-card"&gt;</span>
+              Серия</span
+            >
+            <span class="tree-line">
+              ├─
+              <span class="tree-element"
+                >&lt;section class="battle-arena"&gt;</span
+              >
+              <span class="tree-comment">// Игровое поле</span></span
+            >
+            <span class="tree-line">
+              │ └─
+              <span class="tree-element"
+                >&lt;div class="vs-section"&gt;</span
+              ></span
+            >
+            <span class="tree-line">
+              │ ├─
+              <span class="tree-element">&lt;div class="player-side"&gt;</span>
+              Игрок</span
+            >
+            <span class="tree-line">
+              │ ├─
+              <span class="tree-element">&lt;div class="vs-divider"&gt;</span>
+              VS</span
+            >
+            <span class="tree-line">
+              │ └─
+              <span class="tree-element"
+                >&lt;div class="computer-side"&gt;</span
+              >
+              Компьютер</span
+            >
+            <span class="tree-line">
+              ├─
+              <span class="tree-element"
+                >&lt;section class="choice-buttons"&gt;</span
+              >
+              <span class="tree-comment">// Кнопки выбора</span></span
+            >
+            <span class="tree-line">
+              │ ├─ <span class="tree-element">&lt;button&gt;</span> Камень</span
+            >
+            <span class="tree-line">
+              │ ├─ <span class="tree-element">&lt;button&gt;</span> Бумага</span
+            >
+            <span class="tree-line">
+              │ └─
+              <span class="tree-element">&lt;button&gt;</span> Ножницы</span
+            >
+            <span class="tree-line">
+              ├─
+              <span class="tree-element"
+                >&lt;section class="result-section"&gt;</span
+              >
+              <span class="tree-comment">// Результаты</span></span
+            >
+            <span class="tree-line">
+              │ └─
+              <span class="tree-element"
+                >&lt;div class="result-display"&gt;</span
+              ></span
+            >
+            <span class="tree-line">
+              └─
+              <span class="tree-element"
+                >&lt;section class="game-controls"&gt;</span
+              >
+              <span class="tree-comment">// Управление</span></span
+            >
+            <span class="tree-line">
+              ├─ <span class="tree-element">&lt;button&gt;</span> Сброс</span
+            >
+            <span class="tree-line">
+              └─ <span class="tree-element">&lt;button&gt;</span> Правила</span
+            >
+          </div>
+        </div>
+
+        <div class="accessibility-section">
+          <h3>♿ Доступность (Accessibility)</h3>
+
+          <div class="accessibility-tip">
+            <strong>aria-label:</strong> Описывает назначение элементов для
+            программ чтения экрана. Особенно важно для кнопок с только эмодзи.
+          </div>
+
+          <div class="accessibility-tip">
+            <strong>aria-live:</strong> Сообщает об изменениях контента.
+            "polite" - после завершения текущего чтения, "assertive" -
+            немедленно.
+          </div>
+
+          <div class="accessibility-tip">
+            <strong>aria-hidden="true":</strong> Скрывает декоративные элементы
+            (например, эмодзи) от программ чтения экрана, чтобы не засорять
+            информацию.
+          </div>
+
+          <div class="accessibility-tip">
+            <strong>Семантические теги:</strong> &lt;main&gt;, &lt;section&gt;,
+            &lt;header&gt; помогают программам понять структуру страницы и
+            навигацию по ней.
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>🎯 Твоё задание</h3>
+          <p>Создай HTML файл со следующей структурой:</p>
+
+          <ol class="task-list">
+            <li>Базовую HTML5 структуру с правильным DOCTYPE и meta-тегами</li>
+            <li>Заголовок игры с названием и подзаголовком</li>
+            <li>Панель статистики с четырьмя карточками счётчиков</li>
+            <li>Боевую арену с отображением выборов игрока и компьютера</li>
+            <li>Три кнопки выбора хода с эмодзи и подписями</li>
+            <li>Область результатов с сообщениями для игрока</li>
+            <li>Кнопки управления (сброс и правила)</li>
+            <li>Правильные aria-атрибуты для доступности</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Используй семантические HTML5 теги и не забывай про доступность!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="rps-lesson-2.html" class="next-lesson">
+            Следующий урок: CSS стилизация →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Анимация появления секций
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .demo-container, .structure-showcase, .accessibility-section, .task-section"
+        );
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

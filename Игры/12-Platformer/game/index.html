@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏃‍♂️ Adventure Platformer - Обучающая игра</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        color: #ecf0f1;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      canvas {
+        border: 3px solid #ecf0f1;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        background: linear-gradient(to bottom, #87ceeb 0%, #98fb98 100%);
+      }
+
+      .ui-overlay {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 30px;
+        color: #ecf0f1;
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        z-index: 10;
+      }
+
+      .controls {
+        margin-top: 15px;
+        text-align: center;
+        color: #ecf0f1;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px 20px;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+      }
+
+      .controls p {
+        margin: 3px 0;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ecf0f1;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .back-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+      }
+
+      .start-screen,
+      .game-over-screen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(52, 73, 94, 0.95);
+        color: #ecf0f1;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        border: 2px solid #3498db;
+        max-width: 600px;
+        z-index: 20;
+      }
+
+      .start-screen h2,
+      .game-over-screen h2 {
+        margin-bottom: 20px;
+        font-size: 2rem;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #27ae60, #229954);
+        color: #ecf0f1;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        background: linear-gradient(45deg, #229954, #1e8449);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+      }
+
+      .game-info {
+        color: #bdc3c7;
+        font-size: 0.9rem;
+        margin-top: 15px;
+        line-height: 1.4;
+      }
+
+      .level-info {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #ecf0f1;
+        font-weight: bold;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px 20px;
+        border-radius: 15px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      }
+
+      @media (max-width: 768px) {
+        canvas {
+          width: 95vw;
+          height: 60vh;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        .game-container {
+          padding: 15px;
+        }
+
+        .ui-overlay {
+          font-size: 1.2rem;
+          gap: 20px;
+        }
+
+        .controls p {
+          font-size: 0.8rem;
+        }
+      }
+
+      .particle {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #ffd700;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: sparkle 1s ease-out forwards;
+      }
+
+      @keyframes sparkle {
+        0% {
+          opacity: 1;
+          transform: scale(0) rotate(0deg);
+        }
+        50% {
+          opacity: 0.8;
+          transform: scale(1.5) rotate(180deg);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0) rotate(360deg);
+        }
+      }
+
+      .power-up-notification {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 215, 0, 0.9);
+        color: #333;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        animation: slideDown 2s ease-out forwards;
+        z-index: 15;
+      }
+
+      @keyframes slideDown {
+        0% {
+          transform: translate(-50%, -100px);
+          opacity: 0;
+        }
+        20% {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+        80% {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -50px);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../index.html" class="back-button">← К урокам</a>
+
+    <!-- UI Overlay -->
+    <div class="ui-overlay" id="gameUI">
+      <div>❤️ Жизни: <span id="lives">3</span></div>
+      <div>🌟 Очки: <span id="score">0</span></div>
+      <div>💎 Гемы: <span id="gems">0</span></div>
+    </div>
+
+    <div class="level-info" id="levelInfo">Уровень 1: Основы движения</div>
+
+    <div class="game-container">
+      <h1>🏃‍♂️ Adventure Platformer</h1>
+      <canvas id="gameCanvas" width="1000" height="600"></canvas>
+
+      <div class="controls">
+        <p>🎮 Стрелки/WASD - движение | Пробел - прыжок | R - перезапуск</p>
+        <p>💎 Собирайте гемы, избегайте врагов и препятствий!</p>
+      </div>
+    </div>
+
+    <!-- Экран старта -->
+    <div class="start-screen" id="startScreen">
+      <h2>🏃‍♂️ Добро пожаловать в Adventure Platformer!</h2>
+      <p>Помогите герою собрать все гемы и пройти уровни</p>
+
+      <button class="btn" onclick="startGame()">🚀 Начать приключение</button>
+
+      <div class="game-info">
+        <p><strong>🎓 Учебные концепции:</strong></p>
+        <p>• Физика платформера: гравитация, прыжки, столкновения</p>
+        <p>• Уровневая система и игровые состояния</p>
+        <p>• Объектно-ориентированное программирование (ООП)</p>
+        <p>• Система частиц и визуальные эффекты</p>
+        <p>• Процедурная генерация контента</p>
+        <p>• Оптимизация игрового цикла</p>
+      </div>
+    </div>
+
+    <!-- Экран окончания игры -->
+    <div class="game-over-screen" id="gameOverScreen" style="display: none">
+      <h2 id="gameOverTitle">🎉 Уровень пройден!</h2>
+      <p id="gameOverText">Отличная работа!</p>
+      <p id="gameOverStats">Статистика уровня</p>
+      <button class="btn" onclick="nextLevel()">➡️ Следующий уровень</button>
+      <button class="btn" onclick="restartLevel()">🔄 Пройти заново</button>
+      <button class="btn" onclick="backToMenu()">🏠 В меню</button>
+    </div>
+
+    <script>
+      // ===========================================
+      // КОНСТАНТЫ И НАСТРОЙКИ ИГРЫ
+      // ===========================================
+
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Физические константы
+      const GRAVITY = 0.8;
+      const JUMP_FORCE = -15;
+      const PLAYER_SPEED = 5;
+      const FRICTION = 0.85;
+      const TILE_SIZE = 40;
+
+      // Игровые константы
+      const GAME_STATES = {
+        START: "start",
+        PLAYING: "playing",
+        PAUSED: "paused",
+        GAME_OVER: "gameOver",
+        LEVEL_COMPLETE: "levelComplete",
+      };
+
+      // ===========================================
+      // СИСТЕМА ЧАСТИЦ
+      // ===========================================
+
+      class Particle {
+        constructor(x, y, color = "#FFD700", type = "gem") {
+          this.x = x;
+          this.y = y;
+          this.velocityX = (Math.random() - 0.5) * 8;
+          this.velocityY = Math.random() * -8 - 2;
+          this.life = 1.0;
+          this.decay = 0.02;
+          this.size = Math.random() * 6 + 3;
+          this.color = color;
+          this.type = type;
+          this.gravity = type === "gem" ? 0.2 : 0.5;
+        }
+
+        update() {
+          this.x += this.velocityX;
+          this.y += this.velocityY;
+          this.velocityY += this.gravity;
+          this.velocityX *= 0.98;
+          this.life -= this.decay;
+          this.size *= 0.99;
+
+          return this.life > 0;
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.life;
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+
+          if (this.type === "gem") {
+            // Рисуем звездочку
+            this.drawStar(this.x, this.y, this.size);
+          } else {
+            // Рисуем круг
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          }
+
+          ctx.fill();
+          ctx.restore();
+        }
+
+        drawStar(x, y, size) {
+          const spikes = 5;
+          const outerRadius = size;
+          const innerRadius = size * 0.4;
+
+          ctx.beginPath();
+          for (let i = 0; i < spikes * 2; i++) {
+            const angle = (i * Math.PI) / spikes;
+            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+            const px = x + Math.cos(angle) * radius;
+            const py = y + Math.sin(angle) * radius;
+
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+        }
+      }
+
+      // ===========================================
+      // ИГРОК
+      // ===========================================
+
+      class Player {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.width = 30;
+          this.height = 40;
+          this.velocityX = 0;
+          this.velocityY = 0;
+          this.onGround = false;
+          this.facingRight = true;
+          this.animationFrame = 0;
+          this.animationSpeed = 0.2;
+          this.jumpCooldown = 0;
+          this.invulnerable = false;
+          this.invulnerableTime = 0;
+
+          // Способности
+          this.hasDoubleJump = false;
+          this.doubleJumpUsed = false;
+          this.dashCooldown = 0;
+          this.dashDistance = 100;
+        }
+
+        update() {
+          // Гравитация
+          this.velocityY += GRAVITY;
+
+          // Движение
+          this.x += this.velocityX;
+          this.y += this.velocityY;
+
+          // Трение
+          this.velocityX *= FRICTION;
+
+          // Анимация
+          if (Math.abs(this.velocityX) > 0.1) {
+            this.animationFrame += this.animationSpeed;
+          }
+
+          // Кулдауны
+          if (this.jumpCooldown > 0) this.jumpCooldown--;
+          if (this.dashCooldown > 0) this.dashCooldown--;
+          if (this.invulnerableTime > 0) {
+            this.invulnerableTime--;
+            if (this.invulnerableTime <= 0) {
+              this.invulnerable = false;
+            }
+          }
+
+          // Ограничения экрана
+          if (this.x < 0) this.x = 0;
+          if (this.x > canvas.width - this.width)
+            this.x = canvas.width - this.width;
+
+          // Проверка на падение
+          if (this.y > canvas.height + 100) {
+            this.takeDamage();
+            this.respawn();
+          }
+        }
+
+        draw() {
+          ctx.save();
+
+          // Мигание при неуязвимости
+          if (this.invulnerable && Math.floor(this.invulnerableTime / 5) % 2) {
+            ctx.globalAlpha = 0.5;
+          }
+
+          // Отражение спрайта
+          if (!this.facingRight) {
+            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+            ctx.scale(-1, 1);
+            ctx.translate(-this.width / 2, -this.height / 2);
+          } else {
+            ctx.translate(this.x, this.y);
+          }
+
+          // Тело персонажа
+          const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+          gradient.addColorStop(0, "#4FC3F7");
+          gradient.addColorStop(1, "#29B6F6");
+
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, this.width, this.height);
+
+          // Голова
+          ctx.fillStyle = "#FFB74D";
+          ctx.fillRect(5, 0, this.width - 10, 15);
+
+          // Глаза
+          ctx.fillStyle = "#333";
+          ctx.fillRect(8, 3, 3, 3);
+          ctx.fillRect(this.width - 11, 3, 3, 3);
+
+          // Анимация ног при движении
+          if (Math.abs(this.velocityX) > 0.1) {
+            const legOffset = Math.sin(this.animationFrame) * 3;
+            ctx.fillStyle = "#1976D2";
+            ctx.fillRect(2 + legOffset, this.height - 8, 8, 8);
+            ctx.fillRect(this.width - 10 - legOffset, this.height - 8, 8, 8);
+          } else {
+            ctx.fillStyle = "#1976D2";
+            ctx.fillRect(2, this.height - 8, 8, 8);
+            ctx.fillRect(this.width - 10, this.height - 8, 8, 8);
+          }
+
+          ctx.restore();
+        }
+
+        jump() {
+          if (this.jumpCooldown > 0) return;
+
+          if (this.onGround) {
+            this.velocityY = JUMP_FORCE;
+            this.onGround = false;
+            this.jumpCooldown = 10;
+            this.doubleJumpUsed = false;
+            this.createJumpEffect();
+            playJumpSound();
+          } else if (this.hasDoubleJump && !this.doubleJumpUsed) {
+            this.velocityY = JUMP_FORCE * 0.8;
+            this.doubleJumpUsed = true;
+            this.jumpCooldown = 10;
+            this.createJumpEffect();
+            playJumpSound();
+          }
+        }
+
+        dash() {
+          if (this.dashCooldown > 0) return;
+
+          const direction = this.facingRight ? 1 : -1;
+          this.velocityX = direction * 15;
+          this.dashCooldown = 60; // 1 секунда кулдауна
+          this.createDashEffect();
+          playDashSound();
+        }
+
+        takeDamage() {
+          if (this.invulnerable) return false;
+
+          gameData.lives--;
+          this.invulnerable = true;
+          this.invulnerableTime = 120; // 2 секунды неуязвимости
+
+          this.createHitEffect();
+          playHitSound();
+          updateUI();
+
+          if (gameData.lives <= 0) {
+            gameState = GAME_STATES.GAME_OVER;
+            showGameOver(false);
+          }
+
+          return true;
+        }
+
+        respawn() {
+          this.x = gameData.currentLevel.playerStart.x;
+          this.y = gameData.currentLevel.playerStart.y;
+          this.velocityX = 0;
+          this.velocityY = 0;
+        }
+
+        createJumpEffect() {
+          for (let i = 0; i < 8; i++) {
+            particles.push(
+              new Particle(
+                this.x + this.width / 2,
+                this.y + this.height,
+                "#87CEEB",
+                "jump"
+              )
+            );
+          }
+        }
+
+        createDashEffect() {
+          for (let i = 0; i < 12; i++) {
+            particles.push(
+              new Particle(
+                this.x + this.width / 2,
+                this.y + this.height / 2,
+                "#FFA726",
+                "dash"
+              )
+            );
+          }
+        }
+
+        createHitEffect() {
+          for (let i = 0; i < 15; i++) {
+            particles.push(
+              new Particle(
+                this.x + this.width / 2,
+                this.y + this.height / 2,
+                "#F44336",
+                "hit"
+              )
+            );
+          }
+        }
+      }
+
+      // ===========================================
+      // ВРАГИ
+      // ===========================================
+
+      class Enemy {
+        constructor(x, y, type = "walker") {
+          this.x = x;
+          this.y = y;
+          this.width = 30;
+          this.height = 30;
+          this.type = type;
+          this.speed = type === "walker" ? 1 : 2;
+          this.direction = 1;
+          this.animationFrame = 0;
+          this.patrolDistance = 100;
+          this.startX = x;
+          this.health = type === "walker" ? 1 : 2;
+
+          // Летающий тип
+          if (type === "flyer") {
+            this.amplitude = 50;
+            this.frequency = 0.05;
+            this.baseY = y;
+          }
+        }
+
+        update() {
+          this.animationFrame += 0.1;
+
+          if (this.type === "walker") {
+            // Движение по земле
+            this.x += this.speed * this.direction;
+
+            // Поворот в конце патруля
+            if (Math.abs(this.x - this.startX) > this.patrolDistance) {
+              this.direction *= -1;
+            }
+          } else if (this.type === "flyer") {
+            // Летающий враг
+            this.x += this.speed * this.direction;
+            this.y =
+              this.baseY +
+              Math.sin(this.animationFrame * this.frequency * 60) *
+                this.amplitude;
+
+            // Поворот
+            if (Math.abs(this.x - this.startX) > this.patrolDistance) {
+              this.direction *= -1;
+            }
+          }
+
+          // Проверка столкновения с игроком
+          if (this.checkCollisionWithPlayer()) {
+            if (player.takeDamage()) {
+              // Отталкивание игрока
+              const pushDirection = player.x < this.x ? -1 : 1;
+              player.velocityX = pushDirection * 8;
+              player.velocityY = -5;
+            }
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+
+          if (this.type === "walker") {
+            // Ходящий враг (красный квадрат с глазами)
+            ctx.fillStyle = "#E53E3E";
+            ctx.fillRect(
+              -this.width / 2,
+              -this.height / 2,
+              this.width,
+              this.height
+            );
+
+            // Глаза
+            ctx.fillStyle = "#FFD700";
+            const eyeOffset = Math.sin(this.animationFrame * 5) * 2;
+            ctx.fillRect(-10 + eyeOffset, -8, 4, 4);
+            ctx.fillRect(6 + eyeOffset, -8, 4, 4);
+
+            // Зубы
+            ctx.fillStyle = "#FFF";
+            for (let i = 0; i < 3; i++) {
+              ctx.fillRect(-8 + i * 6, 4, 3, 6);
+            }
+          } else if (this.type === "flyer") {
+            // Летающий враг (фиолетовый круг)
+            ctx.fillStyle = "#9C27B0";
+            ctx.beginPath();
+            ctx.arc(0, 0, this.width / 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Крылья
+            const wingFlap = Math.sin(this.animationFrame * 10) * 0.5 + 0.5;
+            ctx.fillStyle = "#BA68C8";
+            ctx.ellipse(
+              -this.width / 2,
+              0,
+              8,
+              15 * wingFlap,
+              0,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+            ctx.ellipse(this.width / 2, 0, 8, 15 * wingFlap, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Глаза
+            ctx.fillStyle = "#F44336";
+            ctx.fillRect(-6, -4, 4, 4);
+            ctx.fillRect(2, -4, 4, 4);
+          }
+
+          ctx.restore();
+        }
+
+        checkCollisionWithPlayer() {
+          return (
+            player.x < this.x + this.width &&
+            player.x + player.width > this.x &&
+            player.y < this.y + this.height &&
+            player.y + player.height > this.y
+          );
+        }
+
+        takeDamage() {
+          this.health--;
+          if (this.health <= 0) {
+            this.createDeathEffect();
+            return true; // Враг уничтожен
+          }
+          return false;
+        }
+
+        createDeathEffect() {
+          for (let i = 0; i < 10; i++) {
+            particles.push(
+              new Particle(
+                this.x + this.width / 2,
+                this.y + this.height / 2,
+                this.type === "walker" ? "#E53E3E" : "#9C27B0",
+                "death"
+              )
+            );
+          }
+          playEnemyDeathSound();
+        }
+      }
+
+      // ===========================================
+      // ПРЕДМЕТЫ
+      // ===========================================
+
+      class Gem {
+        constructor(x, y, type = "normal") {
+          this.x = x;
+          this.y = y;
+          this.width = 20;
+          this.height = 20;
+          this.type = type;
+          this.animationFrame = 0;
+          this.floatOffset = Math.random() * Math.PI * 2;
+          this.collected = false;
+
+          this.value = type === "special" ? 50 : 10;
+          this.color = type === "special" ? "#FF6B6B" : "#FFD700";
+        }
+
+        update() {
+          this.animationFrame += 0.1;
+
+          // Плавающая анимация
+          this.y += Math.sin(this.animationFrame + this.floatOffset) * 0.5;
+
+          // Проверка сбора игроком
+          if (this.checkCollisionWithPlayer() && !this.collected) {
+            this.collect();
+          }
+        }
+
+        draw() {
+          if (this.collected) return;
+
+          ctx.save();
+          ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+          ctx.rotate(this.animationFrame * 2);
+
+          // Создаем градиент для гема
+          const gradient = ctx.createRadialGradient(
+            0,
+            0,
+            0,
+            0,
+            0,
+            this.width / 2
+          );
+          gradient.addColorStop(0, this.color);
+          gradient.addColorStop(
+            0.7,
+            this.type === "special" ? "#FF8A80" : "#FFF176"
+          );
+          gradient.addColorStop(
+            1,
+            this.type === "special" ? "#FFCDD2" : "#FFF9C4"
+          );
+
+          ctx.fillStyle = gradient;
+
+          // Рисуем форму гема
+          this.drawGemShape();
+
+          // Добавляем блеск
+          ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+          ctx.beginPath();
+          ctx.arc(-4, -4, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        }
+
+        drawGemShape() {
+          const size = this.width / 2;
+          ctx.beginPath();
+          ctx.moveTo(0, -size);
+          ctx.lineTo(size * 0.7, -size * 0.3);
+          ctx.lineTo(size, size * 0.3);
+          ctx.lineTo(0, size);
+          ctx.lineTo(-size, size * 0.3);
+          ctx.lineTo(-size * 0.7, -size * 0.3);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        checkCollisionWithPlayer() {
+          return (
+            player.x < this.x + this.width &&
+            player.x + player.width > this.x &&
+            player.y < this.y + this.height &&
+            player.y + player.height > this.y
+          );
+        }
+
+        collect() {
+          this.collected = true;
+          gameData.score += this.value;
+          gameData.gems++;
+
+          // Создаем эффект сбора
+          for (let i = 0; i < 12; i++) {
+            particles.push(
+              new Particle(
+                this.x + this.width / 2,
+                this.y + this.height / 2,
+                this.color,
+                "gem"
+              )
+            );
+          }
+
+          playGemSound();
+          updateUI();
+
+          // Проверяем завершение уровня
+          checkLevelComplete();
+        }
+      }
+
+      // ===========================================
+      // СИСТЕМА УРОВНЕЙ
+      // ===========================================
+
+      class Level {
+        constructor(data) {
+          this.platforms = data.platforms || [];
+          this.enemies = data.enemies || [];
+          this.gems = data.gems || [];
+          this.playerStart = data.playerStart || { x: 50, y: 400 };
+          this.title = data.title || "Уровень";
+          this.description = data.description || "Описание уровня";
+          this.background = data.background || "#87CEEB";
+          this.requiredGems = data.requiredGems || this.gems.length;
+        }
+
+        draw() {
+          // Фон уровня
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          gradient.addColorStop(0, this.background);
+          gradient.addColorStop(1, "#98FB98");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Рисуем платформы
+          this.platforms.forEach((platform) => {
+            ctx.fillStyle = "#8D6E63";
+            ctx.fillRect(
+              platform.x,
+              platform.y,
+              platform.width,
+              platform.height
+            );
+
+            // Добавляем текстуру
+            ctx.fillStyle = "#A1887F";
+            ctx.fillRect(platform.x, platform.y, platform.width, 5);
+
+            // Трава сверху
+            ctx.fillStyle = "#4CAF50";
+            ctx.fillRect(platform.x, platform.y - 5, platform.width, 5);
+          });
+
+          // Рисуем врагов
+          this.enemies.forEach((enemy) => enemy.draw());
+
+          // Рисуем гемы
+          this.gems.forEach((gem) => gem.draw());
+        }
+
+        update() {
+          // Обновляем врагов
+          this.enemies = this.enemies.filter((enemy) => {
+            enemy.update();
+            return true; // Пока не удаляем врагов
+          });
+
+          // Обновляем гемы
+          this.gems.forEach((gem) => gem.update());
+        }
+
+        checkCollisions(player) {
+          player.onGround = false;
+
+          // Проверка столкновений с платформами
+          this.platforms.forEach((platform) => {
+            if (
+              player.x < platform.x + platform.width &&
+              player.x + player.width > platform.x &&
+              player.y < platform.y + platform.height &&
+              player.y + player.height > platform.y
+            ) {
+              // Вертикальное столкновение
+              if (player.velocityY > 0) {
+                // Падение вниз
+                player.y = platform.y - player.height;
+                player.velocityY = 0;
+                player.onGround = true;
+              } else if (player.velocityY < 0) {
+                // Удар головой
+                player.y = platform.y + platform.height;
+                player.velocityY = 0;
+              }
+            }
+          });
+        }
+      }
+
+      // ===========================================
+      // ДАННЫЕ УРОВНЕЙ
+      // ===========================================
+
+      const LEVELS = [
+        {
+          title: "Уровень 1: Основы движения",
+          description: "Изучите основы управления и физики",
+          platforms: [
+            { x: 0, y: 550, width: 300, height: 50 },
+            { x: 400, y: 450, width: 200, height: 30 },
+            { x: 700, y: 350, width: 300, height: 30 },
+            { x: 200, y: 250, width: 150, height: 30 },
+          ],
+          enemies: [
+            new Enemy(450, 420, "walker"),
+            new Enemy(750, 150, "flyer"),
+          ],
+          gems: [
+            new Gem(500, 410),
+            new Gem(800, 310),
+            new Gem(250, 210),
+            new Gem(150, 510, "special"),
+          ],
+          playerStart: { x: 50, y: 500 },
+          background: "#87CEEB",
+          requiredGems: 3,
+        },
+        {
+          title: "Уровень 2: Точные прыжки",
+          description: "Освойте сложные комбинации прыжков",
+          platforms: [
+            { x: 0, y: 550, width: 150, height: 50 },
+            { x: 250, y: 450, width: 100, height: 20 },
+            { x: 450, y: 350, width: 100, height: 20 },
+            { x: 650, y: 250, width: 100, height: 20 },
+            { x: 850, y: 150, width: 150, height: 20 },
+            { x: 400, y: 500, width: 200, height: 20 },
+          ],
+          enemies: [
+            new Enemy(300, 420, "walker"),
+            new Enemy(500, 320, "walker"),
+            new Enemy(200, 300, "flyer"),
+            new Enemy(600, 100, "flyer"),
+          ],
+          gems: [
+            new Gem(300, 410),
+            new Gem(500, 310),
+            new Gem(700, 210),
+            new Gem(900, 110),
+            new Gem(500, 460, "special"),
+            new Gem(75, 510, "special"),
+          ],
+          playerStart: { x: 50, y: 500 },
+          background: "#FFB74D",
+          requiredGems: 5,
+        },
+        {
+          title: "Уровень 3: Мастер платформера",
+          description: "Финальный вызов для истинного мастера!",
+          platforms: [
+            { x: 0, y: 550, width: 100, height: 50 },
+            { x: 200, y: 480, width: 80, height: 15 },
+            { x: 350, y: 420, width: 60, height: 15 },
+            { x: 480, y: 360, width: 80, height: 15 },
+            { x: 350, y: 300, width: 60, height: 15 },
+            { x: 200, y: 240, width: 80, height: 15 },
+            { x: 400, y: 180, width: 200, height: 15 },
+            { x: 700, y: 120, width: 100, height: 15 },
+            { x: 850, y: 200, width: 150, height: 20 },
+          ],
+          enemies: [
+            new Enemy(230, 450, "walker"),
+            new Enemy(380, 390, "walker"),
+            new Enemy(510, 330, "walker"),
+            new Enemy(100, 400, "flyer"),
+            new Enemy(300, 250, "flyer"),
+            new Enemy(600, 100, "flyer"),
+            new Enemy(900, 50, "flyer"),
+          ],
+          gems: [
+            new Gem(240, 440),
+            new Gem(390, 380),
+            new Gem(520, 320),
+            new Gem(390, 260),
+            new Gem(240, 200),
+            new Gem(500, 140),
+            new Gem(750, 80),
+            new Gem(925, 160, "special"),
+            new Gem(50, 510, "special"),
+          ],
+          playerStart: { x: 25, y: 500 },
+          background: "#E1BEE7",
+          requiredGems: 7,
+        },
+      ];
+
+      // ===========================================
+      // ИГРОВЫЕ ПЕРЕМЕННЫЕ
+      // ===========================================
+
+      let gameState = GAME_STATES.START;
+      let player;
+      let particles = [];
+      let keys = {};
+
+      let gameData = {
+        currentLevelIndex: 0,
+        currentLevel: null,
+        score: 0,
+        lives: 3,
+        gems: 0,
+        startTime: 0,
+        levelStartTime: 0,
+      };
+
+      // ===========================================
+      // УПРАВЛЕНИЕ
+      // ===========================================
+
+      document.addEventListener("keydown", (e) => {
+        keys[e.code] = true;
+
+        if (e.code === "Space") {
+          e.preventDefault();
+          if (gameState === GAME_STATES.PLAYING) {
+            player.jump();
+          } else if (gameState === GAME_STATES.START) {
+            startGame();
+          }
+        }
+
+        if (e.code === "ShiftLeft" && gameState === GAME_STATES.PLAYING) {
+          player.dash();
+        }
+
+        if (e.code === "KeyR" && gameState === GAME_STATES.PLAYING) {
+          restartLevel();
+        }
+      });
+
+      document.addEventListener("keyup", (e) => {
+        keys[e.code] = false;
+      });
+
+      // ===========================================
+      // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ
+      // ===========================================
+
+      function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (gameState === GAME_STATES.PLAYING) {
+          // Обновление игровой логики
+          handleInput();
+
+          if (player) {
+            player.update();
+            gameData.currentLevel.checkCollisions(player);
+            gameData.currentLevel.update();
+          }
+
+          // Обновление частиц
+          particles = particles.filter((particle) => particle.update());
+
+          // Отрисовка
+          gameData.currentLevel.draw();
+          if (player) player.draw();
+          particles.forEach((particle) => particle.draw());
+        }
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      function handleInput() {
+        if (!player) return;
+
+        // Горизонтальное движение
+        if (keys["ArrowLeft"] || keys["KeyA"]) {
+          player.velocityX = -PLAYER_SPEED;
+          player.facingRight = false;
+        } else if (keys["ArrowRight"] || keys["KeyD"]) {
+          player.velocityX = PLAYER_SPEED;
+          player.facingRight = true;
+        }
+
+        // Прыжок
+        if (keys["ArrowUp"] || keys["KeyW"] || keys["Space"]) {
+          player.jump();
+        }
+      }
+
+      // ===========================================
+      // ФУНКЦИИ УПРАВЛЕНИЯ ИГРОЙ
+      // ===========================================
+
+      function startGame() {
+        gameState = GAME_STATES.PLAYING;
+        gameData.currentLevelIndex = 0;
+        gameData.score = 0;
+        gameData.lives = 3;
+        gameData.gems = 0;
+        gameData.startTime = Date.now();
+
+        loadLevel(0);
+
+        document.getElementById("startScreen").style.display = "none";
+        document.getElementById("gameUI").style.display = "flex";
+        updateUI();
+      }
+
+      function loadLevel(levelIndex) {
+        if (levelIndex >= LEVELS.length) {
+          // Все уровни пройдены
+          showGameOver(true);
+          return;
+        }
+
+        gameData.currentLevelIndex = levelIndex;
+        gameData.currentLevel = new Level(LEVELS[levelIndex]);
+        gameData.levelStartTime = Date.now();
+        gameData.gems = 0;
+
+        // Создаем игрока
+        player = new Player(
+          gameData.currentLevel.playerStart.x,
+          gameData.currentLevel.playerStart.y
+        );
+
+        // Обновляем интерфейс
+        document.getElementById("levelInfo").textContent =
+          gameData.currentLevel.title;
+        updateUI();
+
+        // Даем двойной прыжок с 2-го уровня
+        if (levelIndex >= 1) {
+          player.hasDoubleJump = true;
+          showPowerUpNotification("🦅 Двойной прыжок разблокирован!");
+        }
+      }
+
+      function checkLevelComplete() {
+        const collectedGems = gameData.currentLevel.gems.filter(
+          (gem) => gem.collected
+        ).length;
+
+        if (collectedGems >= gameData.currentLevel.requiredGems) {
+          gameState = GAME_STATES.LEVEL_COMPLETE;
+          setTimeout(() => {
+            showLevelComplete();
+          }, 1000);
+        }
+      }
+
+      function showLevelComplete() {
+        const levelTime = Math.round(
+          (Date.now() - gameData.levelStartTime) / 1000
+        );
+        const bonusPoints = Math.max(0, 100 - levelTime);
+        gameData.score += bonusPoints;
+
+        document.getElementById("gameOverTitle").textContent =
+          "🎉 Уровень пройден!";
+        document.getElementById("gameOverText").textContent =
+          "Отличная работа! Переходим к следующему уровню.";
+        document.getElementById("gameOverStats").innerHTML = `
+                Время: ${levelTime}с | Бонус: ${bonusPoints} очков<br>
+                Собрано гемов: ${gameData.gems} | Всего очков: ${gameData.score}
+            `;
+
+        document.getElementById("gameOverScreen").style.display = "block";
+      }
+
+      function showGameOver(victory) {
+        const totalTime = Math.round((Date.now() - gameData.startTime) / 1000);
+
+        if (victory) {
+          document.getElementById("gameOverTitle").textContent =
+            "🏆 Поздравляем! Все уровни пройдены!";
+          document.getElementById("gameOverText").textContent =
+            "Вы мастер платформера!";
+        } else {
+          document.getElementById("gameOverTitle").textContent =
+            "💀 Игра окончена";
+          document.getElementById("gameOverText").textContent =
+            "Не сдавайтесь, попробуйте еще раз!";
+        }
+
+        document.getElementById("gameOverStats").innerHTML = `
+                Общее время: ${totalTime}с | Финальный счет: ${gameData.score}<br>
+                Пройдено уровней: ${gameData.currentLevelIndex}/${LEVELS.length}
+            `;
+
+        document.getElementById("gameOverScreen").style.display = "block";
+      }
+
+      function nextLevel() {
+        gameData.currentLevelIndex++;
+        loadLevel(gameData.currentLevelIndex);
+        gameState = GAME_STATES.PLAYING;
+        document.getElementById("gameOverScreen").style.display = "none";
+      }
+
+      function restartLevel() {
+        loadLevel(gameData.currentLevelIndex);
+        gameState = GAME_STATES.PLAYING;
+        document.getElementById("gameOverScreen").style.display = "none";
+      }
+
+      function backToMenu() {
+        gameState = GAME_STATES.START;
+        document.getElementById("gameOverScreen").style.display = "none";
+        document.getElementById("startScreen").style.display = "block";
+        document.getElementById("gameUI").style.display = "none";
+      }
+
+      function updateUI() {
+        document.getElementById("lives").textContent = gameData.lives;
+        document.getElementById("score").textContent = gameData.score;
+        document.getElementById("gems").textContent = gameData.gems;
+      }
+
+      function showPowerUpNotification(text) {
+        const notification = document.createElement("div");
+        notification.className = "power-up-notification";
+        notification.textContent = text;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 2000);
+      }
+
+      // ===========================================
+      // ЗВУКОВЫЕ ЭФФЕКТЫ
+      // ===========================================
+
+      function playJumpSound() {
+        createBeep(400, 0.1, "sine");
+      }
+
+      function playGemSound() {
+        createBeep(800, 0.2, "triangle");
+      }
+
+      function playHitSound() {
+        createBeep(150, 0.3, "sawtooth");
+      }
+
+      function playDashSound() {
+        createBeep(600, 0.15, "square");
+      }
+
+      function playEnemyDeathSound() {
+        createBeep(200, 0.4, "sawtooth");
+      }
+
+      function createBeep(frequency, duration, type = "sine") {
+        try {
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.setValueAtTime(
+            frequency,
+            audioContext.currentTime
+          );
+          oscillator.type = type;
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + duration
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch (e) {
+          console.log("Звук недоступен");
+        }
+      }
+
+      // ===========================================
+      // ЗАПУСК ИГРЫ
+      // ===========================================
+
+      // Инициализация
+      updateUI();
+
+      // Запуск игрового цикла
+      gameLoop();
+
+      // ===========================================
+      // ОБУЧАЮЩИЕ КОММЕНТАРИИ
+      // ===========================================
+
+      /*
+        ОБРАЗОВАТЕЛЬНЫЕ КОНЦЕПЦИИ В ЭТОЙ ИГРЕ:
+        
+        1. ОБЪЕКТНО-ОРИЕНТИРОВАННОЕ ПРОГРАММИРОВАНИЕ (ООП)
+           - Классы Player, Enemy, Gem, Level, Particle
+           - Инкапсуляция данных и методов
+           - Наследование и полиморфизм
+        
+        2. ФИЗИКА ИГРЫ
+           - Гравитация и прыжки
+           - Столкновения и отскоки
+           - Трение и скорость
+        
+        3. СИСТЕМА СОСТОЯНИЙ
+           - Управление состояниями игры
+           - Переходы между уровнями
+           - Обработка событий
+        
+        4. СИСТЕМА ЧАСТИЦ
+           - Создание визуальных эффектов
+           - Жизненный цикл частиц
+           - Физика частиц
+        
+        5. УРОВНЕВАЯ СИСТЕМА
+           - Дизайн уровней
+           - Прогрессия сложности
+           - Система достижений
+        
+        6. ИГРОВАЯ ЛОГИКА
+           - Обнаружение столкновений
+           - Система очков
+           - Управление ресурсами (жизни)
+        
+        7. АНИМАЦИЯ И ГРАФИКА
+           - Canvas API для рендеринга
+           - Покадровая анимация
+           - Градиенты и эффекты
+        
+        8. АРХИТЕКТУРА ИГРОВОГО ЦИКЛА
+           - Разделение логики обновления и отрисовки
+           - RequestAnimationFrame для плавности
+           - Оптимизация производительности
+        
+        АЛГОРИТМЫ:
+        - Обнаружение столкновений AABB (Axis-Aligned Bounding Box)
+        - Система частиц с физикой
+        - ИИ врагов с патрулированием
+        - Анимация спрайтов и эффектов
+        - Управление памятью (удаление объектов)
+        */
+    </script>
+  </body>
+</html>

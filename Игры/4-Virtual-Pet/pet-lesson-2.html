@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 2: CSS дизайн и анимации тамагочи</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #a8e6cf 0%,
+          #dcedc1 50%,
+          #ffd3a5 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "🎨✨🌈";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #e74c3c;
+      }
+
+      .section h2 {
+        color: #e74c3c;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(231, 76, 60, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #e74c3c;
+      }
+
+      .visual-example {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .visual-example h3 {
+        color: #155724;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .demo-pet {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 350px;
+        margin: 0 auto 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border: 3px solid #f8f9fa;
+        position: relative;
+      }
+
+      .demo-pet::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(
+          45deg,
+          #ff9a56,
+          #ff6b6b,
+          #4ecdc4,
+          #45b7d1,
+          #96ceb4,
+          #feca57
+        );
+        border-radius: 23px;
+        z-index: -1;
+        animation: rainbow-border 3s linear infinite;
+      }
+
+      @keyframes rainbow-border {
+        0% {
+          filter: hue-rotate(0deg);
+        }
+        100% {
+          filter: hue-rotate(360deg);
+        }
+      }
+
+      .demo-pet-avatar {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        text-align: center;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        font-size: 3rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .demo-pet-avatar::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: shine 2s ease-in-out infinite;
+      }
+
+      @keyframes shine {
+        0% {
+          transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        100% {
+          transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .demo-stat {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+      }
+
+      .demo-stat:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-color: #dee2e6;
+      }
+
+      .demo-stat-label {
+        font-size: 0.9rem;
+        color: #495057;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      .demo-stat-bar {
+        background: #e9ecef;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .demo-stat-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease, background-color 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-stat-fill::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.7),
+          transparent
+        );
+        animation: progress-shine 2s ease-in-out infinite;
+      }
+
+      @keyframes progress-shine {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .demo-hunger {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      }
+      .demo-happiness {
+        background: linear-gradient(135deg, #feca57, #ff9ff3);
+      }
+      .demo-energy {
+        background: linear-gradient(135deg, #48cae4, #0077b6);
+      }
+      .demo-cleanliness {
+        background: linear-gradient(135deg, #a8e6cf, #56ccf2);
+      }
+
+      .demo-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .demo-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-btn:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .demo-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .demo-btn::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.5s ease;
+      }
+
+      .demo-btn:active::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      .color-palette {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .color-item {
+        text-align: center;
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .color-item:hover {
+        transform: translateY(-5px);
+      }
+
+      .color-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border: 3px solid white;
+      }
+
+      .gradient-examples {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .gradient-item {
+        height: 80px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+      }
+
+      .gradient-item:hover {
+        transform: scale(1.02);
+      }
+
+      .animation-demo {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .bouncing-pet {
+        font-size: 4rem;
+        animation: bounce 1.5s ease-in-out infinite;
+        display: inline-block;
+        margin: 20px;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-30px);
+        }
+        60% {
+          transform: translateY(-15px);
+        }
+      }
+
+      .floating-hearts {
+        position: relative;
+        display: inline-block;
+        margin: 20px;
+      }
+
+      .heart {
+        position: absolute;
+        color: #ff6b6b;
+        font-size: 1.5rem;
+        animation: float-heart 3s ease-in-out infinite;
+        opacity: 0;
+      }
+
+      .heart:nth-child(1) {
+        left: 0;
+        animation-delay: 0s;
+      }
+      .heart:nth-child(2) {
+        left: 20px;
+        animation-delay: 0.5s;
+      }
+      .heart:nth-child(3) {
+        left: 40px;
+        animation-delay: 1s;
+      }
+
+      @keyframes float-heart {
+        0% {
+          transform: translateY(0);
+          opacity: 0;
+        }
+        20% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "🎨";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .tips-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .tips-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .tip-item {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+      }
+
+      .css-property {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .css-value {
+        color: #f39c12;
+        font-weight: 600;
+      }
+
+      .css-selector {
+        color: #3498db;
+        font-weight: 600;
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .demo-stats,
+        .demo-buttons,
+        .color-palette,
+        .gradient-examples {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🎨 Урок 2: CSS дизайн и анимации</h1>
+        <p class="lesson-info">Превращаем HTML в красивого и живого тамагочи</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы превратим нашу HTML-заготовку в красивый
+            интерактивный интерфейс! Создадим яркие градиенты, анимированные
+            полоски здоровья, красивые кнопки и живые эффекты.
+          </p>
+          <p>
+            Ты узнаешь, как использовать современный CSS для создания
+            привлекательного пользовательского интерфейса с анимациями и
+            интерактивными элементами.
+          </p>
+        </div>
+
+        <div class="visual-example">
+          <h3>Предварительный просмотр стилизованного тамагочи</h3>
+          <div class="demo-pet">
+            <div class="demo-pet-avatar">
+              🐣
+              <div style="font-size: 1rem; margin-top: 10px; opacity: 0.9">
+                Малыш (уровень 2)
+              </div>
+            </div>
+            <div class="demo-stats">
+              <div class="demo-stat">
+                <div class="demo-stat-label">🍎 Голод</div>
+                <div class="demo-stat-bar">
+                  <div
+                    class="demo-stat-fill demo-hunger"
+                    style="width: 75%"
+                  ></div>
+                </div>
+                <div
+                  style="text-align: right; font-size: 0.8rem; margin-top: 5px"
+                >
+                  75%
+                </div>
+              </div>
+              <div class="demo-stat">
+                <div class="demo-stat-label">😊 Счастье</div>
+                <div class="demo-stat-bar">
+                  <div
+                    class="demo-stat-fill demo-happiness"
+                    style="width: 90%"
+                  ></div>
+                </div>
+                <div
+                  style="text-align: right; font-size: 0.8rem; margin-top: 5px"
+                >
+                  90%
+                </div>
+              </div>
+              <div class="demo-stat">
+                <div class="demo-stat-label">💤 Энергия</div>
+                <div class="demo-stat-bar">
+                  <div
+                    class="demo-stat-fill demo-energy"
+                    style="width: 60%"
+                  ></div>
+                </div>
+                <div
+                  style="text-align: right; font-size: 0.8rem; margin-top: 5px"
+                >
+                  60%
+                </div>
+              </div>
+              <div class="demo-stat">
+                <div class="demo-stat-label">🛁 Чистота</div>
+                <div class="demo-stat-bar">
+                  <div
+                    class="demo-stat-fill demo-cleanliness"
+                    style="width: 85%"
+                  ></div>
+                </div>
+                <div
+                  style="text-align: right; font-size: 0.8rem; margin-top: 5px"
+                >
+                  85%
+                </div>
+              </div>
+            </div>
+            <div class="demo-buttons">
+              <button class="demo-btn">🍎 Покормить</button>
+              <button class="demo-btn">🎮 Играть</button>
+              <button class="demo-btn">💤 Спать</button>
+              <button class="demo-btn">🛁 Мыть</button>
+            </div>
+          </div>
+          <p><em>Вот каким станет наш тамагочи после стилизации!</em></p>
+        </div>
+
+        <div class="section">
+          <h2>🌈 Основные стили контейнера</h2>
+          <p>
+            Начнём с создания базовых стилей. Установим красивый фон,
+            центрирование и основную цветовую схему для нашего тамагочи.
+          </p>
+
+          <div class="code-title">🎨 Базовая стилизация</div>
+          <div class="code-example">
+            <pre><span class="css-selector">body</span> {
+  <span class="css-property">font-family</span>: <span class="css-value">'Segoe UI', Arial, sans-serif</span>;
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)</span>;
+  <span class="css-property">margin</span>: <span class="css-value">0</span>;
+  <span class="css-property">padding</span>: <span class="css-value">20px</span>;
+  <span class="css-property">min-height</span>: <span class="css-value">100vh</span>;
+  <span class="css-property">display</span>: <span class="css-value">flex</span>;
+  <span class="css-property">justify-content</span>: <span class="css-value">center</span>;
+  <span class="css-property">align-items</span>: <span class="css-value">center</span>;
+}
+
+<span class="css-selector">.pet-container</span> {
+  <span class="css-property">background</span>: <span class="css-value">rgba(255, 255, 255, 0.95)</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">25px</span>;
+  <span class="css-property">box-shadow</span>: <span class="css-value">0 20px 40px rgba(0, 0, 0, 0.2)</span>;
+  <span class="css-property">padding</span>: <span class="css-value">30px</span>;
+  <span class="css-property">max-width</span>: <span class="css-value">400px</span>;
+  <span class="css-property">width</span>: <span class="css-value">100%</span>;
+  <span class="css-property">backdrop-filter</span>: <span class="css-value">blur(10px)</span>;
+}</pre>
+          </div>
+
+          <p>
+            <span class="highlight">linear-gradient</span> создаёт красивый
+            градиентный фон, а
+            <span class="highlight">backdrop-filter</span> добавляет эффект
+            размытия для современного вида.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🔥 Градиенты и цветовая палитра</h2>
+          <p>
+            Градиенты делают интерфейс живым и современным. Создадим красивую
+            цветовую схему для разных элементов нашего тамагочи.
+          </p>
+
+          <div class="color-palette">
+            <div class="color-item">
+              <div
+                class="color-circle"
+                style="background: linear-gradient(135deg, #ff6b6b, #ee5a52)"
+              ></div>
+              <div><strong>Голод</strong></div>
+              <div style="font-size: 0.8rem; color: #666">Красный градиент</div>
+            </div>
+            <div class="color-item">
+              <div
+                class="color-circle"
+                style="background: linear-gradient(135deg, #feca57, #ff9ff3)"
+              ></div>
+              <div><strong>Счастье</strong></div>
+              <div style="font-size: 0.8rem; color: #666">Жёлто-розовый</div>
+            </div>
+            <div class="color-item">
+              <div
+                class="color-circle"
+                style="background: linear-gradient(135deg, #48cae4, #0077b6)"
+              ></div>
+              <div><strong>Энергия</strong></div>
+              <div style="font-size: 0.8rem; color: #666">Синий градиент</div>
+            </div>
+            <div class="color-item">
+              <div
+                class="color-circle"
+                style="background: linear-gradient(135deg, #a8e6cf, #56ccf2)"
+              ></div>
+              <div><strong>Чистота</strong></div>
+              <div style="font-size: 0.8rem; color: #666">Зелёно-голубой</div>
+            </div>
+          </div>
+
+          <div class="code-title">🌈 CSS градиенты для статистик</div>
+          <div class="code-example">
+            <pre><span class="css-selector">.hunger-bar</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #ff6b6b, #ee5a52)</span>;
+}
+
+<span class="css-selector">.happiness-bar</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #feca57, #ff9ff3)</span>;
+}
+
+<span class="css-selector">.energy-bar</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #48cae4, #0077b6)</span>;
+}
+
+<span class="css-selector">.cleanliness-bar</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #a8e6cf, #56ccf2)</span>;
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🐾 Стилизация области питомца</h2>
+          <p>
+            Создадим красивую область для отображения нашего виртуального друга
+            с градиентным фоном и эффектами свечения.
+          </p>
+
+          <div class="code-title">🐾 Дизайн питомца</div>
+          <div class="code-example">
+            <pre><span class="css-selector">.pet-display</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #74b9ff, #0984e3)</span>;
+  <span class="css-property">color</span>: <span class="css-value">white</span>;
+  <span class="css-property">text-align</span>: <span class="css-value">center</span>;
+  <span class="css-property">padding</span>: <span class="css-value">30px</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">15px</span>;
+  <span class="css-property">margin-bottom</span>: <span class="css-value">20px</span>;
+  <span class="css-property">position</span>: <span class="css-value">relative</span>;
+  <span class="css-property">overflow</span>: <span class="css-value">hidden</span>;
+  <span class="css-property">box-shadow</span>: <span class="css-value">0 10px 25px rgba(116, 185, 255, 0.3)</span>;
+}
+
+<span class="css-selector">.pet-avatar .emoji</span> {
+  <span class="css-property">font-size</span>: <span class="css-value">4rem</span>;
+  <span class="css-property">display</span>: <span class="css-value">block</span>;
+  <span class="css-property">margin-bottom</span>: <span class="css-value">10px</span>;
+  <span class="css-property">animation</span>: <span class="css-value">bounce 2s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">@keyframes bounce</span> {
+  <span class="css-value">0%, 20%, 50%, 80%, 100%</span> { <span class="css-property">transform</span>: <span class="css-value">translateY(0)</span>; }
+  <span class="css-value">40%</span> { <span class="css-property">transform</span>: <span class="css-value">translateY(-10px)</span>; }
+  <span class="css-value">60%</span> { <span class="css-property">transform</span>: <span class="css-value">translateY(-5px)</span>; }
+}</pre>
+          </div>
+
+          <div class="animation-demo">
+            <h4 style="margin-bottom: 20px">Демонстрация анимации:</h4>
+            <div class="bouncing-pet">🐣</div>
+            <div class="floating-hearts">
+              <span style="color: white">💖 Счастливый питомец!</span>
+              <div class="heart">💕</div>
+              <div class="heart">💖</div>
+              <div class="heart">❤️</div>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.9">
+              Анимации делают игру живой и эмоциональной!
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 Полоски прогресса с анимацией</h2>
+          <p>
+            Создадим красивые анимированные полоски для отображения статистик
+            здоровья питомца. Они будут изменяться плавно и показывать блики при
+            обновлении.
+          </p>
+
+          <div class="code-title">📊 Стили статистик</div>
+          <div class="code-example">
+            <pre><span class="css-selector">.pet-stats</span> {
+  <span class="css-property">margin-bottom</span>: <span class="css-value">25px</span>;
+}
+
+<span class="css-selector">.stats-grid</span> {
+  <span class="css-property">display</span>: <span class="css-value">grid</span>;
+  <span class="css-property">grid-template-columns</span>: <span class="css-value">1fr 1fr</span>;
+  <span class="css-property">gap</span>: <span class="css-value">15px</span>;
+}
+
+<span class="css-selector">.stat-item</span> {
+  <span class="css-property">background</span>: <span class="css-value">#f8f9fa</span>;
+  <span class="css-property">padding</span>: <span class="css-value">15px</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">12px</span>;
+  <span class="css-property">border</span>: <span class="css-value">2px solid #e9ecef</span>;
+  <span class="css-property">transition</span>: <span class="css-value">all 0.3s ease</span>;
+}
+
+<span class="css-selector">.stat-item:hover</span> {
+  <span class="css-property">transform</span>: <span class="css-value">translateY(-2px)</span>;
+  <span class="css-property">box-shadow</span>: <span class="css-value">0 5px 15px rgba(0, 0, 0, 0.1)</span>;
+}
+
+<span class="css-selector">.stat-bar</span> {
+  <span class="css-property">background</span>: <span class="css-value">#e9ecef</span>;
+  <span class="css-property">height</span>: <span class="css-value">10px</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">5px</span>;
+  <span class="css-property">overflow</span>: <span class="css-value">hidden</span>;
+  <span class="css-property">margin</span>: <span class="css-value">8px 0</span>;
+  <span class="css-property">position</span>: <span class="css-value">relative</span>;
+}
+
+<span class="css-selector">.stat-fill</span> {
+  <span class="css-property">height</span>: <span class="css-value">100%</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">5px</span>;
+  <span class="css-property">transition</span>: <span class="css-value">width 0.5s ease</span>;
+  <span class="css-property">position</span>: <span class="css-value">relative</span>;
+  <span class="css-property">overflow</span>: <span class="css-value">hidden</span>;
+}
+
+<span class="css-selector">.stat-fill::before</span> {
+  <span class="css-property">content</span>: <span class="css-value">''</span>;
+  <span class="css-property">position</span>: <span class="css-value">absolute</span>;
+  <span class="css-property">top</span>: <span class="css-value">0</span>;
+  <span class="css-property">left</span>: <span class="css-value">-100%</span>;
+  <span class="css-property">width</span>: <span class="css-value">100%</span>;
+  <span class="css-property">height</span>: <span class="css-value">100%</span>;
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)</span>;
+  <span class="css-property">animation</span>: <span class="css-value">shine 2s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">@keyframes shine</span> {
+  <span class="css-value">0%</span> { <span class="css-property">left</span>: <span class="css-value">-100%</span>; }
+  <span class="css-value">100%</span> { <span class="css-property">left</span>: <span class="css-value">100%</span>; }
+}</pre>
+          </div>
+
+          <p>
+            Эффект <span class="highlight">shine</span> создаёт красивый блик,
+            который проходит по полоске прогресса, делая её более живой.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Интерактивные кнопки</h2>
+          <p>
+            Создадим красивые кнопки с эффектами наведения, нажатия и пульсации.
+            Кнопки должны быть яркими и привлекательными для детей.
+          </p>
+
+          <div class="code-title">🎮 Стили кнопок</div>
+          <div class="code-example">
+            <pre><span class="css-selector">.actions-grid</span> {
+  <span class="css-property">display</span>: <span class="css-value">grid</span>;
+  <span class="css-property">grid-template-columns</span>: <span class="css-value">1fr 1fr</span>;
+  <span class="css-property">gap</span>: <span class="css-value">12px</span>;
+}
+
+<span class="css-selector">.action-btn</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #667eea, #764ba2)</span>;
+  <span class="css-property">color</span>: <span class="css-value">white</span>;
+  <span class="css-property">border</span>: <span class="css-value">none</span>;
+  <span class="css-property">padding</span>: <span class="css-value">15px 20px</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">12px</span>;
+  <span class="css-property">font-size</span>: <span class="css-value">1rem</span>;
+  <span class="css-property">font-weight</span>: <span class="css-value">600</span>;
+  <span class="css-property">cursor</span>: <span class="css-value">pointer</span>;
+  <span class="css-property">transition</span>: <span class="css-value">all 0.3s ease</span>;
+  <span class="css-property">box-shadow</span>: <span class="css-value">0 4px 15px rgba(102, 126, 234, 0.3)</span>;
+  <span class="css-property">position</span>: <span class="css-value">relative</span>;
+  <span class="css-property">overflow</span>: <span class="css-value">hidden</span>;
+}
+
+<span class="css-selector">.action-btn:hover</span> {
+  <span class="css-property">transform</span>: <span class="css-value">translateY(-2px) scale(1.02)</span>;
+  <span class="css-property">box-shadow</span>: <span class="css-value">0 8px 25px rgba(102, 126, 234, 0.4)</span>;
+}
+
+<span class="css-selector">.action-btn:active</span> {
+  <span class="css-property">transform</span>: <span class="css-value">translateY(0) scale(0.98)</span>;
+}
+
+<span class="css-selector">.action-btn::before</span> {
+  <span class="css-property">content</span>: <span class="css-value">''</span>;
+  <span class="css-property">position</span>: <span class="css-value">absolute</span>;
+  <span class="css-property">top</span>: <span class="css-value">50%</span>;
+  <span class="css-property">left</span>: <span class="css-value">50%</span>;
+  <span class="css-property">width</span>: <span class="css-value">0</span>;
+  <span class="css-property">height</span>: <span class="css-value">0</span>;
+  <span class="css-property">background</span>: <span class="css-value">rgba(255, 255, 255, 0.5)</span>;
+  <span class="css-property">border-radius</span>: <span class="css-value">50%</span>;
+  <span class="css-property">transform</span>: <span class="css-value">translate(-50%, -50%)</span>;
+  <span class="css-property">transition</span>: <span class="css-value">all 0.5s ease</span>;
+}
+
+<span class="css-selector">.action-btn:active::before</span> {
+  <span class="css-property">width</span>: <span class="css-value">300px</span>;
+  <span class="css-property">height</span>: <span class="css-value">300px</span>;
+}</pre>
+          </div>
+
+          <p>
+            Эффект ripple (расширяющийся круг) при нажатии создаёт ощущение
+            отзывчивости и современности интерфейса.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>✨ Специальные эффекты и состояния</h2>
+          <p>
+            Добавим специальные эффекты для разных состояний питомца: когда он
+            голоден, счастлив, устал или грязный. Это сделает игру более
+            эмоциональной.
+          </p>
+
+          <div class="code-title">✨ Эффекты состояний</div>
+          <div class="code-example">
+            <pre><span class="css-selector">.pet-hungry</span> {
+  <span class="css-property">animation</span>: <span class="css-value">shake 0.5s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">.pet-happy</span> {
+  <span class="css-property">animation</span>: <span class="css-value">bounce 1s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">.pet-sleeping</span> {
+  <span class="css-property">opacity</span>: <span class="css-value">0.7</span>;
+  <span class="css-property">filter</span>: <span class="css-value">blur(1px)</span>;
+}
+
+<span class="css-selector">@keyframes shake</span> {
+  <span class="css-value">0%, 100%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(0)</span>; }
+  <span class="css-value">25%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(-5px)</span>; }
+  <span class="css-value">75%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(5px)</span>; }
+}
+
+<span class="css-selector">.low-stat</span> {
+  <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #ff6b6b, #ee5a52) !important</span>;
+  <span class="css-property">animation</span>: <span class="css-value">pulse 1s ease-in-out infinite</span>;
+}
+
+<span class="css-selector">@keyframes pulse</span> {
+  <span class="css-value">0%, 100%</span> { <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; }
+  <span class="css-value">50%</span> { <span class="css-property">transform</span>: <span class="css-value">scale(1.05)</span>; }
+}</pre>
+          </div>
+
+          <div class="gradient-examples">
+            <div
+              class="gradient-item"
+              style="background: linear-gradient(135deg, #ff6b6b, #ee5a52)"
+            >
+              Критически низко
+            </div>
+            <div
+              class="gradient-item"
+              style="background: linear-gradient(135deg, #feca57, #ff9ff3)"
+            >
+              Нормально
+            </div>
+            <div
+              class="gradient-item"
+              style="background: linear-gradient(135deg, #a8e6cf, #56ccf2)"
+            >
+              Отлично
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📱 Адаптивный дизайн</h2>
+          <p>
+            Сделаем наш тамагочи отлично выглядящим на всех устройствах - от
+            мобильных телефонов до планшетов.
+          </p>
+
+          <div class="code-title">📱 Медиа-запросы</div>
+          <div class="code-example">
+            <pre><span class="css-selector">@media (max-width: 768px)</span> {
+  <span class="css-selector">.pet-container</span> {
+    <span class="css-property">margin</span>: <span class="css-value">10px</span>;
+    <span class="css-property">padding</span>: <span class="css-value">20px</span>;
+  }
+  
+  <span class="css-selector">.stats-grid</span> {
+    <span class="css-property">grid-template-columns</span>: <span class="css-value">1fr</span>;
+    <span class="css-property">gap</span>: <span class="css-value">10px</span>;
+  }
+  
+  <span class="css-selector">.actions-grid</span> {
+    <span class="css-property">grid-template-columns</span>: <span class="css-value">1fr</span>;
+  }
+  
+  <span class="css-selector">.pet-avatar .emoji</span> {
+    <span class="css-property">font-size</span>: <span class="css-value">3rem</span>;
+  }
+}</pre>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>🎨 Твоё задание</h3>
+          <p>
+            Создай файл <strong>styles.css</strong> и добавь в HTML следующие
+            стили:
+          </p>
+
+          <ol class="task-list">
+            <li>Красивый градиентный фон для всей страницы</li>
+            <li>Стилизацию главного контейнера с закруглёнными углами</li>
+            <li>Красивую область питомца с градиентом и анимацией</li>
+            <li>Полоски прогресса с разными цветами для каждой статистики</li>
+            <li>Интерактивные кнопки с эффектами наведения</li>
+            <li>Анимации bounce, shine и pulse</li>
+            <li>Адаптивные стили для мобильных устройств</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #856404">
+            💡 Не забудь связать CSS файл с HTML через тег &lt;link&gt;!
+          </p>
+        </div>
+
+        <div class="tips-section">
+          <h3>💡 Секреты красивого CSS</h3>
+
+          <div class="tip-item">
+            <strong>Градиенты:</strong> Используй linear-gradient с углом 135deg
+            для красивых диагональных переходов. Попробуй сочетания из 2-3
+            близких цветов.
+          </div>
+
+          <div class="tip-item">
+            <strong>Анимации:</strong> Делай анимации плавными (ease-in-out) и
+            не слишком быстрыми. 0.3s для hover эффектов, 1-2s для декоративных
+            анимаций.
+          </div>
+
+          <div class="tip-item">
+            <strong>Тени:</strong> box-shadow создаёт глубину. Используй
+            полупрозрачные тени с небольшим размытием для естественного вида.
+          </div>
+
+          <div class="tip-item">
+            <strong>Переходы:</strong> transition: all 0.3s ease делает любое
+            изменение стилей плавным и приятным для глаз.
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="pet-lesson-3.html" class="next-lesson">
+            ⚙️ Следующий урок: JavaScript логика →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Анимация демо-питомца
+      document.addEventListener("DOMContentLoaded", function () {
+        const demoPet = document.querySelector(".demo-pet-avatar");
+        const demoStats = document.querySelectorAll(".demo-stat-fill");
+        const demoButtons = document.querySelectorAll(".demo-btn");
+
+        // Случайное изменение статистик
+        setInterval(() => {
+          demoStats.forEach((stat) => {
+            const randomWidth = Math.floor(Math.random() * 40) + 60; // 60-100%
+            stat.style.width = randomWidth + "%";
+
+            // Добавляем класс для пульсации при низких значениях
+            if (randomWidth < 30) {
+              stat.parentElement.parentElement.style.animation =
+                "pulse 1s ease-in-out infinite";
+            } else {
+              stat.parentElement.parentElement.style.animation = "none";
+            }
+          });
+        }, 3000);
+
+        // Интерактивность кнопок
+        demoButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // Эффект кормления
+            if (this.textContent.includes("🍎")) {
+              demoPet.style.animation = "bounce 0.5s ease-in-out 3";
+              setTimeout(() => {
+                demoPet.style.animation = "bounce 2s ease-in-out infinite";
+              }, 1500);
+            }
+
+            // Эффект игры
+            if (this.textContent.includes("🎮")) {
+              demoPet.style.transform = "rotate(360deg)";
+              setTimeout(() => {
+                demoPet.style.transform = "rotate(0deg)";
+              }, 500);
+            }
+          });
+        });
+
+        // Плавное появление секций
+        const sections = document.querySelectorAll(".section, .visual-example");
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

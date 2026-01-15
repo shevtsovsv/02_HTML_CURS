@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5a: Система достижений и очков</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #f093fb 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #e74c3c;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "🏆🎖️✨";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #e74c3c;
+      }
+
+      .section h2 {
+        color: #e74c3c;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(231, 76, 60, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #e74c3c;
+      }
+
+      .js-keyword {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .js-function {
+        color: #f39c12;
+        font-weight: 600;
+      }
+
+      .js-string {
+        color: #2ecc71;
+      }
+
+      .js-number {
+        color: #3498db;
+      }
+
+      .js-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .achievements-demo {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .achievements-demo h3 {
+        margin-bottom: 20px;
+        font-size: 1.6rem;
+        text-align: center;
+      }
+
+      .demo-game-area {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        backdrop-filter: blur(5px);
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        backdrop-filter: blur(5px);
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #fdcb6e;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      .achievement-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .achievement-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .achievement-card.unlocked {
+        border-color: #fdcb6e;
+        background: rgba(253, 203, 110, 0.2);
+      }
+
+      .achievement-card.unlocked::before {
+        content: "✨";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.2rem;
+        animation: sparkle 2s infinite;
+      }
+
+      .achievement-icon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .achievement-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .achievement-desc {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-bottom: 10px;
+      }
+
+      .achievement-progress {
+        background: rgba(255, 255, 255, 0.2);
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .achievement-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #fdcb6e, #e17055);
+        border-radius: 4px;
+        transition: width 1s ease;
+      }
+
+      .demo-button {
+        background: linear-gradient(135deg, #fdcb6e, #e17055);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 5px;
+        box-shadow: 0 5px 15px rgba(225, 112, 85, 0.3);
+      }
+
+      .demo-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(225, 112, 85, 0.4);
+      }
+
+      .demo-button:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .scoring-showcase {
+        background: linear-gradient(135deg, #e8f5e8, #d5edd5);
+        border: 2px solid #00b894;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .scoring-showcase h3 {
+        color: #00b894;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .scoring-table {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 15px 0;
+      }
+
+      .scoring-table th,
+      .scoring-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .scoring-table th {
+        background: #00b894;
+        color: white;
+        font-weight: bold;
+      }
+
+      .scoring-table tr:hover {
+        background: rgba(0, 184, 148, 0.1);
+      }
+
+      .score-amount {
+        font-weight: bold;
+        color: #00b894;
+        font-size: 1.1rem;
+      }
+
+      .achievement-types {
+        background: linear-gradient(135deg, #fff5e6, #ffe6cc);
+        border: 2px solid #f39c12;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .achievement-types h3 {
+        color: #d68910;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .types-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .type-card {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #f39c12;
+        text-align: center;
+      }
+
+      .type-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .type-title {
+        color: #d68910;
+        font-weight: bold;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+      }
+
+      .type-desc {
+        color: #8b5a2b;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+
+      .implementation-showcase {
+        background: linear-gradient(135deg, #e8e8ff, #d1d1ff);
+        border: 2px solid #6c5ce7;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .implementation-showcase h3 {
+        color: #5f3dc4;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "🏆";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+      }
+
+      @keyframes sparkle {
+        0%,
+        100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2) rotate(180deg);
+          opacity: 0.8;
+        }
+      }
+
+      @keyframes achievementUnlock {
+        0% {
+          transform: scale(0.8) rotate(-10deg);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.1) rotate(5deg);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+      }
+
+      .achievement-unlocked {
+        animation: achievementUnlock 0.6s ease-out;
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .demo-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .achievement-list {
+          grid-template-columns: 1fr;
+        }
+
+        .types-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .scoring-table {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🏆 Урок 5a: Система достижений</h1>
+        <p class="lesson-info">Создаём мотивирующую систему наград и очков</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы создадим увлекательную систему достижений для игры
+            "Угадай число". Изучим, как мотивировать игроков через награды, очки
+            и прогресс.
+          </p>
+          <p>
+            Ты узнаешь, как правильно спроектировать систему достижений, которая
+            будет мотивировать игроков возвращаться и улучшать свои результаты.
+          </p>
+        </div>
+
+        <div class="achievements-demo">
+          <h3>🎖️ Интерактивная система достижений</h3>
+          <p style="margin-bottom: 20px">Попробуй разблокировать достижения:</p>
+
+          <div class="demo-game-area">
+            <div class="demo-stats">
+              <div class="stat-card">
+                <div class="stat-number" id="demoScore">0</div>
+                <div class="stat-label">Очки</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="demoGames">0</div>
+                <div class="stat-label">Игр</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="demoWins">0</div>
+                <div class="stat-label">Побед</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="demoStreak">0</div>
+                <div class="stat-label">Серия</div>
+              </div>
+            </div>
+
+            <div style="margin: 20px 0">
+              <button class="demo-button" onclick="simulateWin()">
+                🎯 Симулировать победу
+              </button>
+              <button class="demo-button" onclick="simulateLoss()">
+                ❌ Симулировать поражение
+              </button>
+              <button class="demo-button" onclick="resetDemo()">
+                🔄 Сброс
+              </button>
+            </div>
+
+            <div class="achievement-list" id="achievementsList">
+              <!-- Достижения будут добавлены через JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🏆 Типы достижений</h2>
+          <p>
+            Хорошая система достижений включает разнообразные цели, которые
+            подходят для разных типов игроков и стилей игры.
+          </p>
+
+          <div class="achievement-types">
+            <h3>🎨 Категории достижений</h3>
+
+            <div class="types-grid">
+              <div class="type-card">
+                <div class="type-icon">🎯</div>
+                <div class="type-title">Точность</div>
+                <div class="type-desc">
+                  За угадывание с минимальным количеством попыток
+                </div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-icon">🔥</div>
+                <div class="type-title">Серии побед</div>
+                <div class="type-desc">
+                  За последовательные победы без поражений
+                </div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-icon">📊</div>
+                <div class="type-title">Статистика</div>
+                <div class="type-desc">
+                  За общие показатели: количество игр, побед
+                </div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-icon">⚡</div>
+                <div class="type-title">Скорость</div>
+                <div class="type-desc">За быстрое угадывание чисел</div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-icon">🧠</div>
+                <div class="type-title">Стратегия</div>
+                <div class="type-desc">
+                  За использование оптимальных алгоритмов
+                </div>
+              </div>
+
+              <div class="type-card">
+                <div class="type-icon">💎</div>
+                <div class="type-title">Редкие</div>
+                <div class="type-desc">Особые достижения для мастеров игры</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="code-title">🏆 Структура достижений</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Конфигурация системы достижений</span>
+<span class="js-keyword">const</span> <span class="js-function">ACHIEVEMENTS</span> = {
+    <span class="js-comment">// Достижения точности</span>
+    accuracy: {
+        perfectGuess: {
+            id: <span class="js-string">'perfect-guess'</span>,
+            name: <span class="js-string">'🎯 Снайпер'</span>,
+            description: <span class="js-string">'Угадай число с первой попытки'</span>,
+            condition: (stats) => stats.lastGameAttempts === <span class="js-number">1</span>,
+            points: <span class="js-number">100</span>,
+            rarity: <span class="js-string">'legendary'</span>
+        },
+        sharpshooter: {
+            id: <span class="js-string">'sharpshooter'</span>,
+            name: <span class="js-string">'🏹 Меткий стрелок'</span>,
+            description: <span class="js-string">'Угадай число за 3 попытки или меньше'</span>,
+            condition: (stats) => stats.lastGameAttempts <= <span class="js-number">3</span> && stats.lastGameAttempts > <span class="js-number">1</span>,
+            points: <span class="js-number">50</span>,
+            rarity: <span class="js-string">'epic'</span>
+        },
+        efficient: {
+            id: <span class="js-string">'efficient'</span>,
+            name: <span class="js-string">'⚡ Эффективный'</span>,
+            description: <span class="js-string">'Угадай число за 5 попыток или меньше'</span>,
+            condition: (stats) => stats.lastGameAttempts <= <span class="js-number">5</span>,
+            points: <span class="js-number">25</span>,
+            rarity: <span class="js-string">'rare'</span>
+        }
+    },
+    
+    <span class="js-comment">// Серии побед</span>
+    streaks: {
+        hotStreak: {
+            id: <span class="js-string">'hot-streak'</span>,
+            name: <span class="js-string">'🔥 Горячая серия'</span>,
+            description: <span class="js-string">'Выиграй 3 игры подряд'</span>,
+            condition: (stats) => stats.winStreak >= <span class="js-number">3</span>,
+            points: <span class="js-number">75</span>,
+            rarity: <span class="js-string">'epic'</span>
+        },
+        unstoppable: {
+            id: <span class="js-string">'unstoppable'</span>,
+            name: <span class="js-string">'🚀 Неудержимый'</span>,
+            description: <span class="js-string">'Выиграй 5 игр подряд'</span>,
+            condition: (stats) => stats.winStreak >= <span class="js-number">5</span>,
+            points: <span class="js-number">150</span>,
+            rarity: <span class="js-string">'legendary'</span>
+        },
+        champion: {
+            id: <span class="js-string">'champion'</span>,
+            name: <span class="js-string">'👑 Чемпион'</span>,
+            description: <span class="js-string">'Выиграй 10 игр подряд'</span>,
+            condition: (stats) => stats.winStreak >= <span class="js-number">10</span>,
+            points: <span class="js-number">500</span>,
+            rarity: <span class="js-string">'mythic'</span>
+        }
+    },
+    
+    <span class="js-comment">// Статистические достижения</span>
+    milestones: {
+        firstWin: {
+            id: <span class="js-string">'first-win'</span>,
+            name: <span class="js-string">'🌟 Первая победа'</span>,
+            description: <span class="js-string">'Выиграй свою первую игру'</span>,
+            condition: (stats) => stats.totalWins === <span class="js-number">1</span>,
+            points: <span class="js-number">20</span>,
+            rarity: <span class="js-string">'common'</span>
+        },
+        veteran: {
+            id: <span class="js-string">'veteran'</span>,
+            name: <span class="js-string">'🎖️ Ветеран'</span>,
+            description: <span class="js-string">'Сыграй 25 игр'</span>,
+            condition: (stats) => stats.totalGames >= <span class="js-number">25</span>,
+            points: <span class="js-number">100</span>,
+            rarity: <span class="js-string">'rare'</span>
+        },
+        master: {
+            id: <span class="js-string">'master'</span>,
+            name: <span class="js-string">'🏆 Мастер'</span>,
+            description: <span class="js-string">'Выиграй 50 игр'</span>,
+            condition: (stats) => stats.totalWins >= <span class="js-number">50</span>,
+            points: <span class="js-number">300</span>,
+            rarity: <span class="js-string">'legendary'</span>
+        }
+    }
+};
+
+<span class="js-comment">// Редкость достижений</span>
+<span class="js-keyword">const</span> <span class="js-function">RARITY_CONFIG</span> = {
+    common: { color: <span class="js-string">'#95a5a6'</span>, multiplier: <span class="js-number">1</span> },
+    rare: { color: <span class="js-string">'#3498db'</span>, multiplier: <span class="js-number">1.5</span> },
+    epic: { color: <span class="js-string">'#9b59b6'</span>, multiplier: <span class="js-number">2</span> },
+    legendary: { color: <span class="js-string">'#f39c12'</span>, multiplier: <span class="js-number">3</span> },
+    mythic: { color: <span class="js-string">'#e74c3c'</span>, multiplier: <span class="js-number">5</span> }
+};</pre>
+          </div>
+
+          <p>
+            Каждое достижение имеет
+            <span class="highlight">условие проверки</span>,
+            <span class="highlight">количество очков</span> и
+            <span class="highlight">редкость</span>, которая влияет на ценность
+            награды.
+          </p>
+        </div>
+
+        <div class="scoring-showcase">
+          <h3>💰 Система очков</h3>
+          <p>Очки мотивируют игроков и показывают прогресс:</p>
+
+          <table class="scoring-table">
+            <thead>
+              <tr>
+                <th>Действие</th>
+                <th>Базовые очки</th>
+                <th>Бонус за сложность</th>
+                <th>Итого</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Победа (лёгкий)</td>
+                <td class="score-amount">+10</td>
+                <td>×1.0</td>
+                <td class="score-amount">10</td>
+              </tr>
+              <tr>
+                <td>Победа (средний)</td>
+                <td class="score-amount">+10</td>
+                <td>×1.5</td>
+                <td class="score-amount">15</td>
+              </tr>
+              <tr>
+                <td>Победа (сложный)</td>
+                <td class="score-amount">+10</td>
+                <td>×2.0</td>
+                <td class="score-amount">20</td>
+              </tr>
+              <tr>
+                <td>Победа (экстрим)</td>
+                <td class="score-amount">+10</td>
+                <td>×3.0</td>
+                <td class="score-amount">30</td>
+              </tr>
+              <tr>
+                <td>Быстрая победа (≤3 попытки)</td>
+                <td class="score-amount">+25</td>
+                <td>×1.5</td>
+                <td class="score-amount">37.5</td>
+              </tr>
+              <tr>
+                <td>Идеальная игра (1 попытка)</td>
+                <td class="score-amount">+100</td>
+                <td>×2.0</td>
+                <td class="score-amount">200</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-title">💰 Расчёт очков</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Система подсчёта очков</span>
+<span class="js-keyword">class</span> <span class="js-function">ScoreSystem</span> {
+    <span class="js-keyword">constructor</span>() {
+        <span class="js-keyword">this</span>.basePoints = {
+            win: <span class="js-number">10</span>,
+            quickWin: <span class="js-number">25</span>,        <span class="js-comment">// ≤ 3 попытки</span>
+            perfectGame: <span class="js-number">100</span>,    <span class="js-comment">// 1 попытка</span>
+            streakBonus: <span class="js-number">5</span>,      <span class="js-comment">// за каждую игру в серии</span>
+            difficultyBonus: <span class="js-number">10</span>  <span class="js-comment">// за каждый уровень сложности</span>
+        };
+        
+        <span class="js-keyword">this</span>.difficultyMultipliers = {
+            easy: <span class="js-number">1.0</span>,
+            medium: <span class="js-number">1.5</span>,
+            hard: <span class="js-number">2.0</span>,
+            extreme: <span class="js-number">3.0</span>
+        };
+    }
+    
+    <span class="js-comment">// Вычисляем очки за игру</span>
+    <span class="js-function">calculateGameScore</span>(gameResult) {
+        <span class="js-keyword">const</span> { 
+            won, 
+            attempts, 
+            difficulty, 
+            maxAttempts, 
+            winStreak 
+        } = gameResult;
+        
+        <span class="js-keyword">if</span> (!won) <span class="js-keyword">return</span> <span class="js-number">0</span>; <span class="js-comment">// Нет очков за поражение</span>
+        
+        <span class="js-keyword">let</span> score = <span class="js-keyword">this</span>.basePoints.win;
+        
+        <span class="js-comment">// Бонус за быстроту</span>
+        <span class="js-keyword">if</span> (attempts === <span class="js-number">1</span>) {
+            score += <span class="js-keyword">this</span>.basePoints.perfectGame;
+        } <span class="js-keyword">else</span> <span class="js-keyword">if</span> (attempts <= <span class="js-number">3</span>) {
+            score += <span class="js-keyword">this</span>.basePoints.quickWin;
+        }
+        
+        <span class="js-comment">// Бонус за эффективность (процент от максимальных попыток)</span>
+        <span class="js-keyword">const</span> efficiency = (<span class="js-number">1</span> - (attempts / maxAttempts)) * <span class="js-number">50</span>;
+        score += Math.<span class="js-function">floor</span>(efficiency);
+        
+        <span class="js-comment">// Бонус за серию побед</span>
+        <span class="js-keyword">if</span> (winStreak > <span class="js-number">1</span>) {
+            score += (winStreak - <span class="js-number">1</span>) * <span class="js-keyword">this</span>.basePoints.streakBonus;
+        }
+        
+        <span class="js-comment">// Множитель за сложность</span>
+        score *= <span class="js-keyword">this</span>.difficultyMultipliers[difficulty];
+        
+        <span class="js-keyword">return</span> Math.<span class="js-function">floor</span>(score);
+    }
+    
+    <span class="js-comment">// Вычисляем очки за достижение</span>
+    <span class="js-function">calculateAchievementScore</span>(achievement) {
+        <span class="js-keyword">const</span> basePoints = achievement.points || <span class="js-number">10</span>;
+        <span class="js-keyword">const</span> rarity = achievement.rarity || <span class="js-string">'common'</span>;
+        <span class="js-keyword">const</span> multiplier = RARITY_CONFIG[rarity].multiplier;
+        
+        <span class="js-keyword">return</span> Math.<span class="js-function">floor</span>(basePoints * multiplier);
+    }
+    
+    <span class="js-comment">// Форматируем отображение очков</span>
+    <span class="js-function">formatScore</span>(score) {
+        <span class="js-keyword">if</span> (score >= <span class="js-number">1000000</span>) {
+            <span class="js-keyword">return</span> (score / <span class="js-number">1000000</span>).<span class="js-function">toFixed</span>(<span class="js-number">1</span>) + <span class="js-string">'M'</span>;
+        } <span class="js-keyword">else</span> <span class="js-keyword">if</span> (score >= <span class="js-number">1000</span>) {
+            <span class="js-keyword">return</span> (score / <span class="js-number">1000</span>).<span class="js-function">toFixed</span>(<span class="js-number">1</span>) + <span class="js-string">'K'</span>;
+        }
+        <span class="js-keyword">return</span> score.<span class="js-function">toString</span>();
+    }
+}</pre>
+          </div>
+        </div>
+
+        <div class="implementation-showcase">
+          <h3>⚙️ Реализация системы достижений</h3>
+          <p>Создаём класс для управления достижениями и их проверки:</p>
+
+          <div class="code-title">⚙️ Менеджер достижений</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Менеджер системы достижений</span>
+<span class="js-keyword">class</span> <span class="js-function">AchievementManager</span> {
+    <span class="js-keyword">constructor</span>(scoreSystem) {
+        <span class="js-keyword">this</span>.scoreSystem = scoreSystem;
+        <span class="js-keyword">this</span>.unlockedAchievements = <span class="js-keyword">new</span> <span class="js-function">Set</span>();
+        <span class="js-keyword">this</span>.playerStats = {
+            totalGames: <span class="js-number">0</span>,
+            totalWins: <span class="js-number">0</span>,
+            winStreak: <span class="js-number">0</span>,
+            maxWinStreak: <span class="js-number">0</span>,
+            totalScore: <span class="js-number">0</span>,
+            lastGameAttempts: <span class="js-number">0</span>,
+            bestTime: <span class="js-keyword">Infinity</span>,
+            perfectGames: <span class="js-number">0</span>
+        };
+        <span class="js-keyword">this</span>.onAchievementUnlocked = <span class="js-keyword">null</span>; <span class="js-comment">// Колбэк</span>
+    }
+    
+    <span class="js-comment">// Обновляем статистику после игры</span>
+    <span class="js-function">updateStats</span>(gameResult) {
+        <span class="js-keyword">const</span> { won, attempts, timeSpent, difficulty } = gameResult;
+        
+        <span class="js-keyword">this</span>.playerStats.totalGames++;
+        <span class="js-keyword">this</span>.playerStats.lastGameAttempts = attempts;
+        
+        <span class="js-keyword">if</span> (won) {
+            <span class="js-keyword">this</span>.playerStats.totalWins++;
+            <span class="js-keyword">this</span>.playerStats.winStreak++;
+            <span class="js-keyword">this</span>.playerStats.maxWinStreak = Math.<span class="js-function">max</span>(
+                <span class="js-keyword">this</span>.playerStats.maxWinStreak, 
+                <span class="js-keyword">this</span>.playerStats.winStreak
+            );
+            
+            <span class="js-keyword">if</span> (attempts === <span class="js-number">1</span>) {
+                <span class="js-keyword">this</span>.playerStats.perfectGames++;
+            }
+            
+            <span class="js-keyword">if</span> (timeSpent < <span class="js-keyword">this</span>.playerStats.bestTime) {
+                <span class="js-keyword">this</span>.playerStats.bestTime = timeSpent;
+            }
+            
+            <span class="js-comment">// Добавляем очки</span>
+            <span class="js-keyword">const</span> gameScore = <span class="js-keyword">this</span>.scoreSystem.<span class="js-function">calculateGameScore</span>({
+                won, attempts, difficulty, 
+                maxAttempts: <span class="js-number">7</span>, <span class="js-comment">// Предполагаем стандарт</span>
+                winStreak: <span class="js-keyword">this</span>.playerStats.winStreak
+            });
+            
+            <span class="js-keyword">this</span>.playerStats.totalScore += gameScore;
+            
+        } <span class="js-keyword">else</span> {
+            <span class="js-keyword">this</span>.playerStats.winStreak = <span class="js-number">0</span>; <span class="js-comment">// Сброс серии</span>
+        }
+        
+        <span class="js-comment">// Проверяем новые достижения</span>
+        <span class="js-keyword">this</span>.<span class="js-function">checkAchievements</span>();
+    }
+    
+    <span class="js-comment">// Проверяем все достижения</span>
+    <span class="js-function">checkAchievements</span>() {
+        <span class="js-keyword">const</span> newAchievements = [];
+        
+        <span class="js-comment">// Проходим по всем категориям достижений</span>
+        <span class="js-keyword">for</span> (<span class="js-keyword">const</span> category <span class="js-keyword">of</span> <span class="js-function">Object</span>.<span class="js-function">values</span>(ACHIEVEMENTS)) {
+            <span class="js-keyword">for</span> (<span class="js-keyword">const</span> achievement <span class="js-keyword">of</span> <span class="js-function">Object</span>.<span class="js-function">values</span>(category)) {
+                <span class="js-comment">// Пропускаем уже разблокированные</span>
+                <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.unlockedAchievements.<span class="js-function">has</span>(achievement.id)) {
+                    <span class="js-keyword">continue</span>;
+                }
+                
+                <span class="js-comment">// Проверяем условие</span>
+                <span class="js-keyword">if</span> (achievement.<span class="js-function">condition</span>(<span class="js-keyword">this</span>.playerStats)) {
+                    <span class="js-keyword">this</span>.<span class="js-function">unlockAchievement</span>(achievement);
+                    newAchievements.<span class="js-function">push</span>(achievement);
+                }
+            }
+        }
+        
+        <span class="js-keyword">return</span> newAchievements;
+    }
+    
+    <span class="js-comment">// Разблокируем достижение</span>
+    <span class="js-function">unlockAchievement</span>(achievement) {
+        <span class="js-keyword">this</span>.unlockedAchievements.<span class="js-function">add</span>(achievement.id);
+        
+        <span class="js-comment">// Добавляем очки за достижение</span>
+        <span class="js-keyword">const</span> points = <span class="js-keyword">this</span>.scoreSystem.<span class="js-function">calculateAchievementScore</span>(achievement);
+        <span class="js-keyword">this</span>.playerStats.totalScore += points;
+        
+        <span class="js-comment">// Уведомляем об разблокировке</span>
+        <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.onAchievementUnlocked) {
+            <span class="js-keyword">this</span>.<span class="js-function">onAchievementUnlocked</span>(achievement, points);
+        }
+        
+        <span class="js-function">console</span>.<span class="js-function">log</span>(<span class="js-string">`🏆 Достижение разблокировано: ${achievement.name} (+${points} очков)`</span>);
+    }
+    
+    <span class="js-comment">// Получаем прогресс для достижений с прогрессом</span>
+    <span class="js-function">getAchievementProgress</span>(achievementId) {
+        <span class="js-keyword">const</span> achievement = <span class="js-keyword">this</span>.<span class="js-function">findAchievementById</span>(achievementId);
+        <span class="js-keyword">if</span> (!achievement || !achievement.progressTracker) {
+            <span class="js-keyword">return</span> { current: <span class="js-number">0</span>, target: <span class="js-number">1</span>, percentage: <span class="js-number">0</span> };
+        }
+        
+        <span class="js-keyword">return</span> achievement.<span class="js-function">progressTracker</span>(<span class="js-keyword">this</span>.playerStats);
+    }
+    
+    <span class="js-comment">// Получаем статистику игрока</span>
+    <span class="js-function">getPlayerStats</span>() {
+        <span class="js-keyword">return</span> {
+            ...<span class="js-keyword">this</span>.playerStats,
+            achievementsCount: <span class="js-keyword">this</span>.unlockedAchievements.size,
+            winRate: <span class="js-keyword">this</span>.playerStats.totalGames > <span class="js-number">0</span> 
+                ? (<span class="js-keyword">this</span>.playerStats.totalWins / <span class="js-keyword">this</span>.playerStats.totalGames) * <span class="js-number">100</span>
+                : <span class="js-number">0</span>
+        };
+    }
+}</pre>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>🏆 Твоё задание</h3>
+          <p>Создай систему достижений для игры "Угадай число":</p>
+
+          <ol class="task-list">
+            <li>Спроектируй разнообразные достижения по категориям</li>
+            <li>Реализуй систему редкости и ценности наград</li>
+            <li>Создай алгоритм подсчёта очков</li>
+            <li>Добавь класс AchievementManager</li>
+            <li>Реализуй автоматическую проверку условий</li>
+            <li>Создай систему уведомлений о разблокировке</li>
+            <li>Добавь визуальные эффекты для наград</li>
+            <li>Реализуй сохранение прогресса в localStorage</li>
+            <li>Протестируй все типы достижений</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Помни: хорошие достижения мотивируют и создают долгосрочные цели!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="guess-lesson-5b-part1.html" class="next-lesson">
+            Следующий урок: Геймификация и прогресс (Часть 1) →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо система достижений
+      let demoStats = {
+        totalGames: 0,
+        totalWins: 0,
+        winStreak: 0,
+        totalScore: 0,
+        lastGameAttempts: 0,
+        perfectGames: 0,
+      };
+
+      let demoUnlockedAchievements = new Set();
+
+      const demoAchievements = [
+        {
+          id: "first-win",
+          name: "🌟 Первая победа",
+          description: "Выиграй свою первую игру",
+          condition: (stats) => stats.totalWins === 1,
+          points: 20,
+          rarity: "common",
+        },
+        {
+          id: "hat-trick",
+          name: "🎯 Хет-трик",
+          description: "Выиграй 3 игры подряд",
+          condition: (stats) => stats.winStreak >= 3,
+          points: 75,
+          rarity: "epic",
+        },
+        {
+          id: "perfect-game",
+          name: "💎 Идеальная игра",
+          description: "Угадай число с первой попытки",
+          condition: (stats) => stats.perfectGames >= 1,
+          points: 100,
+          rarity: "legendary",
+        },
+        {
+          id: "veteran",
+          name: "🎖️ Ветеран",
+          description: "Сыграй 10 игр",
+          condition: (stats) => stats.totalGames >= 10,
+          points: 100,
+          rarity: "rare",
+        },
+        {
+          id: "high-scorer",
+          name: "💰 Богач",
+          description: "Набери 500 очков",
+          condition: (stats) => stats.totalScore >= 500,
+          points: 50,
+          rarity: "epic",
+        },
+      ];
+
+      function initAchievementsList() {
+        const container = document.getElementById("achievementsList");
+        container.innerHTML = "";
+
+        demoAchievements.forEach((achievement) => {
+          const isUnlocked = demoUnlockedAchievements.has(achievement.id);
+          const progress = getProgress(achievement);
+
+          const card = document.createElement("div");
+          card.className = `achievement-card ${isUnlocked ? "unlocked" : ""}`;
+          card.innerHTML = `
+            <div class="achievement-icon">${
+              achievement.name.split(" ")[0]
+            }</div>
+            <div class="achievement-title">${achievement.name.substring(
+              2
+            )}</div>
+            <div class="achievement-desc">${achievement.description}</div>
+            <div style="margin-top: 8px; font-size: 0.8rem; color: ${getRarityColor(
+              achievement.rarity
+            )}">
+              ${achievement.rarity.toUpperCase()} • +${achievement.points} очков
+            </div>
+            ${
+              !isUnlocked && progress.percentage < 100
+                ? `
+              <div class="achievement-progress">
+                <div class="achievement-progress-fill" style="width: ${progress.percentage}%"></div>
+              </div>
+              <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.7">
+                ${progress.current}/${progress.target}
+              </div>
+            `
+                : ""
+            }
+          `;
+
+          container.appendChild(card);
+        });
+      }
+
+      function getProgress(achievement) {
+        switch (achievement.id) {
+          case "first-win":
+            return {
+              current: demoStats.totalWins,
+              target: 1,
+              percentage: Math.min(100, (demoStats.totalWins / 1) * 100),
+            };
+          case "hat-trick":
+            return {
+              current: demoStats.winStreak,
+              target: 3,
+              percentage: Math.min(100, (demoStats.winStreak / 3) * 100),
+            };
+          case "perfect-game":
+            return {
+              current: demoStats.perfectGames,
+              target: 1,
+              percentage: Math.min(100, (demoStats.perfectGames / 1) * 100),
+            };
+          case "veteran":
+            return {
+              current: demoStats.totalGames,
+              target: 10,
+              percentage: Math.min(100, (demoStats.totalGames / 10) * 100),
+            };
+          case "high-scorer":
+            return {
+              current: demoStats.totalScore,
+              target: 500,
+              percentage: Math.min(100, (demoStats.totalScore / 500) * 100),
+            };
+          default:
+            return { current: 0, target: 1, percentage: 0 };
+        }
+      }
+
+      function getRarityColor(rarity) {
+        const colors = {
+          common: "#95a5a6",
+          rare: "#3498db",
+          epic: "#9b59b6",
+          legendary: "#f39c12",
+          mythic: "#e74c3c",
+        };
+        return colors[rarity] || colors.common;
+      }
+
+      function checkAchievements() {
+        const newUnlocks = [];
+
+        demoAchievements.forEach((achievement) => {
+          if (
+            !demoUnlockedAchievements.has(achievement.id) &&
+            achievement.condition(demoStats)
+          ) {
+            demoUnlockedAchievements.add(achievement.id);
+            demoStats.totalScore += achievement.points;
+            newUnlocks.push(achievement);
+
+            // Показываем уведомление
+            setTimeout(() => {
+              showAchievementNotification(achievement);
+            }, 500);
+          }
+        });
+
+        updateDisplay();
+        initAchievementsList();
+
+        return newUnlocks;
+      }
+
+      function showAchievementNotification(achievement) {
+        // Простое уведомление
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #f39c12, #e67e22);
+          color: white;
+          padding: 15px 20px;
+          border-radius: 15px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          z-index: 10000;
+          animation: slideIn 0.5s ease-out;
+          max-width: 300px;
+        `;
+
+        notification.innerHTML = `
+          <strong>🏆 Достижение разблокировано!</strong><br>
+          ${achievement.name.substring(2)}<br>
+          <small>+${achievement.points} очков</small>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      function simulateWin() {
+        const attempts = Math.floor(Math.random() * 7) + 1;
+        const isFirstAttempt = Math.random() < 0.1; // 10% шанс на первую попытку
+
+        demoStats.totalGames++;
+        demoStats.totalWins++;
+        demoStats.winStreak++;
+        demoStats.lastGameAttempts = isFirstAttempt ? 1 : attempts;
+
+        if (isFirstAttempt) {
+          demoStats.perfectGames++;
+          demoStats.totalScore += 100; // Бонус за идеальную игру
+        }
+
+        // Базовые очки за победу
+        demoStats.totalScore += 10 + Math.max(0, 8 - attempts) * 5;
+
+        checkAchievements();
+      }
+
+      function simulateLoss() {
+        demoStats.totalGames++;
+        demoStats.winStreak = 0;
+        demoStats.lastGameAttempts = 7; // Максимум попыток
+
+        checkAchievements();
+      }
+
+      function resetDemo() {
+        demoStats = {
+          totalGames: 0,
+          totalWins: 0,
+          winStreak: 0,
+          totalScore: 0,
+          lastGameAttempts: 0,
+          perfectGames: 0,
+        };
+
+        demoUnlockedAchievements.clear();
+        updateDisplay();
+        initAchievementsList();
+      }
+
+      function updateDisplay() {
+        document.getElementById("demoScore").textContent = demoStats.totalScore;
+        document.getElementById("demoGames").textContent = demoStats.totalGames;
+        document.getElementById("demoWins").textContent = demoStats.totalWins;
+        document.getElementById("demoStreak").textContent = demoStats.winStreak;
+      }
+
+      // Инициализация при загрузке
+      document.addEventListener("DOMContentLoaded", function () {
+        initAchievementsList();
+
+        // Добавляем стили для анимации уведомлений
+        const style = document.createElement("style");
+        style.textContent = `
+          @keyframes slideIn {
+            from {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+
+        // Анимация появления элементов
+        const sections = document.querySelectorAll(
+          ".section, .achievements-demo, .scoring-showcase, .achievement-types, .implementation-showcase, .task-section"
+        );
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

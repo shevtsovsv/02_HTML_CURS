@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 4: Продвинутые режимы игры</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "🚀🏆🎯";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #e74c3c;
+      }
+
+      .section h2 {
+        color: #e74c3c;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(231, 76, 60, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #e74c3c;
+      }
+
+      .js-keyword {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .js-function {
+        color: #9b59b6;
+        font-weight: 600;
+      }
+
+      .js-string {
+        color: #2ecc71;
+      }
+
+      .js-number {
+        color: #e67e22;
+      }
+
+      .js-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .demo-container {
+        background: linear-gradient(135deg, #ffe8e8, #ffcdcd);
+        border: 2px solid #e74c3c;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-container h3 {
+        color: #c0392b;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .mode-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .mode-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .mode-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .mode-btn.active {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+      }
+
+      .difficulty-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .difficulty-btn {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        border: none;
+        padding: 10px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        font-size: 0.85rem;
+      }
+
+      .difficulty-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .difficulty-btn.active {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        transform: scale(1.05);
+      }
+
+      .tournament-bracket {
+        background: linear-gradient(135deg, #e8f5e8, #d5edd5);
+        border: 2px solid #27ae60;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .tournament-bracket h3 {
+        color: #1e8449;
+        margin-bottom: 15px;
+      }
+
+      .bracket-round {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin: 10px 0;
+        flex-wrap: wrap;
+      }
+
+      .bracket-match {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 2px solid #27ae60;
+        font-weight: bold;
+        font-size: 0.9rem;
+        min-width: 120px;
+      }
+
+      .ai-showcase {
+        background: linear-gradient(135deg, #f0e68c, #e6d73a);
+        border: 2px solid #f39c12;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .ai-showcase h3 {
+        color: #b7950b;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .ai-levels {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .ai-level {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #f39c12;
+      }
+
+      .ai-level h4 {
+        color: #b7950b;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .ai-level .ai-icon {
+        font-size: 2rem;
+        margin: 10px 0;
+      }
+
+      .achievements-showcase {
+        background: linear-gradient(135deg, #ffe4b5, #ffd700);
+        border: 2px solid #ffa500;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .achievements-showcase h3 {
+        color: #cc8400;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .achievements-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .achievement {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #ffa500;
+        transition: all 0.3s ease;
+      }
+
+      .achievement:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+      }
+
+      .achievement .achievement-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+
+      .achievement h4 {
+        color: #cc8400;
+        margin-bottom: 5px;
+        font-size: 1rem;
+      }
+
+      .achievement p {
+        font-size: 0.9rem;
+        color: #996600;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .survival-mode {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .survival-mode h3 {
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .survival-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .survival-stat {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 5px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .survival-stat-number {
+        font-size: 1.2rem;
+        display: block;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "🚀";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .mode-selector,
+        .ai-levels,
+        .achievements-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .bracket-round {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🚀 Урок 4: Продвинутые режимы</h1>
+        <p class="lesson-info">
+          Турниры, ИИ разной сложности и система достижений
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            Превращаем простую игру в продвинутую систему с турнирами, режимом
+            выживания, умным ИИ и системой достижений.
+          </p>
+          <p>
+            Ты научишься создавать сложные алгоритмы, управлять состоянием игры
+            и реализовывать системы прогрессии игрока.
+          </p>
+        </div>
+
+        <div class="demo-container">
+          <h3>Демонстрация режимов игры</h3>
+
+          <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('normal')">
+              🎯 Обычный
+            </button>
+            <button class="mode-btn" onclick="switchMode('tournament')">
+              🏆 Турнир
+            </button>
+            <button class="mode-btn" onclick="switchMode('survival')">
+              💀 Выживание
+            </button>
+          </div>
+
+          <div class="difficulty-selector">
+            <button
+              class="difficulty-btn active"
+              onclick="switchDifficulty('easy')"
+            >
+              😊 Лёгкий
+            </button>
+            <button class="difficulty-btn" onclick="switchDifficulty('medium')">
+              🤔 Средний
+            </button>
+            <button class="difficulty-btn" onclick="switchDifficulty('hard')">
+              😈 Сложный
+            </button>
+          </div>
+
+          <div id="gameMode" style="margin-top: 20px">
+            <p>
+              <strong>Режим:</strong> Обычный |
+              <strong>Сложность:</strong> Лёгкий ИИ
+            </p>
+            <p style="font-size: 0.95rem; color: #666; margin-top: 8px">
+              Играй против случайного ИИ без ограничений времени
+            </p>
+          </div>
+        </div>
+
+        <div class="ai-showcase">
+          <h3>🤖 Уровни сложности ИИ</h3>
+          <p>Создадим три типа искусственного интеллекта:</p>
+
+          <div class="ai-levels">
+            <div class="ai-level">
+              <h4>😊 Лёгкий ИИ</h4>
+              <div class="ai-icon">🎲</div>
+              <p>Случайные выборы</p>
+              <p style="font-size: 0.85rem; margin-top: 5px; color: #666">
+                Выбирает ходы полностью случайно
+              </p>
+            </div>
+
+            <div class="ai-level">
+              <h4>🤔 Средний ИИ</h4>
+              <div class="ai-icon">📊</div>
+              <p>Анализирует паттерны</p>
+              <p style="font-size: 0.85rem; margin-top: 5px; color: #666">
+                Помнит твои последние ходы
+              </p>
+            </div>
+
+            <div class="ai-level">
+              <h4>😈 Сложный ИИ</h4>
+              <div class="ai-icon">🧠</div>
+              <p>Предсказывает ходы</p>
+              <p style="font-size: 0.85rem; margin-top: 5px; color: #666">
+                Использует продвинутые алгоритмы
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎲 Простой ИИ (Лёгкий)</h2>
+          <p>
+            Начнём с самого простого - случайного ИИ. Мы уже создали его в
+            предыдущем уроке, теперь оформим как отдельную систему.
+          </p>
+
+          <div class="code-title">🎲 Лёгкий ИИ - Случайные выборы</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Система ИИ с разными уровнями сложности</span>
+<span class="js-keyword">const</span> AISystem = {
+    difficulty: <span class="js-string">'easy'</span>,     <span class="js-comment">// Текущий уровень сложности</span>
+    playerHistory: [],        <span class="js-comment">// История ходов игрока</span>
+    aiHistory: [],           <span class="js-comment">// История ходов ИИ</span>
+    
+    <span class="js-comment">// Лёгкий ИИ - полностью случайный</span>
+    <span class="js-function">getEasyChoice</span>() {
+        <span class="js-keyword">const</span> choices = [<span class="js-string">'rock'</span>, <span class="js-string">'paper'</span>, <span class="js-string">'scissors'</span>];
+        <span class="js-keyword">const</span> randomIndex = <span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * <span class="js-number">3</span>);
+        <span class="js-keyword">return</span> choices[randomIndex];
+    },
+    
+    <span class="js-comment">// Главная функция выбора ИИ</span>
+    <span class="js-function">getChoice</span>() {
+        <span class="js-keyword">let</span> choice;
+        
+        <span class="js-keyword">switch</span> (<span class="js-keyword">this</span>.difficulty) {
+            <span class="js-keyword">case</span> <span class="js-string">'easy'</span>:
+                choice = <span class="js-keyword">this</span>.<span class="js-function">getEasyChoice</span>();
+                <span class="js-keyword">break</span>;
+            <span class="js-keyword">case</span> <span class="js-string">'medium'</span>:
+                choice = <span class="js-keyword">this</span>.<span class="js-function">getMediumChoice</span>();
+                <span class="js-keyword">break</span>;
+            <span class="js-keyword">case</span> <span class="js-string">'hard'</span>:
+                choice = <span class="js-keyword">this</span>.<span class="js-function">getHardChoice</span>();
+                <span class="js-keyword">break</span>;
+            <span class="js-keyword">default</span>:
+                choice = <span class="js-keyword">this</span>.<span class="js-function">getEasyChoice</span>();
+        }
+        
+        <span class="js-comment">// Сохраняем выбор в историю</span>
+        <span class="js-keyword">this</span>.aiHistory.<span class="js-function">push</span>(choice);
+        <span class="js-keyword">return</span> choice;
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 Умный ИИ (Средний)</h2>
+          <p>
+            Средний ИИ анализирует твои последние ходы и пытается предугадать
+            следующий. Он ищет паттерны в твоём поведении.
+          </p>
+
+          <div class="code-title">📊 Средний ИИ - Анализ паттернов</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Средний ИИ - анализирует паттерны игрока</span>
+<span class="js-function">getMediumChoice</span>() {
+    <span class="js-comment">// Если истории мало - играем случайно</span>
+    <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.playerHistory.length < <span class="js-number">3</span>) {
+        <span class="js-keyword">return</span> <span class="js-keyword">this</span>.<span class="js-function">getEasyChoice</span>();
+    }
+    
+    <span class="js-comment">// Анализируем последние 3 хода игрока</span>
+    <span class="js-keyword">const</span> recent = <span class="js-keyword">this</span>.playerHistory.<span class="js-function">slice</span>(-<span class="js-number">3</span>);
+    
+    <span class="js-comment">// Подсчитываем частоту каждого выбора</span>
+    <span class="js-keyword">const</span> frequency = {
+        rock: <span class="js-number">0</span>,
+        paper: <span class="js-number">0</span>,
+        scissors: <span class="js-number">0</span>
+    };
+    
+    recent.<span class="js-function">forEach</span>(choice => {
+        frequency[choice]++;
+    });
+    
+    <span class="js-comment">// Находим самый частый выбор</span>
+    <span class="js-keyword">let</span> mostFrequent = <span class="js-string">'rock'</span>;
+    <span class="js-keyword">let</span> maxCount = <span class="js-number">0</span>;
+    
+    <span class="js-keyword">for</span> (<span class="js-keyword">const</span> [choice, count] <span class="js-keyword">of</span> <span class="js-function">Object.entries</span>(frequency)) {
+        <span class="js-keyword">if</span> (count > maxCount) {
+            maxCount = count;
+            mostFrequent = choice;
+        }
+    }
+    
+    <span class="js-comment">// Выбираем контр-ход против предполагаемого хода игрока</span>
+    <span class="js-keyword">const</span> counter = {
+        rock: <span class="js-string">'paper'</span>,      <span class="js-comment">// Бумага бьёт камень</span>
+        paper: <span class="js-string">'scissors'</span>,  <span class="js-comment">// Ножницы бьют бумагу</span>
+        scissors: <span class="js-string">'rock'</span>     <span class="js-comment">// Камень бьёт ножницы</span>
+    };
+    
+    <span class="js-comment">// 70% шанс умного хода, 30% случайного</span>
+    <span class="js-keyword">if</span> (<span class="js-function">Math.random</span>() < <span class="js-number">0.7</span>) {
+        <span class="js-keyword">return</span> counter[mostFrequent];
+    } <span class="js-keyword">else</span> {
+        <span class="js-keyword">return</span> <span class="js-keyword">this</span>.<span class="js-function">getEasyChoice</span>();
+    }
+},</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🧠 Гениальный ИИ (Сложный)</h2>
+          <p>
+            Самый продвинутый ИИ использует сложные алгоритмы предсказания. Он
+            анализирует последовательности и адаптируется к твоей стратегии.
+          </p>
+
+          <div class="code-title">🧠 Сложный ИИ - Продвинутые алгоритмы</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Сложный ИИ - продвинутый анализ</span>
+<span class="js-function">getHardChoice</span>() {
+    <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.playerHistory.length < <span class="js-number">5</span>) {
+        <span class="js-keyword">return</span> <span class="js-keyword">this</span>.<span class="js-function">getMediumChoice</span>();
+    }
+    
+    <span class="js-comment">// Анализируем последовательности из 2 ходов</span>
+    <span class="js-keyword">const</span> patterns = {};
+    
+    <span class="js-keyword">for</span> (<span class="js-keyword">let</span> i = <span class="js-number">0</span>; i < <span class="js-keyword">this</span>.playerHistory.length - <span class="js-number">2</span>; i++) {
+        <span class="js-keyword">const</span> pattern = <span class="js-keyword">this</span>.playerHistory[i] + <span class="js-keyword">this</span>.playerHistory[i + <span class="js-number">1</span>];
+        <span class="js-keyword">const</span> nextMove = <span class="js-keyword">this</span>.playerHistory[i + <span class="js-number">2</span>];
+        
+        <span class="js-keyword">if</span> (!patterns[pattern]) {
+            patterns[pattern] = [];
+        }
+        patterns[pattern].<span class="js-function">push</span>(nextMove);
+    }
+    
+    <span class="js-comment">// Получаем последний паттерн</span>
+    <span class="js-keyword">const</span> recentHistory = <span class="js-keyword">this</span>.playerHistory.<span class="js-function">slice</span>(-<span class="js-number">2</span>);
+    <span class="js-keyword">const</span> lastPattern = recentHistory.<span class="js-function">join</span>(<span class="js-string">''</span>);
+    
+    <span class="js-keyword">if</span> (patterns[lastPattern] && patterns[lastPattern].length > <span class="js-number">0</span>) {
+        <span class="js-comment">// Находим наиболее вероятный следующий ход</span>
+        <span class="js-keyword">const</span> nextMoves = patterns[lastPattern];
+        <span class="js-keyword">const</span> frequency = {};
+        
+        nextMoves.<span class="js-function">forEach</span>(move => {
+            frequency[move] = (frequency[move] || <span class="js-number">0</span>) + <span class="js-number">1</span>;
+        });
+        
+        <span class="js-keyword">let</span> predictedMove = <span class="js-string">'rock'</span>;
+        <span class="js-keyword">let</span> maxCount = <span class="js-number">0</span>;
+        
+        <span class="js-keyword">for</span> (<span class="js-keyword">const</span> [move, count] <span class="js-keyword">of</span> <span class="js-function">Object.entries</span>(frequency)) {
+            <span class="js-keyword">if</span> (count > maxCount) {
+                maxCount = count;
+                predictedMove = move;
+            }
+        }
+        
+        <span class="js-comment">// Контр-ход против предсказанного хода</span>
+        <span class="js-keyword">const</span> counter = {
+            rock: <span class="js-string">'paper'</span>,
+            paper: <span class="js-string">'scissors'</span>,
+            scissors: <span class="js-string">'rock'</span>
+        };
+        
+        <span class="js-comment">// 80% умного хода, 20% случайного для непредсказуемости</span>
+        <span class="js-keyword">if</span> (<span class="js-function">Math.random</span>() < <span class="js-number">0.8</span>) {
+            <span class="js-keyword">return</span> counter[predictedMove];
+        }
+    }
+    
+    <span class="js-comment">// Если паттерн не найден - используем средний ИИ</span>
+    <span class="js-keyword">return</span> <span class="js-keyword">this</span>.<span class="js-function">getMediumChoice</span>();
+},
+
+<span class="js-comment">// Добавляем ход игрока в историю</span>
+<span class="js-function">addPlayerMove</span>(move) {
+    <span class="js-keyword">this</span>.playerHistory.<span class="js-function">push</span>(move);
+    
+    <span class="js-comment">// Ограничиваем размер истории для производительности</span>
+    <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.playerHistory.length > <span class="js-number">50</span>) {
+        <span class="js-keyword">this</span>.playerHistory.<span class="js-function">shift</span>();
+    }
+}</pre>
+          </div>
+        </div>
+
+        <div class="tournament-bracket">
+          <h3>🏆 Турнирный режим</h3>
+          <p>Система турниров на выбывание с несколькими раундами:</p>
+
+          <div class="bracket-round">
+            <div class="bracket-match">1/8 финала<br />Bo3</div>
+            <div class="bracket-match">1/4 финала<br />Bo3</div>
+            <div class="bracket-match">1/2 финала<br />Bo5</div>
+            <div class="bracket-match">Финал<br />Bo7</div>
+          </div>
+
+          <p style="margin-top: 15px; font-size: 0.9rem; color: #1e8449">
+            Bo3 = лучший из 3, Bo5 = лучший из 5, Bo7 = лучший из 7
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🏆 Система турниров</h2>
+          <p>
+            Создадим турнирную систему, где игрок проходит серию раундов против
+            ИИ возрастающей сложности.
+          </p>
+
+          <div class="code-title">🏆 Турнирная система</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Система турниров</span>
+<span class="js-keyword">const</span> Tournament = {
+    active: <span class="js-keyword">false</span>,
+    currentRound: <span class="js-number">0</span>,
+    playerWins: <span class="js-number">0</span>,
+    aiWins: <span class="js-number">0</span>,
+    
+    rounds: [
+        { name: <span class="js-string">'1/8 финала'</span>, winsNeeded: <span class="js-number">2</span>, aiDifficulty: <span class="js-string">'easy'</span> },
+        { name: <span class="js-string">'1/4 финала'</span>, winsNeeded: <span class="js-number">2</span>, aiDifficulty: <span class="js-string">'easy'</span> },
+        { name: <span class="js-string">'1/2 финала'</span>, winsNeeded: <span class="js-number">3</span>, aiDifficulty: <span class="js-string">'medium'</span> },
+        { name: <span class="js-string">'Финал'</span>, winsNeeded: <span class="js-number">4</span>, aiDifficulty: <span class="js-string">'hard'</span> }
+    ],
+    
+    <span class="js-comment">// Начать турнир</span>
+    <span class="js-function">start</span>() {
+        <span class="js-keyword">this</span>.active = <span class="js-keyword">true</span>;
+        <span class="js-keyword">this</span>.currentRound = <span class="js-number">0</span>;
+        <span class="js-keyword">this</span>.<span class="js-function">resetRound</span>();
+        <span class="js-keyword">this</span>.<span class="js-function">updateDisplay</span>();
+    },
+    
+    <span class="js-comment">// Сброс текущего раунда</span>
+    <span class="js-function">resetRound</span>() {
+        <span class="js-keyword">this</span>.playerWins = <span class="js-number">0</span>;
+        <span class="js-keyword">this</span>.aiWins = <span class="js-number">0</span>;
+        
+        <span class="js-comment">// Устанавливаем сложность ИИ для текущего раунда</span>
+        <span class="js-keyword">const</span> round = <span class="js-keyword">this</span>.rounds[<span class="js-keyword">this</span>.currentRound];
+        AISystem.difficulty = round.aiDifficulty;
+    },
+    
+    <span class="js-comment">// Обработка результата игры</span>
+    <span class="js-function">processResult</span>(result) {
+        <span class="js-keyword">if</span> (!<span class="js-keyword">this</span>.active) <span class="js-keyword">return</span>;
+        
+        <span class="js-keyword">if</span> (result === <span class="js-string">'win'</span>) {
+            <span class="js-keyword">this</span>.playerWins++;
+        } <span class="js-keyword">else if</span> (result === <span class="js-string">'lose'</span>) {
+            <span class="js-keyword">this</span>.aiWins++;
+        }
+        
+        <span class="js-keyword">const</span> round = <span class="js-keyword">this</span>.rounds[<span class="js-keyword">this</span>.currentRound];
+        <span class="js-keyword">const</span> winsNeeded = round.winsNeeded;
+        
+        <span class="js-comment">// Проверяем, выиграл ли кто-то раунд</span>
+        <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.playerWins >= winsNeeded) {
+            <span class="js-keyword">this</span>.<span class="js-function">winRound</span>();
+        } <span class="js-keyword">else if</span> (<span class="js-keyword">this</span>.aiWins >= winsNeeded) {
+            <span class="js-keyword">this</span>.<span class="js-function">loseRound</span>();
+        }
+        
+        <span class="js-keyword">this</span>.<span class="js-function">updateDisplay</span>();
+    },
+    
+    <span class="js-comment">// Победа в раунде</span>
+    <span class="js-function">winRound</span>() {
+        <span class="js-keyword">const</span> round = <span class="js-keyword">this</span>.rounds[<span class="js-keyword">this</span>.currentRound];
+        
+        <span class="js-function">showMessage</span>(<span class="js-string">`🎉 Ты прошёл ${round.name}!`</span>);
+        
+        <span class="js-keyword">if</span> (<span class="js-keyword">this</span>.currentRound >= <span class="js-keyword">this</span>.rounds.length - <span class="js-number">1</span>) {
+            <span class="js-comment">// Выиграл весь турнир!</span>
+            <span class="js-keyword">this</span>.<span class="js-function">winTournament</span>();
+        } <span class="js-keyword">else</span> {
+            <span class="js-comment">// Переходим к следующему раунду</span>
+            <span class="js-keyword">this</span>.currentRound++;
+            <span class="js-function">setTimeout</span>(() => {
+                <span class="js-keyword">this</span>.<span class="js-function">resetRound</span>();
+                <span class="js-keyword">this</span>.<span class="js-function">updateDisplay</span>();
+            }, <span class="js-number">2000</span>);
+        }
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="survival-mode">
+          <h3>💀 Режим выживания</h3>
+          <p>
+            Играй до первого поражения! Сколько побед подряд ты сможешь набрать?
+          </p>
+
+          <div class="survival-stats">
+            <div class="survival-stat">
+              <span class="survival-stat-number">0</span>
+              <span>Раунд</span>
+            </div>
+            <div class="survival-stat">
+              <span class="survival-stat-number">0</span>
+              <span>Жизни</span>
+            </div>
+            <div class="survival-stat">
+              <span class="survival-stat-number">0</span>
+              <span>Счёт</span>
+            </div>
+            <div class="survival-stat">
+              <span class="survival-stat-number">0</span>
+              <span>Рекорд</span>
+            </div>
+          </div>
+
+          <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.9">
+            ИИ становится умнее с каждым раундом. 3 жизни на старте, бонусная
+            жизнь каждые 10 побед!
+          </p>
+        </div>
+
+        <div class="achievements-showcase">
+          <h3>🏅 Система достижений</h3>
+          <p>Получай награды за различные достижения в игре:</p>
+
+          <div class="achievements-grid">
+            <div class="achievement">
+              <div class="achievement-icon">🔥</div>
+              <h4>Огненная серия</h4>
+              <p>Выиграй 10 игр подряд</p>
+            </div>
+
+            <div class="achievement">
+              <div class="achievement-icon">🏆</div>
+              <h4>Чемпион турнира</h4>
+              <p>Выиграй турнир на любой сложности</p>
+            </div>
+
+            <div class="achievement">
+              <div class="achievement-icon">💪</div>
+              <h4>Выживший</h4>
+              <p>Продержись 25 раундов в режиме выживания</p>
+            </div>
+
+            <div class="achievement">
+              <div class="achievement-icon">🎯</div>
+              <h4>Мастер стратегии</h4>
+              <p>Победи сложный ИИ 5 раз подряд</p>
+            </div>
+
+            <div class="achievement">
+              <div class="achievement-icon">⚡</div>
+              <h4>Скоростной игрок</h4>
+              <p>Сыграй 100 игр за сессию</p>
+            </div>
+
+            <div class="achievement">
+              <div class="achievement-icon">🥇</div>
+              <h4>Идеальный турнир</h4>
+              <p>Выиграй турнир без единого поражения</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>🚀 Твоё задание</h3>
+          <p>Создай продвинутую систему игры:</p>
+
+          <ol class="task-list">
+            <li>Реализуй систему ИИ с тремя уровнями сложности</li>
+            <li>Добавь переключение между режимами игры</li>
+            <li>Создай турнирную систему с прогрессией сложности</li>
+            <li>Реализуй режим выживания с нарастающей сложностью</li>
+            <li>Добавь систему достижений с локальным сохранением</li>
+            <li>Создай интерфейс для выбора сложности ИИ</li>
+            <li>Добавь анимации переходов между режимами</li>
+            <li>Реализуй сохранение статистики в localStorage</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Начни с простого ИИ, потом добавляй сложные алгоритмы!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="rps-lesson-5.html" class="next-lesson">
+            Следующий урок: Эффекты и полировка →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо для урока
+      let currentMode = "normal";
+      let currentDifficulty = "easy";
+
+      function switchMode(mode) {
+        currentMode = mode;
+
+        // Обновляем активные кнопки
+        document.querySelectorAll(".mode-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Обновляем описание режима
+        updateModeDescription();
+      }
+
+      function switchDifficulty(difficulty) {
+        currentDifficulty = difficulty;
+
+        // Обновляем активные кнопки
+        document.querySelectorAll(".difficulty-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Обновляем описание режима
+        updateModeDescription();
+      }
+
+      function updateModeDescription() {
+        const modeDescriptions = {
+          normal: "Играй против ИИ без ограничений времени",
+          tournament: "Проходи турнирные раунды возрастающей сложности",
+          survival: "Играй до первого поражения, ИИ становится умнее",
+        };
+
+        const difficultyDescriptions = {
+          easy: "Лёгкий ИИ - случайные выборы",
+          medium: "Средний ИИ - анализ паттернов",
+          hard: "Сложный ИИ - предсказание ходов",
+        };
+
+        const modeNames = {
+          normal: "Обычный",
+          tournament: "Турнир",
+          survival: "Выживание",
+        };
+
+        const difficultyNames = {
+          easy: "Лёгкий ИИ",
+          medium: "Средний ИИ",
+          hard: "Сложный ИИ",
+        };
+
+        const gameMode = document.getElementById("gameMode");
+        gameMode.innerHTML = `
+          <p><strong>Режим:</strong> ${modeNames[currentMode]} | <strong>Сложность:</strong> ${difficultyNames[currentDifficulty]}</p>
+          <p style="font-size: 0.95rem; color: #666; margin-top: 8px;">
+            ${modeDescriptions[currentMode]}<br>
+            ${difficultyDescriptions[currentDifficulty]}
+          </p>
+        `;
+      }
+
+      // Анимация появления элементов
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .demo-container, .tournament-bracket, .ai-showcase, .survival-mode, .achievements-showcase, .task-section"
+        );
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

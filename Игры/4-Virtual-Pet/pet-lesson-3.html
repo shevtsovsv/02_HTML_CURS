@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 3: JavaScript логика ухода за питомцем</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #a8e6cf 0%,
+          #dcedc1 50%,
+          #ffd3a5 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "⚙️💻🎮";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #f39c12;
+      }
+
+      .section h2 {
+        color: #f39c12;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(243, 156, 18, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #f39c12;
+      }
+
+      .interactive-demo {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .interactive-demo h3 {
+        color: #155724;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .demo-pet-container {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 350px;
+        margin: 0 auto;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-pet-display {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        position: relative;
+      }
+
+      .demo-pet-emoji {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .demo-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 15px;
+      }
+
+      .demo-stat {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 0.8rem;
+      }
+
+      .demo-stat-bar {
+        background: #e9ecef;
+        height: 6px;
+        border-radius: 3px;
+        margin: 5px 0;
+        overflow: hidden;
+      }
+
+      .demo-stat-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: all 0.5s ease;
+      }
+
+      .demo-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .demo-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .demo-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .demo-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .demo-message {
+        background: rgba(52, 152, 219, 0.1);
+        border: 1px solid #3498db;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 15px;
+        color: #2980b9;
+        font-size: 0.9rem;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .js-keyword {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .js-function {
+        color: #9b59b6;
+        font-weight: 600;
+      }
+
+      .js-string {
+        color: #2ecc71;
+      }
+
+      .js-number {
+        color: #e67e22;
+      }
+
+      .js-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .concept-box {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .concept-box h4 {
+        color: #004085;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      .concept-box p {
+        color: #004085;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "💻";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .tips-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .tips-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .tip-item {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>⚙️ Урок 3: JavaScript логика ухода</h1>
+        <p class="lesson-info">
+          Оживляем питомца с помощью интерактивного кода
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы научимся программировать поведение виртуального
+            питомца! Создадим систему ухода: кормление, игры, сон и гигиена.
+            Питомец будет реагировать на действия игрока и изменять свои
+            статистики в реальном времени.
+          </p>
+          <p>
+            Ты освоишь основы JavaScript: переменные, функции, события, объекты
+            и работу с DOM для создания интерактивных приложений.
+          </p>
+        </div>
+
+        <div class="interactive-demo">
+          <h3>Интерактивная демонстрация</h3>
+          <div class="demo-pet-container">
+            <div class="demo-pet-display">
+              <span class="demo-pet-emoji" id="demoEmoji">🥚</span>
+              <div id="demoName">Малыш</div>
+              <div id="demoStatus" style="font-size: 0.9rem; opacity: 0.9">
+                Спокоен
+              </div>
+            </div>
+            <div class="demo-stats-grid">
+              <div class="demo-stat">
+                <div>🍎 Голод</div>
+                <div class="demo-stat-bar">
+                  <div
+                    id="demoHunger"
+                    class="demo-stat-fill"
+                    style="
+                      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+                      width: 80%;
+                    "
+                  ></div>
+                </div>
+                <div id="demoHungerText">80%</div>
+              </div>
+              <div class="demo-stat">
+                <div>😊 Счастье</div>
+                <div class="demo-stat-bar">
+                  <div
+                    id="demoHappiness"
+                    class="demo-stat-fill"
+                    style="
+                      background: linear-gradient(135deg, #feca57, #ff9ff3);
+                      width: 60%;
+                    "
+                  ></div>
+                </div>
+                <div id="demoHappinessText">60%</div>
+              </div>
+              <div class="demo-stat">
+                <div>💤 Энергия</div>
+                <div class="demo-stat-bar">
+                  <div
+                    id="demoEnergy"
+                    class="demo-stat-fill"
+                    style="
+                      background: linear-gradient(135deg, #48cae4, #0077b6);
+                      width: 90%;
+                    "
+                  ></div>
+                </div>
+                <div id="demoEnergyText">90%</div>
+              </div>
+              <div class="demo-stat">
+                <div>🛁 Чистота</div>
+                <div class="demo-stat-bar">
+                  <div
+                    id="demoCleanliness"
+                    class="demo-stat-fill"
+                    style="
+                      background: linear-gradient(135deg, #a8e6cf, #56ccf2);
+                      width: 50%;
+                    "
+                  ></div>
+                </div>
+                <div id="demoCleanlinessText">50%</div>
+              </div>
+            </div>
+            <div class="demo-actions">
+              <button class="demo-btn" onclick="feedPet()">🍎 Покормить</button>
+              <button class="demo-btn" onclick="playWithPet()">
+                🎮 Играть
+              </button>
+              <button class="demo-btn" onclick="petSleep()">💤 Спать</button>
+              <button class="demo-btn" onclick="cleanPet()">🛁 Мыть</button>
+            </div>
+            <div class="demo-message" id="demoMessage">
+              Нажми на кнопки, чтобы ухаживать за питомцем!
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 Объект питомца</h2>
+          <p>
+            Первым делом создадим объект, который будет содержать всю информацию
+            о нашем питомце: его статистики, уровень, возраст и состояние.
+          </p>
+
+          <div class="code-title">🐾 Структура данных питомца</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Создаём объект питомца с начальными значениями</span>
+<span class="js-keyword">let</span> <span class="js-function">pet</span> = {
+  <span class="js-string">name</span>: <span class="js-string">"Малыш"</span>,
+  <span class="js-string">level</span>: <span class="js-number">1</span>,
+  <span class="js-string">age</span>: <span class="js-number">0</span>, <span class="js-comment">// в минутах</span>
+  <span class="js-string">stage</span>: <span class="js-string">"egg"</span>, <span class="js-comment">// egg, baby, child, teen, adult</span>
+  <span class="js-string">emoji</span>: <span class="js-string">"🥚"</span>,
+  
+  <span class="js-comment">// Статистики здоровья (от 0 до 100)</span>
+  <span class="js-string">stats</span>: {
+    <span class="js-string">hunger</span>: <span class="js-number">100</span>,      <span class="js-comment">// чем выше, тем сытее</span>
+    <span class="js-string">happiness</span>: <span class="js-number">100</span>,  <span class="js-comment">// уровень счастья</span>
+    <span class="js-string">energy</span>: <span class="js-number">100</span>,     <span class="js-comment">// энергия для активности</span>
+    <span class="js-string">cleanliness</span>: <span class="js-number">100</span> <span class="js-comment">// чистота питомца</span>
+  },
+  
+  <span class="js-string">status</span>: <span class="js-string">"Спокоен"</span>,  <span class="js-comment">// текущее настроение</span>
+  <span class="js-string">lastFed</span>: <span class="js-function">Date.now</span>(),
+  <span class="js-string">isAlive</span>: <span class="js-keyword">true</span>
+};</pre>
+          </div>
+
+          <div class="concept-box">
+            <h4>💡 Концепция: Объекты в JavaScript</h4>
+            <p>
+              Объект - это способ сгруппировать связанную информацию. Наш
+              питомец - это объект со свойствами (name, level) и вложенными
+              объектами (stats). Мы можем обращаться к свойствам через точку:
+              pet.name или pet.stats.hunger.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🍎 Функция кормления</h2>
+          <p>
+            Создадим функцию для кормления питомца. Кормление увеличивает
+            сытость, но может снизить энергию, если питомец переел.
+          </p>
+
+          <div class="code-title">🍎 Логика кормления</div>
+          <div class="code-example">
+            <pre><span class="js-function">function</span> <span class="js-function">feedPet</span>() {
+  <span class="js-comment">// Проверяем, жив ли питомец</span>
+  <span class="js-keyword">if</span> (!pet.isAlive) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"Питомец больше не нуждается в заботе..."</span>);
+    <span class="js-keyword">return</span>;
+  }
+
+  <span class="js-comment">// Проверяем, не слишком ли сыт питомец</span>
+  <span class="js-keyword">if</span> (pet.stats.hunger >= <span class="js-number">95</span>) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"🤢 Я уже сыт! Спасибо!"</span>);
+    pet.stats.energy = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.energy - <span class="js-number">5</span>);
+    <span class="js-keyword">return</span>;
+  }
+
+  <span class="js-comment">// Увеличиваем сытость</span>
+  pet.stats.hunger = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.hunger + <span class="js-number">25</span>);
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">10</span>);
+  pet.lastFed = <span class="js-function">Date.now</span>();
+  
+  <span class="js-comment">// Показываем реакцию питомца</span>
+  <span class="js-keyword">let</span> reactions = [
+    <span class="js-string">"😋 Ммм, вкусно!"</span>,
+    <span class="js-string">"🤤 Ещё немножко!"</span>,
+    <span class="js-string">"😊 Спасибо за еду!"</span>
+  ];
+  
+  <span class="js-keyword">let</span> reaction = reactions[<span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * reactions.length)];
+  <span class="js-function">showMessage</span>(reaction);
+  
+  <span class="js-comment">// Обновляем интерфейс</span>
+  <span class="js-function">updateDisplay</span>();
+  <span class="js-function">addExperience</span>(<span class="js-number">5</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Функция игры</h2>
+          <p>
+            Игры повышают счастье питомца, но требуют энергии. Если энергии
+            мало, питомец откажется играть и захочет поспать.
+          </p>
+
+          <div class="code-title">🎮 Система игр</div>
+          <div class="code-example">
+            <pre><span class="js-function">function</span> <span class="js-function">playWithPet</span>() {
+  <span class="js-keyword">if</span> (!pet.isAlive) <span class="js-keyword">return</span>;
+
+  <span class="js-comment">// Проверяем энергию для игр</span>
+  <span class="js-keyword">if</span> (pet.stats.energy < <span class="js-number">20</span>) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"😴 Я слишком устал для игр..."</span>);
+    <span class="js-keyword">return</span>;
+  }
+
+  <span class="js-comment">// Проверяем голод</span>
+  <span class="js-keyword">if</span> (pet.stats.hunger < <span class="js-number">30</span>) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"😢 Я слишком голоден для игр!"</span>);
+    <span class="js-keyword">return</span>;
+  }
+
+  <span class="js-comment">// Играем!</span>
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">20</span>);
+  pet.stats.energy = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.energy - <span class="js-number">15</span>);
+  pet.stats.hunger = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.hunger - <span class="js-number">5</span>);
+  pet.stats.cleanliness = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.cleanliness - <span class="js-number">10</span>);
+
+  <span class="js-keyword">let</span> playReactions = [
+    <span class="js-string">"🎉 Как весело!"</span>,
+    <span class="js-string">"😄 Играем ещё!"</span>,
+    <span class="js-string">"🤗 Ура, игры!"</span>,
+    <span class="js-string">"✨ Это так здорово!"</span>
+  ];
+
+  <span class="js-function">showMessage</span>(playReactions[<span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * playReactions.length)]);
+  
+  <span class="js-comment">// Анимация радости</span>
+  <span class="js-function">animatePet</span>(<span class="js-string">"bounce"</span>);
+  <span class="js-function">updateDisplay</span>();
+  <span class="js-function">addExperience</span>(<span class="js-number">8</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>💤 Функция сна</h2>
+          <p>
+            Сон восстанавливает энергию питомца. Во время сна питомец не может
+            выполнять другие действия, но постепенно восстанавливает силы.
+          </p>
+
+          <div class="code-title">💤 Система сна и отдыха</div>
+          <div class="code-example">
+            <pre><span class="js-function">function</span> <span class="js-function">petSleep</span>() {
+  <span class="js-keyword">if</span> (!pet.isAlive) <span class="js-keyword">return</span>;
+
+  <span class="js-comment">// Проверяем, нужен ли сон</span>
+  <span class="js-keyword">if</span> (pet.stats.energy >= <span class="js-number">90</span>) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"😊 Я полон энергии! Не хочу спать."</span>);
+    <span class="js-keyword">return</span>;
+  }
+
+  <span class="js-comment">// Питомец засыпает</span>
+  pet.stats.energy = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.energy + <span class="js-number">30</span>);
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">5</span>);
+  
+  <span class="js-comment">// Во время сна немного проголодается</span>
+  pet.stats.hunger = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.hunger - <span class="js-number">5</span>);
+
+  <span class="js-function">showMessage</span>(<span class="js-string">"💤 Zzz... Хорошо отдохнул!"</span>);
+  
+  <span class="js-comment">// Анимация сна</span>
+  <span class="js-function">animatePet</span>(<span class="js-string">"sleep"</span>);
+  <span class="js-function">updateDisplay</span>();
+  <span class="js-function">addExperience</span>(<span class="js-number">3</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🛁 Функция гигиены</h2>
+          <p>
+            Мытьё повышает чистоту питомца и немного улучшает настроение.
+            Грязный питомец может заболеть и потерять счастье.
+          </p>
+
+          <div class="code-title">🛁 Система чистоты</div>
+          <div class="code-example">
+            <pre><span class="js-function">function</span> <span class="js-function">cleanPet</span>() {
+  <span class="js-keyword">if</span> (!pet.isAlive) <span class="js-keyword">return</span>;
+
+  <span class="js-comment">// Проверяем, нужно ли мытьё</span>
+  <span class="js-keyword">if</span> (pet.stats.cleanliness >= <span class="js-number">90</span>) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"✨ Я уже чистый и красивый!"</span>);
+    <span class="js-keyword">return</span>;
+  }
+
+  <span class="js-comment">// Моем питомца</span>
+  pet.stats.cleanliness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.cleanliness + <span class="js-number">40</span>);
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">15</span>);
+  
+  <span class="js-comment">// Мытьё немного утомляет</span>
+  pet.stats.energy = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.energy - <span class="js-number">5</span>);
+
+  <span class="js-keyword">let</span> cleanReactions = [
+    <span class="js-string">"🛁 Так приятно и чисто!"</span>,
+    <span class="js-string">"✨ Теперь я сияю!"</span>,
+    <span class="js-string">"🌟 Какой я красивый!"</span>,
+    <span class="js-string">"😊 Спасибо за заботу!"</span>
+  ];
+
+  <span class="js-function">showMessage</span>(cleanReactions[<span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * cleanReactions.length)]);
+  
+  <span class="js-function">animatePet</span>(<span class="js-string">"shine"</span>);
+  <span class="js-function">updateDisplay</span>();
+  <span class="js-function">addExperience</span>(<span class="js-number">4</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔄 Обновление интерфейса</h2>
+          <p>
+            Создадим функции для обновления визуального отображения статистик
+            питомца. Это свяжет логику игры с пользовательским интерфейсом.
+          </p>
+
+          <div class="code-title">🎨 Функции интерфейса</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Обновляем все элементы интерфейса</span>
+<span class="js-function">function</span> <span class="js-function">updateDisplay</span>() {
+  <span class="js-comment">// Обновляем информацию о питомце</span>
+  <span class="js-function">document.getElementById</span>(<span class="js-string">"pet-emoji"</span>).textContent = pet.emoji;
+  <span class="js-function">document.getElementById</span>(<span class="js-string">"pet-stage"</span>).textContent = <span class="js-function">getStageRussian</span>(pet.stage);
+  <span class="js-function">document.getElementById</span>(<span class="js-string">"pet-level"</span>).textContent = pet.level;
+  <span class="js-function">document.getElementById</span>(<span class="js-string">"pet-status"</span>).textContent = <span class="js-function">getStatus</span>();
+  <span class="js-function">document.getElementById</span>(<span class="js-string">"age"</span>).textContent = pet.age;
+
+  <span class="js-comment">// Обновляем статистики</span>
+  <span class="js-function">updateStatBar</span>(<span class="js-string">"hunger"</span>, pet.stats.hunger);
+  <span class="js-function">updateStatBar</span>(<span class="js-string">"happiness"</span>, pet.stats.happiness);
+  <span class="js-function">updateStatBar</span>(<span class="js-string">"energy"</span>, pet.stats.energy);
+  <span class="js-function">updateStatBar</span>(<span class="js-string">"cleanliness"</span>, pet.stats.cleanliness);
+
+  <span class="js-comment">// Обновляем состояние питомца</span>
+  <span class="js-function">updatePetMood</span>();
+}
+
+<span class="js-comment">// Обновляем полоску статистики</span>
+<span class="js-function">function</span> <span class="js-function">updateStatBar</span>(statName, value) {
+  <span class="js-keyword">const</span> bar = <span class="js-function">document.getElementById</span>(statName + <span class="js-string">"-bar"</span>);
+  <span class="js-keyword">const</span> valueSpan = <span class="js-function">document.getElementById</span>(statName + <span class="js-string">"-value"</span>);
+  
+  bar.style.width = value + <span class="js-string">"%"</span>;
+  valueSpan.textContent = <span class="js-function">Math.round</span>(value) + <span class="js-string">"%"</span>;
+  
+  <span class="js-comment">// Меняем цвет в зависимости от значения</span>
+  <span class="js-keyword">if</span> (value < <span class="js-number">30</span>) {
+    bar.style.background = <span class="js-string">"linear-gradient(135deg, #ff6b6b, #ee5a52)"</span>;
+    bar.parentElement.parentElement.classList.add(<span class="js-string">"low-stat"</span>);
+  } <span class="js-keyword">else</span> {
+    bar.parentElement.parentElement.classList.remove(<span class="js-string">"low-stat"</span>);
+  }
+}
+
+<span class="js-comment">// Показываем сообщение игроку</span>
+<span class="js-function">function</span> <span class="js-function">showMessage</span>(text) {
+  <span class="js-keyword">const</span> messageEl = <span class="js-function">document.getElementById</span>(<span class="js-string">"message"</span>);
+  messageEl.textContent = text;
+  messageEl.style.animation = <span class="js-string">"fadeIn 0.3s ease"</span>;
+  
+  <span class="js-comment">// Очищаем сообщение через 3 секунды</span>
+  <span class="js-function">setTimeout</span>(() => {
+    messageEl.style.animation = <span class="js-string">"fadeOut 0.3s ease"</span>;
+  }, <span class="js-number">2700</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>💻 Твоё задание</h3>
+          <p>
+            Создай файл <strong>script.js</strong> со следующим функционалом:
+          </p>
+
+          <ol class="task-list">
+            <li>Объект pet с начальными статистиками</li>
+            <li>Функцию feedPet() для кормления питомца</li>
+            <li>Функцию playWithPet() для игр с питомцем</li>
+            <li>Функцию petSleep() для сна и отдыха</li>
+            <li>Функцию cleanPet() для гигиены</li>
+            <li>Функцию updateDisplay() для обновления интерфейса</li>
+            <li>Привязку кнопок к функциям через addEventListener</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #856404">
+            💡 Не забудь добавить &lt;script src="script.js"&gt;&lt;/script&gt;
+            в HTML!
+          </p>
+        </div>
+
+        <div class="tips-section">
+          <h3>💡 Секреты хорошего кода</h3>
+
+          <div class="tip-item">
+            <strong>Валидация входных данных:</strong> Всегда проверяй условия
+            перед выполнением действий. Питомец не может играть, если он слишком
+            голоден или устал.
+          </div>
+
+          <div class="tip-item">
+            <strong>Math.min() и Math.max():</strong> Используй эти функции для
+            ограничения значений. Статистики не должны выходить за пределы
+            0-100.
+          </div>
+
+          <div class="tip-item">
+            <strong>Случайные реакции:</strong> Массив с разными сообщениями +
+            Math.random() делают питомца более живым и непредсказуемым.
+          </div>
+
+          <div class="tip-item">
+            <strong>Модульность:</strong> Разбивай код на небольшие функции.
+            Каждая функция должна делать что-то одно, но делать это хорошо.
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="pet-lesson-4.html" class="next-lesson">
+            🌟 Следующий урок: Эволюция и мини-игры →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо питомец для этого урока
+      let demoPet = {
+        stats: { hunger: 80, happiness: 60, energy: 90, cleanliness: 50 },
+        emoji: "🥚",
+        name: "Малыш",
+      };
+
+      function feedPet() {
+        if (demoPet.stats.hunger >= 95) {
+          document.getElementById("demoMessage").textContent =
+            "🤢 Я уже сыт! Спасибо!";
+          return;
+        }
+
+        demoPet.stats.hunger = Math.min(100, demoPet.stats.hunger + 25);
+        demoPet.stats.happiness = Math.min(100, demoPet.stats.happiness + 10);
+
+        document.getElementById("demoMessage").textContent = "😋 Ммм, вкусно!";
+        document.getElementById("demoEmoji").style.animation =
+          "bounce 0.5s ease-in-out 3";
+        setTimeout(() => {
+          document.getElementById("demoEmoji").style.animation = "none";
+        }, 1500);
+
+        updateDemoStats();
+      }
+
+      function playWithPet() {
+        if (demoPet.stats.energy < 20) {
+          document.getElementById("demoMessage").textContent =
+            "😴 Я слишком устал для игр...";
+          return;
+        }
+
+        demoPet.stats.happiness = Math.min(100, demoPet.stats.happiness + 20);
+        demoPet.stats.energy = Math.max(0, demoPet.stats.energy - 15);
+        demoPet.stats.cleanliness = Math.max(0, demoPet.stats.cleanliness - 10);
+
+        document.getElementById("demoMessage").textContent = "🎉 Как весело!";
+        document.getElementById("demoEmoji").style.animation =
+          "bounce 0.3s ease-in-out infinite";
+        setTimeout(() => {
+          document.getElementById("demoEmoji").style.animation = "none";
+        }, 2000);
+
+        updateDemoStats();
+      }
+
+      function petSleep() {
+        if (demoPet.stats.energy >= 90) {
+          document.getElementById("demoMessage").textContent =
+            "😊 Я полон энергии! Не хочу спать.";
+          return;
+        }
+
+        demoPet.stats.energy = Math.min(100, demoPet.stats.energy + 30);
+        demoPet.stats.happiness = Math.min(100, demoPet.stats.happiness + 5);
+
+        document.getElementById("demoMessage").textContent =
+          "💤 Zzz... Хорошо отдохнул!";
+        document.getElementById("demoEmoji").style.opacity = "0.7";
+        document.getElementById("demoEmoji").style.filter = "blur(1px)";
+        setTimeout(() => {
+          document.getElementById("demoEmoji").style.opacity = "1";
+          document.getElementById("demoEmoji").style.filter = "none";
+        }, 1500);
+
+        updateDemoStats();
+      }
+
+      function cleanPet() {
+        if (demoPet.stats.cleanliness >= 90) {
+          document.getElementById("demoMessage").textContent =
+            "✨ Я уже чистый и красивый!";
+          return;
+        }
+
+        demoPet.stats.cleanliness = Math.min(
+          100,
+          demoPet.stats.cleanliness + 40
+        );
+        demoPet.stats.happiness = Math.min(100, demoPet.stats.happiness + 15);
+
+        document.getElementById("demoMessage").textContent =
+          "🛁 Так приятно и чисто!";
+        document.getElementById("demoEmoji").style.textShadow =
+          "0 0 10px #ffd700";
+        setTimeout(() => {
+          document.getElementById("demoEmoji").style.textShadow = "none";
+        }, 2000);
+
+        updateDemoStats();
+      }
+
+      function updateDemoStats() {
+        document.getElementById("demoHunger").style.width =
+          demoPet.stats.hunger + "%";
+        document.getElementById("demoHungerText").textContent =
+          Math.round(demoPet.stats.hunger) + "%";
+
+        document.getElementById("demoHappiness").style.width =
+          demoPet.stats.happiness + "%";
+        document.getElementById("demoHappinessText").textContent =
+          Math.round(demoPet.stats.happiness) + "%";
+
+        document.getElementById("demoEnergy").style.width =
+          demoPet.stats.energy + "%";
+        document.getElementById("demoEnergyText").textContent =
+          Math.round(demoPet.stats.energy) + "%";
+
+        document.getElementById("demoCleanliness").style.width =
+          demoPet.stats.cleanliness + "%";
+        document.getElementById("demoCleanlinessText").textContent =
+          Math.round(demoPet.stats.cleanliness) + "%";
+      }
+
+      // Автоматическое снижение статистик для демонстрации
+      setInterval(() => {
+        demoPet.stats.hunger = Math.max(0, demoPet.stats.hunger - 0.5);
+        demoPet.stats.happiness = Math.max(0, demoPet.stats.happiness - 0.3);
+        demoPet.stats.energy = Math.max(0, demoPet.stats.energy - 0.2);
+        demoPet.stats.cleanliness = Math.max(
+          0,
+          demoPet.stats.cleanliness - 0.4
+        );
+        updateDemoStats();
+      }, 2000);
+
+      // Анимация появления секций
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .interactive-demo"
+        );
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+
+      // Добавляем CSS для анимаций
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+          40% { transform: translateY(-10px); }
+          60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(-10px); }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>

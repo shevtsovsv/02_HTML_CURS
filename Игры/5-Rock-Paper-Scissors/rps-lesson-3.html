@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 3: JavaScript логика игры</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "⚡🧠💻";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #2ecc71;
+      }
+
+      .section h2 {
+        color: #2ecc71;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(46, 204, 113, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #2ecc71;
+      }
+
+      .js-keyword {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .js-function {
+        color: #9b59b6;
+        font-weight: 600;
+      }
+
+      .js-string {
+        color: #2ecc71;
+      }
+
+      .js-number {
+        color: #e67e22;
+      }
+
+      .js-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .demo-container {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-container h3 {
+        color: #155724;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .interactive-demo {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 2px solid #28a745;
+      }
+
+      .demo-game {
+        text-align: center;
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .demo-stat {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 12px 8px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .demo-stat-number {
+        font-size: 1.2rem;
+        display: block;
+      }
+
+      .demo-battle {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 15px;
+        align-items: center;
+        margin: 15px 0;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .demo-choice {
+        font-size: 2.5rem;
+        margin: 10px 0;
+      }
+
+      .demo-vs {
+        font-size: 1.5rem;
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .demo-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .demo-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 10px;
+        font-size: 1.8rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .demo-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .demo-btn span {
+        display: block;
+        font-size: 0.6rem;
+        margin-top: 3px;
+        font-weight: bold;
+      }
+
+      .demo-result {
+        background: #74b9ff;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-weight: bold;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+      }
+
+      .logic-flow {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .logic-flow h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .flow-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .flow-step {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #ffc107;
+        position: relative;
+      }
+
+      .flow-step::before {
+        content: attr(data-step);
+        position: absolute;
+        left: -15px;
+        top: 15px;
+        background: #ffc107;
+        color: #856404;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .flow-step h4 {
+        color: #856404;
+        margin-bottom: 8px;
+        padding-left: 20px;
+      }
+
+      .flow-step p {
+        color: #6c5500;
+        margin: 0;
+        padding-left: 20px;
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      .rules-showcase {
+        background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
+        border: 2px solid #0288d1;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .rules-showcase h3 {
+        color: #01579b;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .rules-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .rule-card {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #0288d1;
+      }
+
+      .rule-card h4 {
+        color: #01579b;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .rule-card .choice-icons {
+        font-size: 2rem;
+        margin: 10px 0;
+      }
+
+      .rule-card .result {
+        font-weight: bold;
+        color: #d32f2f;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "⚡";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .debugging-section {
+        background: linear-gradient(135deg, #ffe6e6, #ffcccc);
+        border: 2px solid #e74c3c;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .debugging-section h3 {
+        color: #c0392b;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .debug-tip {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #e74c3c;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .demo-battle {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .demo-vs {
+          order: 2;
+          text-align: center;
+        }
+
+        .rules-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>⚡ Урок 3: JavaScript логика</h1>
+        <p class="lesson-info">Оживляем игру с помощью программирования</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы напишем основную логику игры на JavaScript. Научимся
+            определять победителя, создавать ИИ противника и обновлять
+            статистику игры в реальном времени.
+          </p>
+          <p>
+            Ты изучишь переменные, функции, условия и циклы на практическом
+            примере создания полнофункциональной игры.
+          </p>
+        </div>
+
+        <div class="demo-container">
+          <h3>Живая демонстрация логики</h3>
+          <p>Попробуй поиграть и посмотри, как работает код:</p>
+
+          <div class="interactive-demo">
+            <div class="demo-game">
+              <div class="demo-stats">
+                <div class="demo-stat">
+                  <span class="demo-stat-number" id="demoWins">0</span>
+                  <span>Победы</span>
+                </div>
+                <div class="demo-stat">
+                  <span class="demo-stat-number" id="demoLosses">0</span>
+                  <span>Поражения</span>
+                </div>
+                <div class="demo-stat">
+                  <span class="demo-stat-number" id="demoDraws">0</span>
+                  <span>Ничьи</span>
+                </div>
+                <div class="demo-stat">
+                  <span class="demo-stat-number" id="demoStreak">0</span>
+                  <span>Серия</span>
+                </div>
+              </div>
+
+              <div class="demo-battle">
+                <div>
+                  <h4>👤 Игрок</h4>
+                  <div class="demo-choice" id="demoPlayerChoice">❓</div>
+                </div>
+                <div class="demo-vs">VS</div>
+                <div>
+                  <h4>🤖 ИИ</h4>
+                  <div class="demo-choice" id="demoComputerChoice">❓</div>
+                </div>
+              </div>
+
+              <div class="demo-buttons">
+                <button class="demo-btn" onclick="demoPlay('rock')">
+                  ✊
+                  <span>Камень</span>
+                </button>
+                <button class="demo-btn" onclick="demoPlay('paper')">
+                  ✋
+                  <span>Бумага</span>
+                </button>
+                <button class="demo-btn" onclick="demoPlay('scissors')">
+                  ✌️
+                  <span>Ножницы</span>
+                </button>
+              </div>
+
+              <div class="demo-result" id="demoResult">Выбери свой ход!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-showcase">
+          <h3>📋 Правила игры</h3>
+          <p>Вспомним логику определения победителя:</p>
+
+          <div class="rules-grid">
+            <div class="rule-card">
+              <h4>Камень vs Ножницы</h4>
+              <div class="choice-icons">✊ → ✌️</div>
+              <div class="result">Камень побеждает!</div>
+            </div>
+            <div class="rule-card">
+              <h4>Бумага vs Камень</h4>
+              <div class="choice-icons">✋ → ✊</div>
+              <div class="result">Бумага побеждает!</div>
+            </div>
+            <div class="rule-card">
+              <h4>Ножницы vs Бумага</h4>
+              <div class="choice-icons">✌️ → ✋</div>
+              <div class="result">Ножницы побеждают!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔧 Настройка переменных</h2>
+          <p>
+            Начнём с создания переменных для хранения состояния игры. Это
+            данные, которые изменяются в процессе игры.
+          </p>
+
+          <div class="code-title">🔧 Игровые переменные</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Объект для хранения статистики игры</span>
+<span class="js-keyword">let</span> gameStats = {
+    wins: <span class="js-number">0</span>,        <span class="js-comment">// Количество побед</span>
+    losses: <span class="js-number">0</span>,      <span class="js-comment">// Количество поражений</span>
+    draws: <span class="js-number">0</span>,       <span class="js-comment">// Количество ничьих</span>
+    streak: <span class="js-number">0</span>,      <span class="js-comment">// Текущая серия побед</span>
+    maxStreak: <span class="js-number">0</span>,   <span class="js-comment">// Максимальная серия</span>
+    totalGames: <span class="js-number">0</span>   <span class="js-comment">// Общее количество игр</span>
+};
+
+<span class="js-comment">// Объект с вариантами ходов и их отображением</span>
+<span class="js-keyword">const</span> choices = {
+    rock: {
+        emoji: <span class="js-string">'✊'</span>,
+        name: <span class="js-string">'Камень'</span>
+    },
+    paper: {
+        emoji: <span class="js-string">'✋'</span>,
+        name: <span class="js-string">'Бумага'</span>
+    },
+    scissors: {
+        emoji: <span class="js-string">'✌️'</span>,
+        name: <span class="js-string">'Ножницы'</span>
+    }
+};
+
+<span class="js-comment">// Массив возможных ходов для ИИ</span>
+<span class="js-keyword">const</span> choiceKeys = <span class="js-function">Object.keys</span>(choices); <span class="js-comment">// ['rock', 'paper', 'scissors']</span></pre>
+          </div>
+
+          <p>
+            <span class="highlight">let</span> позволяет изменять переменную,
+            <span class="highlight">const</span> - создаёт константу. Объекты
+            удобны для группировки связанных данных.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Основная функция игры</h2>
+          <p>
+            Создадим главную функцию, которая запускается при клике на кнопку
+            выбора. Она координирует весь процесс игры.
+          </p>
+
+          <div class="code-title">🎮 Функция makeChoice</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Главная функция игры</span>
+<span class="js-function">function</span> <span class="js-function">makeChoice</span>(playerChoice) {
+    <span class="js-comment">// 1. Получаем выбор компьютера</span>
+    <span class="js-keyword">const</span> computerChoice = <span class="js-function">getComputerChoice</span>();
+    
+    <span class="js-comment">// 2. Показываем выборы на экране</span>
+    <span class="js-function">displayChoices</span>(playerChoice, computerChoice);
+    
+    <span class="js-comment">// 3. Определяем результат</span>
+    <span class="js-keyword">const</span> result = <span class="js-function">determineWinner</span>(playerChoice, computerChoice);
+    
+    <span class="js-comment">// 4. Обновляем статистику</span>
+    <span class="js-function">updateStats</span>(result);
+    
+    <span class="js-comment">// 5. Показываем результат</span>
+    <span class="js-function">showResult</span>(result, playerChoice, computerChoice);
+    
+    <span class="js-comment">// 6. Обновляем отображение</span>
+    <span class="js-function">updateDisplay</span>();
+}</pre>
+          </div>
+
+          <p>
+            Функция принимает параметр
+            <span class="highlight">playerChoice</span> - выбор игрока ('rock',
+            'paper' или 'scissors').
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🤖 Создание ИИ противника</h2>
+          <p>
+            Напишем функцию для генерации случайного выбора компьютера. Пока
+            сделаем простого противника, а в следующих уроках улучшим его.
+          </p>
+
+          <div class="code-title">🤖 Случайный выбор ИИ</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Функция выбора компьютера</span>
+<span class="js-function">function</span> <span class="js-function">getComputerChoice</span>() {
+    <span class="js-comment">// Генерируем случайное число от 0 до 2</span>
+    <span class="js-keyword">const</span> randomIndex = <span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * <span class="js-number">3</span>);
+    
+    <span class="js-comment">// Возвращаем соответствующий выбор</span>
+    <span class="js-keyword">return</span> choiceKeys[randomIndex];
+}
+
+<span class="js-comment">// Альтернативный способ - более читаемый</span>
+<span class="js-function">function</span> <span class="js-function">getComputerChoiceV2</span>() {
+    <span class="js-keyword">const</span> choices = [<span class="js-string">'rock'</span>, <span class="js-string">'paper'</span>, <span class="js-string">'scissors'</span>];
+    <span class="js-keyword">const</span> randomIndex = <span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * choices.length);
+    <span class="js-keyword">return</span> choices[randomIndex];
+}</pre>
+          </div>
+
+          <p>
+            <span class="highlight">Math.random()</span> возвращает случайное
+            число от 0 до 1.
+            <span class="highlight">Math.floor()</span> округляет вниз до целого
+            числа.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🏆 Определение победителя</h2>
+          <p>
+            Самая важная функция - определение того, кто выиграл раунд.
+            Используем логику условий для сравнения ходов.
+          </p>
+
+          <div class="code-title">🏆 Логика победы</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Функция определения победителя</span>
+<span class="js-function">function</span> <span class="js-function">determineWinner</span>(player, computer) {
+    <span class="js-comment">// Если выборы одинаковые - ничья</span>
+    <span class="js-keyword">if</span> (player === computer) {
+        <span class="js-keyword">return</span> <span class="js-string">'draw'</span>;
+    }
+    
+    <span class="js-comment">// Объект с правилами победы</span>
+    <span class="js-keyword">const</span> winConditions = {
+        rock: <span class="js-string">'scissors'</span>,      <span class="js-comment">// Камень бьёт ножницы</span>
+        paper: <span class="js-string">'rock'</span>,        <span class="js-comment">// Бумага бьёт камень</span>
+        scissors: <span class="js-string">'paper'</span>     <span class="js-comment">// Ножницы бьют бумагу</span>
+    };
+    
+    <span class="js-comment">// Проверяем, побеждает ли игрок</span>
+    <span class="js-keyword">if</span> (winConditions[player] === computer) {
+        <span class="js-keyword">return</span> <span class="js-string">'win'</span>;
+    } <span class="js-keyword">else</span> {
+        <span class="js-keyword">return</span> <span class="js-string">'lose'</span>;
+    }
+}
+
+<span class="js-comment">// Альтернативная версия с подробными условиями</span>
+<span class="js-function">function</span> <span class="js-function">determineWinnerDetailed</span>(player, computer) {
+    <span class="js-keyword">if</span> (player === computer) {
+        <span class="js-keyword">return</span> <span class="js-string">'draw'</span>;
+    }
+    
+    <span class="js-keyword">if</span> (
+        (player === <span class="js-string">'rock'</span> && computer === <span class="js-string">'scissors'</span>) ||
+        (player === <span class="js-string">'paper'</span> && computer === <span class="js-string">'rock'</span>) ||
+        (player === <span class="js-string">'scissors'</span> && computer === <span class="js-string">'paper'</span>)
+    ) {
+        <span class="js-keyword">return</span> <span class="js-string">'win'</span>;
+    } <span class="js-keyword">else</span> {
+        <span class="js-keyword">return</span> <span class="js-string">'lose'</span>;
+    }
+}</pre>
+          </div>
+        </div>
+
+        <div class="logic-flow">
+          <h3>🔄 Поток выполнения игры</h3>
+
+          <div class="flow-steps">
+            <div class="flow-step" data-step="1">
+              <h4>Игрок делает выбор</h4>
+              <p>Нажимает на одну из кнопок: Камень, Бумага или Ножницы</p>
+            </div>
+
+            <div class="flow-step" data-step="2">
+              <h4>Генерируется выбор ИИ</h4>
+              <p>
+                Math.random() создаёт случайное число, выбирается один из трёх
+                вариантов
+              </p>
+            </div>
+
+            <div class="flow-step" data-step="3">
+              <h4>Отображаются выборы</h4>
+              <p>На экране показываются эмодзи выборов игрока и компьютера</p>
+            </div>
+
+            <div class="flow-step" data-step="4">
+              <h4>Определяется победитель</h4>
+              <p>
+                Сравниваются выборы по правилам игры, возвращается результат
+              </p>
+            </div>
+
+            <div class="flow-step" data-step="5">
+              <h4>Обновляется статистика</h4>
+              <p>
+                Увеличиваются счётчики побед/поражений/ничьих, пересчитывается
+                серия
+              </p>
+            </div>
+
+            <div class="flow-step" data-step="6">
+              <h4>Показывается результат</h4>
+              <p>
+                Выводится сообщение о результате раунда и обновляется интерфейс
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 Обновление статистики</h2>
+          <p>
+            Создадим функцию для обновления игровой статистики и отображения
+            изменений на экране.
+          </p>
+
+          <div class="code-title">📊 Функции статистики</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Обновление статистики после игры</span>
+<span class="js-function">function</span> <span class="js-function">updateStats</span>(result) {
+    gameStats.totalGames++;
+    
+    <span class="js-keyword">switch</span> (result) {
+        <span class="js-keyword">case</span> <span class="js-string">'win'</span>:
+            gameStats.wins++;
+            gameStats.streak++;
+            <span class="js-comment">// Обновляем максимальную серию</span>
+            <span class="js-keyword">if</span> (gameStats.streak > gameStats.maxStreak) {
+                gameStats.maxStreak = gameStats.streak;
+            }
+            <span class="js-keyword">break</span>;
+            
+        <span class="js-keyword">case</span> <span class="js-string">'lose'</span>:
+            gameStats.losses++;
+            gameStats.streak = <span class="js-number">0</span>; <span class="js-comment">// Сброс серии</span>
+            <span class="js-keyword">break</span>;
+            
+        <span class="js-keyword">case</span> <span class="js-string">'draw'</span>:
+            gameStats.draws++;
+            <span class="js-comment">// Серия не сбрасывается при ничьей</span>
+            <span class="js-keyword">break</span>;
+    }
+}
+
+<span class="js-comment">// Обновление отображения на экране</span>
+<span class="js-function">function</span> <span class="js-function">updateDisplay</span>() {
+    <span class="js-comment">// Находим элементы по ID и обновляем их содержимое</span>
+    <span class="js-function">document.getElementById</span>(<span class="js-string">'wins'</span>).textContent = gameStats.wins;
+    <span class="js-function">document.getElementById</span>(<span class="js-string">'losses'</span>).textContent = gameStats.losses;
+    <span class="js-function">document.getElementById</span>(<span class="js-string">'draws'</span>).textContent = gameStats.draws;
+    <span class="js-function">document.getElementById</span>(<span class="js-string">'streak'</span>).textContent = gameStats.streak;
+}
+
+<span class="js-comment">// Отображение выборов игроков</span>
+<span class="js-function">function</span> <span class="js-function">displayChoices</span>(playerChoice, computerChoice) {
+    <span class="js-function">document.getElementById</span>(<span class="js-string">'playerChoice'</span>).textContent = choices[playerChoice].emoji;
+    <span class="js-function">document.getElementById</span>(<span class="js-string">'computerChoice'</span>).textContent = choices[computerChoice].emoji;
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>💬 Показ результатов</h2>
+          <p>
+            Добавим функцию для показа понятных сообщений о результате игры с
+            использованием эмодзи и текста.
+          </p>
+
+          <div class="code-title">💬 Функция результатов</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Показ результата игры</span>
+<span class="js-function">function</span> <span class="js-function">showResult</span>(result, playerChoice, computerChoice) {
+    <span class="js-keyword">const</span> resultElement = <span class="js-function">document.getElementById</span>(<span class="js-string">'gameResult'</span>);
+    <span class="js-keyword">const</span> playerName = choices[playerChoice].name;
+    <span class="js-keyword">const</span> computerName = choices[computerChoice].name;
+    
+    <span class="js-keyword">let</span> message = <span class="js-string">''</span>;
+    <span class="js-keyword">let</span> className = <span class="js-string">'result-text'</span>;
+    
+    <span class="js-keyword">switch</span> (result) {
+        <span class="js-keyword">case</span> <span class="js-string">'win'</span>:
+            message = <span class="js-string">`🎉 Ты победил! ${playerName} бьёт ${computerName}!`</span>;
+            className += <span class="js-string">' win'</span>;
+            <span class="js-keyword">break</span>;
+            
+        <span class="js-keyword">case</span> <span class="js-string">'lose'</span>:
+            message = <span class="js-string">`😔 Ты проиграл! ${computerName} бьёт ${playerName}!`</span>;
+            className += <span class="js-string">' lose'</span>;
+            <span class="js-keyword">break</span>;
+            
+        <span class="js-keyword">case</span> <span class="js-string">'draw'</span>:
+            message = <span class="js-string">`🤝 Ничья! Оба выбрали ${playerName}!`</span>;
+            className += <span class="js-string">' draw'</span>;
+            <span class="js-keyword">break</span>;
+    }
+    
+    <span class="js-comment">// Обновляем текст и стиль</span>
+    resultElement.textContent = message;
+    resultElement.className = className;
+    
+    <span class="js-comment">// Добавляем информацию о серии</span>
+    <span class="js-keyword">if</span> (gameStats.streak >= <span class="js-number">3</span> && result === <span class="js-string">'win'</span>) {
+        <span class="js-function">setTimeout</span>(() => {
+            resultElement.textContent += <span class="js-string">` 🔥 СЕРИЯ x${gameStats.streak}!`</span>;
+        }, <span class="js-number">1000</span>);
+    }
+}</pre>
+          </div>
+
+          <p>
+            <span class="highlight">template literals</span> (обратные кавычки)
+            позволяют встраивать переменные в строки.
+            <span class="highlight">setTimeout</span>
+            выполняет код с задержкой.
+          </p>
+        </div>
+
+        <div class="debugging-section">
+          <h3>🐛 Отладка и тестирование</h3>
+
+          <div class="debug-tip">
+            <strong>console.log():</strong> Добавь console.log(playerChoice,
+            computerChoice, result) в функции для отслеживания значений
+            переменных в консоли браузера.
+          </div>
+
+          <div class="debug-tip">
+            <strong>Проверка результатов:</strong> Протестируй все возможные
+            комбинации ходов, чтобы убедиться, что логика определения победителя
+            работает правильно.
+          </div>
+
+          <div class="debug-tip">
+            <strong>Обработка ошибок:</strong> Добавь проверки на существование
+            элементов DOM перед их изменением: if (element) element.textContent
+            = value.
+          </div>
+
+          <div class="code-title">🐛 Отладочная версия</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Версия с отладкой</span>
+<span class="js-function">function</span> <span class="js-function">makeChoiceDebug</span>(playerChoice) {
+    <span class="js-function">console.log</span>(<span class="js-string">'🎮 Игрок выбрал:'</span>, playerChoice);
+    
+    <span class="js-keyword">const</span> computerChoice = <span class="js-function">getComputerChoice</span>();
+    <span class="js-function">console.log</span>(<span class="js-string">'🤖 Компьютер выбрал:'</span>, computerChoice);
+    
+    <span class="js-keyword">const</span> result = <span class="js-function">determineWinner</span>(playerChoice, computerChoice);
+    <span class="js-function">console.log</span>(<span class="js-string">'🏆 Результат:'</span>, result);
+    
+    <span class="js-function">console.log</span>(<span class="js-string">'📊 Статистика до:'</span>, { ...gameStats });
+    <span class="js-function">updateStats</span>(result);
+    <span class="js-function">console.log</span>(<span class="js-string">'📊 Статистика после:'</span>, { ...gameStats });
+    
+    <span class="js-function">displayChoices</span>(playerChoice, computerChoice);
+    <span class="js-function">showResult</span>(result, playerChoice, computerChoice);
+    <span class="js-function">updateDisplay</span>();
+}</pre>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>⚡ Твоё задание</h3>
+          <p>Добавь JavaScript логику к своей игре:</p>
+
+          <ol class="task-list">
+            <li>Создай переменные для хранения статистики игры</li>
+            <li>Напиши объект с вариантами ходов и их отображением</li>
+            <li>Реализуй функцию случайного выбора для ИИ</li>
+            <li>Создай функцию определения победителя с правильной логикой</li>
+            <li>Добавь обновление статистики с подсчётом серий</li>
+            <li>Реализуй отображение результатов с эмодзи</li>
+            <li>Подключи функции к кнопкам через onclick</li>
+            <li>Протестируй все возможные комбинации ходов</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Используй console.log() для отладки своего кода!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="rps-lesson-4.html" class="next-lesson">
+            Следующий урок: Продвинутые режимы →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо-игра для урока
+      let demoStats = { wins: 0, losses: 0, draws: 0, streak: 0 };
+      const demoChoices = {
+        rock: { emoji: "✊", name: "Камень" },
+        paper: { emoji: "✋", name: "Бумага" },
+        scissors: { emoji: "✌️", name: "Ножницы" },
+      };
+
+      function demoPlay(playerChoice) {
+        const computerChoice = getDemoComputerChoice();
+
+        // Показать выборы
+        document.getElementById("demoPlayerChoice").textContent =
+          demoChoices[playerChoice].emoji;
+        document.getElementById("demoComputerChoice").textContent =
+          demoChoices[computerChoice].emoji;
+
+        // Определить результат
+        const result = demoWinner(playerChoice, computerChoice);
+
+        // Обновить статистику
+        demoUpdateStats(result);
+
+        // Показать результат
+        demoShowResult(result, playerChoice, computerChoice);
+      }
+
+      function getDemoComputerChoice() {
+        const choices = ["rock", "paper", "scissors"];
+        return choices[Math.floor(Math.random() * 3)];
+      }
+
+      function demoWinner(player, computer) {
+        if (player === computer) return "draw";
+        const winConditions = {
+          rock: "scissors",
+          paper: "rock",
+          scissors: "paper",
+        };
+        return winConditions[player] === computer ? "win" : "lose";
+      }
+
+      function demoUpdateStats(result) {
+        switch (result) {
+          case "win":
+            demoStats.wins++;
+            demoStats.streak++;
+            break;
+          case "lose":
+            demoStats.losses++;
+            demoStats.streak = 0;
+            break;
+          case "draw":
+            demoStats.draws++;
+            break;
+        }
+
+        document.getElementById("demoWins").textContent = demoStats.wins;
+        document.getElementById("demoLosses").textContent = demoStats.losses;
+        document.getElementById("demoDraws").textContent = demoStats.draws;
+        document.getElementById("demoStreak").textContent = demoStats.streak;
+      }
+
+      function demoShowResult(result, playerChoice, computerChoice) {
+        const resultElement = document.getElementById("demoResult");
+        const playerName = demoChoices[playerChoice].name;
+        const computerName = demoChoices[computerChoice].name;
+
+        switch (result) {
+          case "win":
+            resultElement.textContent = `🎉 Победа! ${playerName} бьёт ${computerName}!`;
+            resultElement.style.background =
+              "linear-gradient(135deg, #2ecc71, #27ae60)";
+            break;
+          case "lose":
+            resultElement.textContent = `😔 Поражение! ${computerName} бьёт ${playerName}!`;
+            resultElement.style.background =
+              "linear-gradient(135deg, #e74c3c, #c0392b)";
+            break;
+          case "draw":
+            resultElement.textContent = `🤝 Ничья! Оба выбрали ${playerName}!`;
+            resultElement.style.background =
+              "linear-gradient(135deg, #f39c12, #e67e22)";
+            break;
+        }
+
+        if (demoStats.streak >= 3 && result === "win") {
+          setTimeout(() => {
+            resultElement.textContent += ` 🔥 СЕРИЯ x${demoStats.streak}!`;
+          }, 1000);
+        }
+      }
+
+      // Анимация появления
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .demo-container, .logic-flow, .rules-showcase, .debugging-section, .task-section"
+        );
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

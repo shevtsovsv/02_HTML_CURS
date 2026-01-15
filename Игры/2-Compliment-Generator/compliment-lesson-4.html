@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 4: Категории и статистика в "Генераторе комплиментов"</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #ff9a9e 0%,
+          #fecfef 50%,
+          #fecfef 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-menu {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-menu:hover {
+        background: #ff5252;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-number {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 30px;
+        border-radius: 15px;
+        background: #f8f9fa;
+        border-left: 5px solid #ff6b6b;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        margin-bottom: 15px;
+        margin-top: 25px;
+        font-size: 1.4rem;
+      }
+
+      .section p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 25px;
+        border-radius: 10px;
+        margin: 20px 0;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        line-height: 1.5;
+        border-left: 4px solid #ff6b6b;
+      }
+
+      .code-block pre {
+        margin: 0;
+      }
+
+      .highlight {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #f39c12;
+        margin: 20px 0;
+      }
+
+      .highlight h4 {
+        color: #8b4513;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      .highlight p {
+        color: #8b4513;
+        margin: 0;
+      }
+
+      .demo-container {
+        background: linear-gradient(
+          135deg,
+          #ff9a9e 0%,
+          #fecfef 50%,
+          #fecfef 100%
+        );
+        border-radius: 10px;
+        padding: 30px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-game {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 25px;
+        padding: 20px;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .js-concept {
+        background: #e8f5e8;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin: 15px 0;
+      }
+
+      .js-concept strong {
+        color: #155724;
+        font-size: 1.1rem;
+      }
+
+      .js-concept p {
+        color: #155724;
+        margin-top: 8px;
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .demo-stat-card {
+        background: rgba(255, 255, 255, 0.7);
+        padding: 15px;
+        border-radius: 15px;
+        border: 2px solid #ddd;
+      }
+
+      .demo-stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #e91e63;
+      }
+
+      .demo-category-btn {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        border-radius: 25px;
+        cursor: pointer;
+        margin: 5px 3px;
+        transition: all 0.3s ease;
+      }
+
+      .demo-category-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .demo-category-btn.active {
+        background: linear-gradient(135deg, #00b894, #00a085);
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding: 20px 0;
+        border-top: 1px solid #eee;
+      }
+
+      .nav-btn {
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-menu"> ← Вернуться к урокам </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>📊 Категории и статистика</h1>
+        <p class="lesson-number">Урок 4 из 5</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы значительно расширим функционал нашего генератора.
+            Добавим систему категорий комплиментов, статистику использования,
+            переключение между состояниями и научимся создавать более сложную
+            структуру данных.
+          </p>
+
+          <div class="highlight">
+            <h4>💡 Что вы узнаете:</h4>
+            <p>
+              • Работу с объектами JavaScript<br />
+              • Систему категорий и переключение<br />
+              • CSS Grid для статистических карточек<br />
+              • Динамическое обновление интерфейса<br />
+              • Управление состоянием приложения
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📚 Новые концепции</h2>
+
+          <div class="js-concept">
+            <strong>Объекты JavaScript</strong>
+            <p>
+              Структуры данных для группировки связанных значений: {ключ1:
+              значение1, ключ2: значение2}
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>querySelector() и querySelectorAll()</strong>
+            <p>
+              Методы для поиска элементов по CSS селекторам, более гибкие чем
+              getElementById
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>classList.add() и classList.remove()</strong>
+            <p>
+              Методы для добавления и удаления CSS классов для изменения
+              внешнего вида
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>CSS Grid</strong>
+            <p>
+              Система сетки для создания двумерных макетов:
+              grid-template-columns, gap
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>Управление состоянием</strong>
+            <p>
+              Отслеживание и изменение текущего состояния приложения (активная
+              категория, счётчики)
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🗂️ Структура данных с категориями</h2>
+          <p>Создадим объект с комплиментами, разделёнными по категориям:</p>
+
+          <div class="code-block">
+            <pre>
+// Переменные для состояния приложения
+let currentCategory = 'general';
+let totalCount = 0;
+let categoryCount = 0;
+let userName = '';
+
+// Объект с массивами комплиментов по категориям
+const compliments = {
+  general: [
+    "Ты потрясающий человек!",
+    "У тебя прекрасная улыбка!",
+    "Ты делаешь мир лучше!",
+    "Ты очень талантливый!",
+    "С тобой всегда весело!",
+    "Ты настоящий друг!",
+    "У тебя золотое сердце!",
+    "Ты источник вдохновения!"
+  ],
+  smart: [
+    "Ты невероятно умный!",
+    "Твои идеи просто гениальные!",
+    "Ты быстро всё понимаешь!",
+    "У тебя отличная память!",
+    "Ты настоящий эрудит!",
+    "Твоя логика безупречна!",
+    "Ты всегда находишь решение!",
+    "У тебя аналитический склад ума!"
+  ],
+  creative: [
+    "Ты очень творческий!",
+    "У тебя богатое воображение!",
+    "Твои идеи уникальны!",
+    "Ты настоящий художник души!",
+    "У тебя отличный вкус!",
+    "Ты мыслишь нестандартно!",
+    "Твоё творчество восхищает!",
+    "У тебя талант к искусству!"
+  ],
+  kind: [
+    "Ты очень добрый!",
+    "У тебя большое сердце!",
+    "Ты всегда готов помочь!",
+    "Ты заботливый и внимательный!",
+    "Твоя доброта согревает!",
+    "Ты умеешь дружить!",
+    "У тебя щедрая душа!",
+    "Ты делаешь добрые дела!"
+  ]
+};</pre
+            >
+          </div>
+
+          <div class="highlight">
+            <h4>🔍 Структура объекта:</h4>
+            <p>
+              • Каждый ключ — название категории<br />
+              • Каждое значение — массив комплиментов<br />
+              • Легко добавлять новые категории<br />
+              • Удобно получать комплименты:
+              <code>compliments[currentCategory]</code>
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🔄 Функция переключения категорий</h2>
+          <p>Создадим функцию для смены активной категории:</p>
+
+          <div class="code-block">
+            <pre>
+function setCategory(category) {
+  // Убираем активный класс у всех кнопок
+  const buttons = document.querySelectorAll('.category-button');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  // Добавляем активный класс к выбранной кнопке
+  document.getElementById(`btn-${category}`).classList.add('active');
+  
+  // Устанавливаем новую категорию и сбрасываем счётчик
+  currentCategory = category;
+  categoryCount = 0;
+  updateStats();
+}
+
+// Функция для обновления статистики
+function updateStats() {
+  document.getElementById('totalCount').textContent = totalCount;
+  document.getElementById('categoryCount').textContent = categoryCount;
+}</pre
+            >
+          </div>
+
+          <p>Ключевые особенности:</p>
+          <ul style="margin-left: 20px; margin-top: 10px">
+            <li>
+              <code>querySelectorAll()</code> — находит все кнопки категорий
+            </li>
+            <li>
+              <code>forEach()</code> — выполняет действие для каждой кнопки
+            </li>
+            <li><code>classList</code> — управляет CSS классами</li>
+            <li>Сброс счётчика категории при смене</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🎲 Обновлённая функция генерации</h2>
+          <p>Модифицируем функцию генерации для работы с категориями:</p>
+
+          <div class="code-block">
+            <pre>
+function generateCompliment() {
+  // Получаем массив комплиментов текущей категории
+  const categoryCompliments = compliments[currentCategory];
+  
+  // Выбираем случайный комплимент
+  const randomIndex = Math.floor(Math.random() * categoryCompliments.length);
+  let compliment = categoryCompliments[randomIndex];
+  
+  // Если есть имя, добавляем его к комплименту
+  if (userName) {
+    compliment = `${userName}, ${compliment.toLowerCase()}`;
+  }
+  
+  // Показываем комплимент
+  document.getElementById('complimentDisplay').textContent = compliment;
+  
+  // Обновляем счётчики
+  totalCount++;
+  categoryCount++;
+  updateStats();
+}</pre
+            >
+          </div>
+
+          <div class="highlight">
+            <h4>💡 Логика работы:</h4>
+            <p>
+              1. Получаем комплименты только из активной категории<br />
+              2. Выбираем случайный элемент из этой категории<br />
+              3. Увеличиваем общий счётчик и счётчик категории<br />
+              4. Обновляем отображение статистики
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🏗️ HTML структура с категориями</h2>
+          <p>Добавим кнопки категорий и статистику в HTML:</p>
+
+          <div class="code-block">
+            <pre>
+&lt;div style="margin: 20px 0;"&gt;
+  &lt;p&gt;&lt;strong&gt;Выбери категорию комплиментов:&lt;/strong&gt;&lt;/p&gt;
+  &lt;button class="category-button active" onclick="setCategory('general')" id="btn-general"&gt;
+    🌟 Общие
+  &lt;/button&gt;
+  &lt;button class="category-button" onclick="setCategory('smart')" id="btn-smart"&gt;
+    🧠 Умные
+  &lt;/button&gt;
+  &lt;button class="category-button" onclick="setCategory('creative')" id="btn-creative"&gt;
+    🎨 Творческие
+  &lt;/button&gt;
+  &lt;button class="category-button" onclick="setCategory('kind')" id="btn-kind"&gt;
+    💝 Добрые
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Статистика --&gt;
+&lt;div class="stats"&gt;
+  &lt;div class="stat-card"&gt;
+    &lt;div class="stat-number" id="totalCount"&gt;0&lt;/div&gt;
+    &lt;div class="stat-label"&gt;Всего комплиментов&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="stat-card"&gt;
+    &lt;div class="stat-number" id="categoryCount"&gt;0&lt;/div&gt;
+    &lt;div class="stat-label"&gt;В этой категории&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎨 CSS для категорий и статистики</h2>
+          <p>Добавим стили для новых элементов:</p>
+
+          <div class="code-block">
+            <pre>
+.category-button {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  border-radius: 25px;
+  cursor: pointer;
+  margin: 5px 3px;
+  transition: all 0.3s ease;
+}
+
+.category-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+}
+
+.category-button.active {
+  background: linear-gradient(135deg, #00b894, #00a085);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 15px;
+  border-radius: 15px;
+  border: 2px solid #ddd;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e91e63;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 5px;
+}</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Демонстрация работы</h2>
+          <p>Попробуйте нашу расширенную версию с категориями и статистикой:</p>
+
+          <div class="demo-container">
+            <div class="demo-game">
+              <h1 style="font-size: 2rem; color: #e91e63; margin-bottom: 10px">
+                😊 Генератор комплиментов 😊
+              </h1>
+
+              <div style="margin: 20px 0">
+                <p><strong>Выбери категорию комплиментов:</strong></p>
+                <button
+                  class="demo-category-btn active"
+                  onclick="demoSetCategory('general')"
+                  id="demo-btn-general"
+                >
+                  🌟 Общие
+                </button>
+                <button
+                  class="demo-category-btn"
+                  onclick="demoSetCategory('smart')"
+                  id="demo-btn-smart"
+                >
+                  🧠 Умные
+                </button>
+                <button
+                  class="demo-category-btn"
+                  onclick="demoSetCategory('creative')"
+                  id="demo-btn-creative"
+                >
+                  🎨 Творческие
+                </button>
+                <button
+                  class="demo-category-btn"
+                  onclick="demoSetCategory('kind')"
+                  id="demo-btn-kind"
+                >
+                  💝 Добрые
+                </button>
+              </div>
+
+              <button
+                onclick="demoGenerateCompliment()"
+                style="
+                  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                  color: white;
+                  border: none;
+                  padding: 15px 30px;
+                  font-size: 1.1rem;
+                  font-weight: bold;
+                  border-radius: 50px;
+                  cursor: pointer;
+                  margin: 15px;
+                  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+                "
+              >
+                🎁 Получить комплимент!
+              </button>
+
+              <div
+                id="demoComplimentDisplay"
+                style="
+                  background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+                  padding: 20px;
+                  border-radius: 20px;
+                  margin: 15px 0;
+                  border: 3px solid #e17055;
+                  font-size: 1.2rem;
+                  font-weight: bold;
+                  color: #d63031;
+                  box-shadow: 0 8px 25px rgba(253, 203, 110, 0.3);
+                "
+              >
+                Выбери категорию и нажми на кнопку! 🌈
+              </div>
+
+              <div class="demo-stats">
+                <div class="demo-stat-card">
+                  <div class="demo-stat-number" id="demoTotalCount">0</div>
+                  <div style="font-size: 0.9rem; color: #666; margin-top: 5px">
+                    Всего комплиментов
+                  </div>
+                </div>
+                <div class="demo-stat-card">
+                  <div class="demo-stat-number" id="demoCategoryCount">0</div>
+                  <div style="font-size: 0.9rem; color: #666; margin-top: 5px">
+                    В этой категории
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎓 Что вы изучили</h2>
+          <ul style="font-size: 1.1rem; line-height: 1.8">
+            <li>Создание сложных структур данных с объектами</li>
+            <li>Систему категорий и переключение между ними</li>
+            <li>Управление состоянием приложения</li>
+            <li>Работу с CSS классами через JavaScript</li>
+            <li>CSS Grid для создания сетки статистики</li>
+            <li>Динамическое обновление интерфейса</li>
+            <li>Счётчики и статистику использования</li>
+          </ul>
+
+          <div class="highlight">
+            <h4>🚀 Что дальше?</h4>
+            <p>
+              В финальном уроке мы добавим систему избранного, персонализацию,
+              спецэффекты и создадим полноценное приложение с богатым
+              функционалом!
+            </p>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <a href="compliment-lesson-3.html" class="nav-btn">
+            ← Предыдущий урок
+          </a>
+          <a href="compliment-lesson-5.html" class="nav-btn">
+            Следующий урок →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let demoCurrentCategory = "general";
+      let demoTotalCount = 0;
+      let demoCategoryCount = 0;
+
+      const demoCompliments = {
+        general: [
+          "Ты потрясающий!",
+          "У тебя прекрасная улыбка!",
+          "Ты делаешь мир лучше!",
+        ],
+        smart: [
+          "Ты невероятно умный!",
+          "Твои идеи гениальные!",
+          "У тебя отличная логика!",
+        ],
+        creative: [
+          "Ты очень творческий!",
+          "У тебя богатое воображение!",
+          "Твои идеи уникальны!",
+        ],
+        kind: [
+          "Ты очень добрый!",
+          "У тебя большое сердце!",
+          "Ты всегда готов помочь!",
+        ],
+      };
+
+      function demoSetCategory(category) {
+        // Убираем активный класс у всех кнопок
+        const buttons = document.querySelectorAll(".demo-category-btn");
+        buttons.forEach((btn) => btn.classList.remove("active"));
+
+        // Добавляем активный класс к выбранной кнопке
+        document.getElementById(`demo-btn-${category}`).classList.add("active");
+
+        // Устанавливаем новую категорию и сбрасываем счётчик
+        demoCurrentCategory = category;
+        demoCategoryCount = 0;
+        demoUpdateStats();
+      }
+
+      function demoUpdateStats() {
+        document.getElementById("demoTotalCount").textContent = demoTotalCount;
+        document.getElementById("demoCategoryCount").textContent =
+          demoCategoryCount;
+      }
+
+      function demoGenerateCompliment() {
+        const categoryCompliments = demoCompliments[demoCurrentCategory];
+        const randomIndex = Math.floor(
+          Math.random() * categoryCompliments.length
+        );
+        const compliment = categoryCompliments[randomIndex];
+
+        document.getElementById("demoComplimentDisplay").textContent =
+          compliment;
+
+        demoTotalCount++;
+        demoCategoryCount++;
+        demoUpdateStats();
+      }
+    </script>
+  </body>
+</html>

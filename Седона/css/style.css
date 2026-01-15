@@ -1,0 +1,196 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  color: #333;
+  line-height: 1.5;
+}
+
+header {
+  text-align: center;
+}
+
+.nav {
+  background: white;
+  padding: 10px 0;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.menu a:hover {
+  color: #81b3d2;
+}
+
+.hero {
+  position: relative;
+}
+
+.hero img {
+  width: 100%;
+  height: auto;
+}
+
+.hero-text {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 72px;
+  letter-spacing: 2px;
+}
+
+.hero-welcome {
+  font-size: 24px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.hero-subtitle {
+  font-style: italic;
+}
+
+.intro {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.reasons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.reason,
+.reason-image {
+  flex: 1 1 50%;
+}
+
+.reason {
+  background-color: #81b3d2;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.reason h3 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.reason-image img {
+  width: 100%;
+  height: auto;
+}
+
+.features {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.feature {
+  flex: 1;
+  max-width: 300px;
+}
+
+.icon {
+  width: 50px;
+  margin-bottom: 10px;
+}
+
+.facts {
+  display: flex;
+  justify-content: space-around;
+  padding: 50px 20px;
+  background-color: #f2f2f2;
+  text-align: center;
+}
+
+.fact {
+  max-width: 250px;
+}
+
+.booking {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #81b3d2;
+  color: white;
+  padding: 15px 40px;
+  border-radius: 4px;
+  margin-top: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #6da4c0;
+}
+
+.map img {
+  width: 100%;
+  height: auto;
+}
+
+.footer {
+  background: #f2f2f2;
+  text-align: center;
+  padding: 30px;
+}
+
+.footer .socials img {
+  width: 24px;
+  margin: 0 10px;
+}
+
+@media (max-width: 768px) {
+  .menu {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .reasons,
+  .features,
+  .facts {
+    flex-direction: column;
+  }
+
+  .reason,
+  .reason-image {
+    flex: 1 1 100%;
+  }
+
+  .hero-title {
+    font-size: 48px;
+  }
+}

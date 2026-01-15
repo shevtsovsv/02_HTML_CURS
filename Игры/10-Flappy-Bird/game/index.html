@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🐦 Flappy Bird - Учебная игра</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      canvas {
+        border: 3px solid #34495e;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(
+          to bottom,
+          #87ceeb 0%,
+          #98fb98 80%,
+          #228b22 100%
+        );
+      }
+
+      .controls {
+        margin-top: 20px;
+        text-align: center;
+        color: #2c3e50;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 15px 25px;
+        border-radius: 15px;
+      }
+
+      .controls p {
+        margin: 5px 0;
+        font-weight: bold;
+      }
+
+      .score-display {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 2rem;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        background: rgba(52, 73, 94, 0.7);
+        padding: 10px 20px;
+        border-radius: 25px;
+      }
+
+      .game-over {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(231, 76, 60, 0.95);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        display: none;
+        backdrop-filter: blur(10px);
+      }
+
+      .start-screen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(52, 152, 219, 0.95);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        background: linear-gradient(45deg, #2980b9, #21618c);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+      }
+
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #2c3e50;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .back-button:hover {
+        background: white;
+        transform: scale(1.05);
+      }
+
+      .difficulty-buttons {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .difficulty-btn {
+        background: linear-gradient(45deg, #27ae60, #229954);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 100px;
+      }
+
+      .difficulty-btn:hover {
+        background: linear-gradient(45deg, #229954, #1e8449);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+      }
+
+      .difficulty-btn.selected {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+      }
+
+      .difficulty-btn.easy {
+        background: linear-gradient(45deg, #27ae60, #229954);
+      }
+
+      .difficulty-btn.medium {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+      }
+
+      .difficulty-btn.hard {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+      }
+
+      .difficulty-info {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        color: #2c3e50;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        canvas {
+          width: 90vw;
+          height: 60vh;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .game-container {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../index.html" class="back-button">← К урокам</a>
+
+    <div class="score-display" id="score">Счёт: 0</div>
+
+    <div class="game-container">
+      <h1>🐦 Flappy Bird</h1>
+      <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+      <div class="controls">
+        <p>🖱️ Клик мышкой или Пробел - прыжок</p>
+        <p>🎯 Пролетайте между трубами и набирайте очки!</p>
+      </div>
+    </div>
+
+    <!-- Экран старта -->
+    <div class="start-screen" id="startScreen">
+      <h2>🐦 Добро пожаловать в Flappy Bird!</h2>
+      <p>Помогите птичке пролететь через препятствия</p>
+      <p>Изучайте физику игр и Canvas API</p>
+
+      <h3>Выберите уровень сложности:</h3>
+      <div class="difficulty-buttons">
+        <button
+          class="difficulty-btn easy selected"
+          onclick="selectDifficulty('easy')"
+        >
+          😊 Легко
+        </button>
+        <button
+          class="difficulty-btn medium"
+          onclick="selectDifficulty('medium')"
+        >
+          😐 Средне
+        </button>
+        <button class="difficulty-btn hard" onclick="selectDifficulty('hard')">
+          😤 Сложно
+        </button>
+      </div>
+
+      <div class="difficulty-info" id="difficultyInfo">
+        <strong>Легкий уровень:</strong><br />
+        • Медленная гравитация<br />
+        • Широкие проходы между трубами<br />
+        • Медленная скорость труб<br />
+        • Идеально для изучения основ!
+      </div>
+
+      <button class="btn" onclick="startGame()">🚀 Начать игру</button>
+      <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.8">
+        Эта игра демонстрирует: гравитацию, столкновения, анимацию и управление
+        игровым состоянием
+      </p>
+    </div>
+
+    <!-- Экран окончания игры -->
+    <div class="game-over" id="gameOver">
+      <h2>💥 Игра окончена!</h2>
+      <p id="finalScore">Ваш счёт: 0</p>
+      <p id="bestScore">Лучший результат: 0</p>
+      <button class="btn" onclick="restartGame()">🔄 Играть снова</button>
+      <button class="btn" onclick="showStartScreen()">🏠 В меню</button>
+    </div>
+
+    <script>
+      // ===========================================
+      // КОНСТАНТЫ И НАСТРОЙКИ ИГРЫ
+      // ===========================================
+
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Настройки сложности
+      const DIFFICULTY_SETTINGS = {
+        easy: {
+          gravity: 0.4,
+          jumpForce: -10,
+          pipeSpeed: 2,
+          pipeGap: 220,
+          pipeFrequency: 150, // кадры между трубами
+        },
+        medium: {
+          gravity: 0.6,
+          jumpForce: -12,
+          pipeSpeed: 3,
+          pipeGap: 180,
+          pipeFrequency: 120,
+        },
+        hard: {
+          gravity: 0.8,
+          jumpForce: -13,
+          pipeSpeed: 4,
+          pipeGap: 150,
+          pipeFrequency: 100,
+        },
+      };
+
+      // Текущие настройки (изначально легкий уровень)
+      let currentDifficulty = "easy";
+      let gameSettings = DIFFICULTY_SETTINGS[currentDifficulty];
+
+      // Физические константы (будут обновляться в зависимости от сложности)
+      const PIPE_WIDTH = 60; // Ширина трубы (постоянная)
+
+      // ===========================================
+      // ИГРОВЫЕ ОБЪЕКТЫ
+      // ===========================================
+
+      // Птичка - главный персонаж
+      const bird = {
+        x: 80, // Позиция X (фиксированная)
+        y: canvas.height / 2, // Позиция Y (начальная - центр)
+        width: 40, // Размеры птички
+        height: 30,
+        velocity: 0, // Скорость падения/взлета
+
+        // Метод прыжка
+        jump: function () {
+          this.velocity = gameSettings.jumpForce;
+        },
+
+        // Обновление физики птички
+        update: function () {
+          this.velocity += gameSettings.gravity; // Применяем гравитацию
+          this.y += this.velocity; // Обновляем позицию
+
+          // Ограничения экрана
+          if (this.y < 0) this.y = 0;
+          if (this.y > canvas.height - this.height) {
+            this.y = canvas.height - this.height;
+            this.velocity = 0;
+          }
+        },
+
+        // Отрисовка птички
+        draw: function () {
+          // Тело птички
+          ctx.fillStyle = "#FFD700";
+          ctx.beginPath();
+          ctx.arc(this.x + 20, this.y + 15, 18, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Глаз
+          ctx.fillStyle = "#000";
+          ctx.beginPath();
+          ctx.arc(this.x + 25, this.y + 10, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Клюв
+          ctx.fillStyle = "#FF6347";
+          ctx.beginPath();
+          ctx.moveTo(this.x + 35, this.y + 15);
+          ctx.lineTo(this.x + 45, this.y + 18);
+          ctx.lineTo(this.x + 35, this.y + 21);
+          ctx.closePath();
+          ctx.fill();
+
+          // Крыло (анимированное)
+          const wingAngle = Math.sin(Date.now() * 0.01) * 0.3;
+          ctx.save();
+          ctx.translate(this.x + 15, this.y + 20);
+          ctx.rotate(wingAngle);
+          ctx.fillStyle = "#FFA500";
+          ctx.fillRect(-8, -5, 15, 10);
+          ctx.restore();
+        },
+      };
+
+      // Массив для хранения труб
+      let pipes = [];
+
+      // ===========================================
+      // ИГРОВЫЕ ПЕРЕМЕННЫЕ
+      // ===========================================
+
+      let gameState = "start"; // 'start', 'playing', 'gameOver'
+      let score = 0; // Текущий счёт
+      let bestScore = localStorage.getItem("flappyBestScore") || 0; // Лучший результат
+      let frameCount = 0; // Счётчик кадров для создания труб
+
+      // ===========================================
+      // ФУНКЦИИ СОЗДАНИЯ ПРЕПЯТСТВИЙ
+      // ===========================================
+
+      // Создание новой пары труб
+      function createPipe() {
+        const gapPosition =
+          Math.random() * (canvas.height - gameSettings.pipeGap - 100) + 50;
+
+        return {
+          x: canvas.width,
+          topHeight: gapPosition,
+          bottomY: gapPosition + gameSettings.pipeGap,
+          bottomHeight: canvas.height - (gapPosition + gameSettings.pipeGap),
+          passed: false, // Флаг для подсчёта очков
+
+          // Обновление позиции трубы
+          update: function () {
+            this.x -= gameSettings.pipeSpeed;
+          },
+
+          // Отрисовка трубы
+          draw: function () {
+            // Верхняя труба
+            this.drawPipe(this.x, 0, PIPE_WIDTH, this.topHeight, true);
+            // Нижняя труба
+            this.drawPipe(
+              this.x,
+              this.bottomY,
+              PIPE_WIDTH,
+              this.bottomHeight,
+              false
+            );
+          },
+
+          // Метод отрисовки одной трубы
+          drawPipe: function (x, y, width, height, isTop) {
+            // Основная часть трубы
+            ctx.fillStyle = "#228B22";
+            ctx.fillRect(x, y, width, height);
+
+            // Градиент для объёма
+            const gradient = ctx.createLinearGradient(x, 0, x + width, 0);
+            gradient.addColorStop(0, "#32CD32");
+            gradient.addColorStop(0.5, "#228B22");
+            gradient.addColorStop(1, "#006400");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, width, height);
+
+            // Заглушка трубы
+            const capHeight = 30;
+            const capWidth = width + 10;
+            const capX = x - 5;
+
+            ctx.fillStyle = "#32CD32";
+            if (isTop) {
+              ctx.fillRect(capX, height - capHeight, capWidth, capHeight);
+            } else {
+              ctx.fillRect(capX, y, capWidth, capHeight);
+            }
+
+            // Обводка
+            ctx.strokeStyle = "#006400";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, width, height);
+          },
+        };
+      }
+
+      // ===========================================
+      // ФУНКЦИИ ОБНАРУЖЕНИЯ СТОЛКНОВЕНИЙ
+      // ===========================================
+
+      // Проверка столкновения птички с трубой
+      function checkCollision() {
+        // Проверка столкновения с границами экрана
+        if (bird.y <= 0 || bird.y >= canvas.height - bird.height) {
+          return true;
+        }
+
+        // Проверка столкновения с трубами
+        for (let pipe of pipes) {
+          // Проверяем, находится ли птичка в области трубы по X
+          if (bird.x + bird.width > pipe.x && bird.x < pipe.x + PIPE_WIDTH) {
+            // Проверяем столкновение с верхней или нижней трубой
+            if (
+              bird.y < pipe.topHeight ||
+              bird.y + bird.height > pipe.bottomY
+            ) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+
+      // ===========================================
+      // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ
+      // ===========================================
+
+      function gameLoop() {
+        // Очистка canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (gameState === "playing") {
+          // Обновление птички
+          bird.update();
+
+          // Создание новых труб с учётом сложности
+          frameCount++;
+          if (frameCount % gameSettings.pipeFrequency === 0) {
+            pipes.push(createPipe());
+          }
+
+          // Обновление труб
+          for (let i = pipes.length - 1; i >= 0; i--) {
+            const pipe = pipes[i];
+            pipe.update();
+
+            // Удаление труб, которые ушли за экран
+            if (pipe.x + PIPE_WIDTH < 0) {
+              pipes.splice(i, 1);
+              continue;
+            }
+
+            // Подсчёт очков
+            if (!pipe.passed && pipe.x + PIPE_WIDTH < bird.x) {
+              pipe.passed = true;
+              score++;
+              updateScore();
+
+              // Звуковой эффект (если доступен)
+              playSound();
+            }
+          }
+
+          // Проверка столкновений
+          if (checkCollision()) {
+            gameOver();
+          }
+        }
+
+        // Отрисовка всех объектов
+        drawGame();
+
+        // Запрос следующего кадра
+        requestAnimationFrame(gameLoop);
+      }
+
+      // ===========================================
+      // ФУНКЦИИ ОТРИСОВКИ
+      // ===========================================
+
+      function drawGame() {
+        // Отрисовка фона (градиент неба)
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, "#87CEEB"); // Светло-голубой
+        gradient.addColorStop(0.7, "#98FB98"); // Светло-зелёный
+        gradient.addColorStop(1, "#228B22"); // Зелёный (земля)
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Отрисовка облаков
+        drawClouds();
+
+        // Отрисовка труб
+        for (let pipe of pipes) {
+          pipe.draw();
+        }
+
+        // Отрисовка птички
+        bird.draw();
+
+        // Отрисовка земли
+        drawGround();
+      }
+
+      // Отрисовка облаков
+      function drawClouds() {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+
+        // Несколько облаков в разных позициях
+        const cloudPositions = [
+          { x: 50, y: 50 },
+          { x: 200, y: 80 },
+          { x: 350, y: 40 },
+          { x: 150, y: 120 },
+        ];
+
+        cloudPositions.forEach((cloud) => {
+          ctx.beginPath();
+          ctx.arc(cloud.x, cloud.y, 20, 0, Math.PI * 2);
+          ctx.arc(cloud.x + 25, cloud.y, 30, 0, Math.PI * 2);
+          ctx.arc(cloud.x + 50, cloud.y, 25, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // Отрисовка земли
+      function drawGround() {
+        const groundHeight = 30;
+        const groundY = canvas.height - groundHeight;
+
+        // Земля
+        ctx.fillStyle = "#8B4513";
+        ctx.fillRect(0, groundY, canvas.width, groundHeight);
+
+        // Трава
+        ctx.fillStyle = "#228B22";
+        for (let x = 0; x < canvas.width; x += 10) {
+          const grassHeight = Math.random() * 8 + 5;
+          ctx.fillRect(x, groundY - grassHeight, 3, grassHeight);
+        }
+      }
+
+      // ===========================================
+      // УПРАВЛЕНИЕ ИГРОЙ
+      // ===========================================
+
+      // Обработка ввода
+      function handleInput() {
+        if (gameState === "playing") {
+          bird.jump();
+        } else if (gameState === "start") {
+          startGame();
+        } else if (gameState === "gameOver") {
+          restartGame();
+        }
+      }
+
+      // События клавиатуры и мыши
+      document.addEventListener("keydown", function (e) {
+        if (e.code === "Space") {
+          e.preventDefault();
+          handleInput();
+        }
+      });
+
+      canvas.addEventListener("click", handleInput);
+
+      // ===========================================
+      // ФУНКЦИИ УПРАВЛЕНИЯ СОСТОЯНИЕМ ИГРЫ
+      // ===========================================
+
+      function startGame() {
+        gameState = "playing";
+        resetGame();
+        document.getElementById("startScreen").style.display = "none";
+      }
+
+      function gameOver() {
+        gameState = "gameOver";
+
+        // Сохранение лучшего результата
+        if (score > bestScore) {
+          bestScore = score;
+          localStorage.setItem("flappyBestScore", bestScore);
+        }
+
+        // Отображение экрана окончания игры
+        document.getElementById(
+          "finalScore"
+        ).textContent = `Ваш счёт: ${score}`;
+        document.getElementById(
+          "bestScore"
+        ).textContent = `Лучший результат: ${bestScore}`;
+        document.getElementById("gameOver").style.display = "block";
+      }
+
+      function restartGame() {
+        resetGame();
+        gameState = "playing";
+        document.getElementById("gameOver").style.display = "none";
+      }
+
+      function showStartScreen() {
+        gameState = "start";
+        resetGame();
+        document.getElementById("gameOver").style.display = "none";
+        document.getElementById("startScreen").style.display = "block";
+      }
+
+      function resetGame() {
+        // Сброс птички
+        bird.y = canvas.height / 2;
+        bird.velocity = 0;
+
+        // Очистка труб
+        pipes = [];
+
+        // Сброс счёта и счётчиков
+        score = 0;
+        frameCount = 0;
+        updateScore();
+      }
+
+      // ===========================================
+      // ФУНКЦИИ УПРАВЛЕНИЯ СЛОЖНОСТЬЮ
+      // ===========================================
+
+      function selectDifficulty(difficulty) {
+        currentDifficulty = difficulty;
+        gameSettings = DIFFICULTY_SETTINGS[difficulty];
+
+        // Обновляем интерфейс
+        document.querySelectorAll(".difficulty-btn").forEach((btn) => {
+          btn.classList.remove("selected");
+        });
+        document
+          .querySelector(`.difficulty-btn.${difficulty}`)
+          .classList.add("selected");
+
+        // Обновляем информацию о сложности
+        updateDifficultyInfo(difficulty);
+      }
+
+      function updateDifficultyInfo(difficulty) {
+        const info = document.getElementById("difficultyInfo");
+        const difficultyData = {
+          easy: {
+            title: "Легкий уровень",
+            features: [
+              "• Медленная гравитация",
+              "• Широкие проходы между трубами",
+              "• Медленная скорость труб",
+              "• Редкие препятствия",
+              "• Идеально для изучения основ!",
+            ],
+          },
+          medium: {
+            title: "Средний уровень",
+            features: [
+              "• Обычная гравитация",
+              "• Средние проходы между трубами",
+              "• Нормальная скорость труб",
+              "• Стандартная частота препятствий",
+              "• Сбалансированная сложность",
+            ],
+          },
+          hard: {
+            title: "Сложный уровень",
+            features: [
+              "• Высокая гравитация",
+              "• Узкие проходы между трубами",
+              "• Быстрая скорость труб",
+              "• Частые препятствия",
+              "• Для опытных игроков!",
+            ],
+          },
+        };
+
+        const data = difficultyData[difficulty];
+        info.innerHTML = `<strong>${
+          data.title
+        }:</strong><br>${data.features.join("<br>")}`;
+      }
+
+      // ===========================================
+      // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+      // ===========================================
+
+      function updateScore() {
+        document.getElementById(
+          "score"
+        ).textContent = `Счёт: ${score} (${getDifficultyEmoji()} ${currentDifficulty.toUpperCase()})`;
+      }
+
+      function getDifficultyEmoji() {
+        const emojis = { easy: "😊", medium: "😐", hard: "😤" };
+        return emojis[currentDifficulty] || "😊";
+      }
+
+      // Простой звуковой эффект
+      function playSound() {
+        // Создание звука через Web Audio API
+        try {
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.1
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.1);
+        } catch (e) {
+          // Браузер не поддерживает Web Audio API
+          console.log("Звук недоступен");
+        }
+      }
+
+      // ===========================================
+      // ЗАПУСК ИГРЫ
+      // ===========================================
+
+      // Инициализация лучшего результата
+      document.getElementById(
+        "bestScore"
+      ).textContent = `Лучший результат: ${bestScore}`;
+
+      // Запуск игрового цикла
+      gameLoop();
+
+      // ===========================================
+      // ОБУЧАЮЩИЕ КОММЕНТАРИИ
+      // ===========================================
+
+      /*
+        ОБРАЗОВАТЕЛЬНЫЕ КОНЦЕПЦИИ В ЭТОЙ ИГРЕ:
+        
+        1. CANVAS API - Рисование 2D графики
+        2. ИГРОВОЙ ЦИКЛ - Непрерывное обновление и отрисовка
+        3. ФИЗИКА - Гравитация, скорость, ускорение
+        4. ОБНАРУЖЕНИЕ СТОЛКНОВЕНИЙ - Математические проверки пересечений
+        5. УПРАВЛЕНИЕ СОСТОЯНИЯМИ - Разные режимы игры
+        6. АНИМАЦИЯ - Плавное движение объектов
+        7. LOCAL STORAGE - Сохранение данных в браузере
+        8. ОБРАБОТКА СОБЫТИЙ - Клавиатура и мышь
+        9. WEB AUDIO API - Создание звуков программно
+        10. РЕСПОНСИВНЫЙ ДИЗАЙН - Адаптация под разные экраны
+        
+        АЛГОРИТМЫ:
+        - Процедурная генерация препятствий
+        - Система счёта
+        - Управление памятью (удаление неиспользуемых объектов)
+        */
+    </script>
+  </body>
+</html>

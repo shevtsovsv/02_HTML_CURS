@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Урок 5d-2: Push уведомления и моментальный retention | Угадай число
+    </title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        overflow-x: hidden;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.1) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(255, 255, 255, 0.1) 75%
+        );
+        background-size: 20px 20px;
+        animation: headerPattern 20s linear infinite;
+      }
+
+      @keyframes headerPattern {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(20px);
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: white;
+        font-size: 2.5rem;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.5rem;
+        font-size: 1.2rem;
+      }
+
+      .lesson-content {
+        background: white;
+        margin: 2rem auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-width: 1000px;
+        position: relative;
+      }
+
+      .section {
+        padding: 40px 50px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-left: 20px;
+      }
+
+      .section h2::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ecf0f1;
+      }
+
+      .theory {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 5px solid #667eea;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 10px;
+        position: relative;
+      }
+
+      .theory::before {
+        content: "🔔";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #667eea;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .practice {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .practice::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(76, 175, 80, 0.1) 0%,
+          transparent 50%
+        );
+        animation: practiceGlow 3s ease-in-out infinite alternate;
+      }
+
+      @keyframes practiceGlow {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        100% {
+          transform: rotate(180deg) scale(1.1);
+        }
+      }
+
+      .code {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        margin: -20px -20px 20px -20px;
+        font-weight: bold;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 2px solid #667eea;
+      }
+
+      .demo {
+        border: 3px solid #667eea;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+        text-align: center;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+      }
+
+      .demo h4 {
+        color: #667eea;
+        margin-top: 0;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Push уведомления стили */
+      .notification-types {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin: 25px 0;
+      }
+
+      .notification-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px solid #dee2e6;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .notification-card::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        z-index: -1;
+        border-radius: 15px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .notification-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+      }
+
+      .notification-card:hover::before {
+        opacity: 1;
+      }
+
+      .notification-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+      }
+
+      .notification-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .notification-description {
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.5;
+      }
+
+      .notification-example {
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 15px;
+        font-style: italic;
+        font-size: 0.9rem;
+        text-align: left;
+      }
+
+      /* Демо уведомления */
+      .notification-demo {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        padding: 15px 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 300px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.5s ease;
+        z-index: 1000;
+      }
+
+      .notification-demo.show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .notification-demo .close-btn {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #666;
+      }
+
+      /* Retention стратегии */
+      .retention-strategies {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 25px 0;
+      }
+
+      .strategy-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .strategy-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+      }
+
+      .strategy-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+          from 0deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        animation: cardRotate 4s linear infinite;
+      }
+
+      @keyframes cardRotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .strategy-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .strategy-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .strategy-description {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+        line-height: 1.4;
+      }
+
+      /* Кнопки управления */
+      .demo-controls {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .demo-btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .demo-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .demo-btn:active {
+        transform: translateY(0);
+      }
+
+      .demo-btn.success {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+      }
+
+      .demo-btn.warning {
+        background: linear-gradient(45deg, #ff9800, #f57c00);
+      }
+
+      .demo-btn.danger {
+        background: linear-gradient(45deg, #f44336, #d32f2f);
+      }
+
+      /* Таймер активности */
+      .activity-timer {
+        background: #f8f9fa;
+        border: 2px solid #667eea;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .timer-display {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+        margin: 15px 0;
+      }
+
+      .activity-status {
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        margin: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .activity-status.active {
+        background: #4caf50;
+        color: white;
+      }
+
+      .activity-status.idle {
+        background: #ff9800;
+        color: white;
+      }
+
+      .activity-status.away {
+        background: #f44336;
+        color: white;
+      }
+
+      /* Модальное окно re-engagement */
+      .reengagement-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+      }
+
+      .reengagement-content {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        text-align: center;
+        position: relative;
+        animation: modalAppear 0.5s ease;
+      }
+
+      @keyframes modalAppear {
+        0% {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .next-lesson {
+        display: inline-block;
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: bold;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        margin-top: 20px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+      }
+
+      /* Адаптивность */
+      @media (max-width: 768px) {
+        .container {
+          padding: 0 15px;
+        }
+
+        .section {
+          padding: 30px 25px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .notification-types {
+          grid-template-columns: 1fr;
+        }
+
+        .retention-strategies {
+          grid-template-columns: 1fr;
+        }
+
+        .demo-controls {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .notification-demo {
+          position: relative;
+          top: 0;
+          right: 0;
+          margin: 20px 0;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="container">
+        <h1>🔔 Push уведомления и моментальный retention</h1>
+        <div class="subtitle">
+          Урок 5d-2: Немедленная реакция на действия игроков
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-content">
+      <div class="section">
+        <h2>📱 Силы push уведомлений</h2>
+
+        <div class="theory">
+          <h3>Зачем нужны push уведомления в играх?</h3>
+          <p>
+            Push уведомления — это мощный инструмент для поддержания связи с
+            игроками даже когда они не играют. Правильно настроенные уведомления
+            могут значительно увеличить retention и lifetime value игроков.
+          </p>
+
+          <h4>Ключевые преимущества:</h4>
+          <ul>
+            <li>
+              <strong>Немедленный контакт</strong> — достигаем игрока в любое
+              время
+            </li>
+            <li>
+              <strong>Персонализация</strong> — уведомления основаны на
+              поведении игрока
+            </li>
+            <li>
+              <strong>Автоматизация</strong> — система работает без участия
+              человека
+            </li>
+            <li>
+              <strong>Измеримость</strong> — можно точно отследить эффективность
+            </li>
+          </ul>
+        </div>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+          "
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+              color: white;
+              padding: 20px;
+              border-radius: 15px;
+            "
+          >
+            <h4 style="margin-top: 0">⚠️ Риски неправильных уведомлений</h4>
+            <ul style="margin: 0; padding-left: 20px">
+              <li>Раздражение игроков</li>
+              <li>Отключение уведомлений</li>
+              <li>Удаление игры</li>
+              <li>Негативные отзывы</li>
+            </ul>
+          </div>
+          <div
+            style="
+              background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+              color: white;
+              padding: 20px;
+              border-radius: 15px;
+            "
+          >
+            <h4 style="margin-top: 0">✅ Принципы эффективных уведомлений</h4>
+            <ul style="margin: 0; padding-left: 20px">
+              <li>Ценность для игрока</li>
+              <li>Правильный тайминг</li>
+              <li>Персонализация</li>
+              <li>Четкий call-to-action</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🔔 Типы push уведомлений</h2>
+
+        <div class="theory">
+          <h3>Классификация уведомлений по целям</h3>
+          <p>
+            Разные типы уведомлений решают разные задачи. Важно понимать, когда
+            и какой тип использовать для максимальной эффективности.
+          </p>
+        </div>
+
+        <div class="notification-types">
+          <div class="notification-card" data-type="re-engagement">
+            <div class="notification-icon">🎮</div>
+            <div class="notification-title">Re-engagement</div>
+            <div class="notification-description">
+              Возвращают неактивных игроков обратно в игру
+            </div>
+            <div class="notification-example">
+              "Давно не виделись! В игре появилось много нового. Загляни!"
+            </div>
+          </div>
+
+          <div class="notification-card" data-type="achievement">
+            <div class="notification-icon">🏆</div>
+            <div class="notification-title">Достижения</div>
+            <div class="notification-description">
+              Сообщают о разблокированных наградах и достижениях
+            </div>
+            <div class="notification-example">
+              "Поздравляем! Вы разблокировали достижение 'Мастер чисел'!"
+            </div>
+          </div>
+
+          <div class="notification-card" data-type="social">
+            <div class="notification-icon">👥</div>
+            <div class="notification-title">Социальные</div>
+            <div class="notification-description">
+              Уведомления о действиях друзей и социальных событиях
+            </div>
+            <div class="notification-example">
+              "Ваш друг Алексей побил ваш рекорд! Попробуйте отыграться!"
+            </div>
+          </div>
+
+          <div class="notification-card" data-type="time-sensitive">
+            <div class="notification-icon">⏰</div>
+            <div class="notification-title">Срочные</div>
+            <div class="notification-description">
+              Ограниченные по времени события и предложения
+            </div>
+            <div class="notification-example">
+              "Бонусы за быструю игру! Только следующие 2 часа."
+            </div>
+          </div>
+
+          <div class="notification-card" data-type="progress">
+            <div class="notification-icon">📈</div>
+            <div class="notification-title">Прогресс</div>
+            <div class="notification-description">
+              Напоминания о незавершенных целях и прогрессе
+            </div>
+            <div class="notification-example">
+              "Вы на полпути к новому рекорду! Еще 5 правильных ответов."
+            </div>
+          </div>
+
+          <div class="notification-card" data-type="content">
+            <div class="notification-icon">🆕</div>
+            <div class="notification-title">Новый контент</div>
+            <div class="notification-description">
+              Информируют о новых уровнях, функциях и обновлениях
+            </div>
+            <div class="notification-example">
+              "Новый режим игры 'Угадай за 30 секунд' уже доступен!"
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <h4>Демо: Тестирование push уведомлений</h4>
+          <p>
+            Попробуйте разные типы уведомлений и посмотрите, как они выглядят:
+          </p>
+
+          <div class="demo-controls">
+            <button
+              class="demo-btn success"
+              onclick="showNotification('achievement')"
+            >
+              🏆 Достижение
+            </button>
+            <button class="demo-btn" onclick="showNotification('social')">
+              👥 Социальное
+            </button>
+            <button
+              class="demo-btn warning"
+              onclick="showNotification('time-sensitive')"
+            >
+              ⏰ Срочное
+            </button>
+            <button
+              class="demo-btn"
+              onclick="showNotification('re-engagement')"
+            >
+              🎮 Возвращение
+            </button>
+          </div>
+
+          <div
+            id="notification-status"
+            style="margin-top: 15px; font-weight: bold; color: #667eea"
+          >
+            Нажмите на кнопку, чтобы увидеть уведомление
+          </div>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Система push уведомлений</div>
+          class PushNotificationSystem { constructor() { this.isSupported =
+          'Notification' in window; this.permission = Notification.permission;
+          this.notificationQueue = []; this.playerData = this.loadPlayerData();
+          this.settings = { maxDailyNotifications: 3, minInterval: 4 * 60 * 60 *
+          1000, // 4 часа quietHours: { start: 22, end: 8 } // 22:00 - 8:00 }; }
+          // Запрос разрешения на уведомления async requestPermission() { if
+          (!this.isSupported) { console.warn('Push уведомления не
+          поддерживаются'); return false; } if (this.permission === 'granted') {
+          return true; } if (this.permission === 'denied') {
+          console.warn('Пользователь запретил уведомления'); return false; }
+          const permission = await Notification.requestPermission();
+          this.permission = permission; return permission === 'granted'; } //
+          Отправка уведомления async sendNotification(type, data = {}) { if
+          (!await this.requestPermission()) { return false; } // Проверяем
+          лимиты и ограничения if (!this.canSendNotification(type)) { return
+          false; } const notificationConfig = this.getNotificationConfig(type,
+          data); const notification = new Notification(notificationConfig.title,
+          { body: notificationConfig.body, icon: notificationConfig.icon, badge:
+          notificationConfig.badge, tag: notificationConfig.tag,
+          requireInteraction: notificationConfig.requireInteraction, actions:
+          notificationConfig.actions }); // Обработчики событий
+          notification.onclick = () => { this.handleNotificationClick(type,
+          data); notification.close(); }; notification.onclose = () => {
+          this.trackNotificationEvent('closed', type, data); }; //
+          Автоматическое закрытие через определенное время setTimeout(() => {
+          notification.close(); }, notificationConfig.duration || 10000);
+          this.trackNotificationSent(type); return true; } // Проверка
+          возможности отправки canSendNotification(type) { const now = new
+          Date(); const hour = now.getHours(); // Проверяем тихие часы if (hour
+          >= this.settings.quietHours.start || hour <
+          this.settings.quietHours.end) { return false; } // Проверяем дневной
+          лимит const today = now.toDateString(); const todayNotifications =
+          this.playerData.notifications .filter(n => new
+          Date(n.timestamp).toDateString() === today); if
+          (todayNotifications.length >= this.settings.maxDailyNotifications) {
+          return false; } // Проверяем минимальный интервал const
+          lastNotification = this.playerData.notifications .sort((a, b) =>
+          b.timestamp - a.timestamp)[0]; if (lastNotification && (now.getTime()
+          - lastNotification.timestamp) < this.settings.minInterval) { return
+          false; } return true; } // Конфигурация уведомлений по типам
+          getNotificationConfig(type, data) { const configs = { 're-engagement':
+          { title: '🎮 Скучаем по вам!', body: `Давно не виделись! Попробуйте
+          новый рекорд.`, icon: '/icons/game-icon.png', requireInteraction:
+          false, duration: 8000 }, 'achievement': { title: '🏆 Поздравляем!',
+          body: `Вы разблокировали достижение: ${data.achievementName}`, icon:
+          '/icons/achievement.png', requireInteraction: true, duration: 15000 },
+          'social': { title: '👥 Активность друзей', body: `${data.friendName}
+          побил ваш рекорд!`, icon: '/icons/social.png', requireInteraction:
+          false, duration: 10000 }, 'time-sensitive': { title: '⏰ Ограниченное
+          предложение!', body: `Бонусы за скорость! Осталось ${data.timeLeft}`,
+          icon: '/icons/bonus.png', requireInteraction: true, duration: 12000 },
+          'progress': { title: '📈 Вы близки к цели!', body: `Еще
+          ${data.remaining} правильных ответов до нового уровня`, icon:
+          '/icons/progress.png', requireInteraction: false, duration: 10000 } };
+          return configs[type] || configs['re-engagement']; } // Обработка клика
+          по уведомлению handleNotificationClick(type, data) { // Открываем игру
+          window.focus(); // Аналитика this.trackNotificationEvent('clicked',
+          type, data); // Специальные действия по типу switch (type) { case
+          'achievement': this.showAchievementModal(data); break; case 'social':
+          this.openLeaderboard(); break; case 'time-sensitive':
+          this.startBonusMode(); break; case 'progress': this.resumeGame();
+          break; default: this.startGame(); } } // Планирование отложенных
+          уведомлений scheduleNotification(type, delay, data = {}) { const
+          sendTime = Date.now() + delay; const scheduledNotification = { type,
+          data, sendTime, id: Date.now() + Math.random() };
+          this.notificationQueue.push(scheduledNotification);
+          this.saveNotificationQueue(); // Устанавливаем таймер setTimeout(() =>
+          { this.sendNotification(type, data);
+          this.removeFromQueue(scheduledNotification.id); }, delay); } // Умные
+          уведомления на основе поведения scheduleSmartNotifications() { const
+          playerBehavior = this.analyzePlayerBehavior(); // Уведомление о
+          возвращении для неактивных игроков if
+          (playerBehavior.daysSinceLastPlay > 1) { const delay =
+          this.calculateOptimalReturnTime(playerBehavior);
+          this.scheduleNotification('re-engagement', delay); } // Уведомление о
+          прогрессе if (playerBehavior.isCloseToAchievement) { const delay = 2 *
+          60 * 60 * 1000; // 2 часа this.scheduleNotification('progress', delay,
+          { remaining: playerBehavior.remainingToAchievement }); } // Социальные
+          уведомления if (playerBehavior.friendsActive) { const delay = 30 * 60
+          * 1000; // 30 минут this.scheduleNotification('social', delay, {
+          friendName: playerBehavior.activeFriend }); } } // Анализ поведения
+          игрока analyzePlayerBehavior() { return { daysSinceLastPlay:
+          this.getDaysSinceLastPlay(), isCloseToAchievement:
+          this.checkAchievementProgress(), remainingToAchievement:
+          this.getRemainingToAchievement(), friendsActive:
+          this.checkFriendsActivity(), activeFriend: this.getActiveFriend(),
+          preferredPlayTime: this.getPreferredPlayTime(), averageSessionLength:
+          this.getAverageSessionLength() }; } // Расчет оптимального времени для
+          возвращения calculateOptimalReturnTime(behavior) { const baseDelay =
+          24 * 60 * 60 * 1000; // 24 часа const preferredHour =
+          behavior.preferredPlayTime; // Корректируем время до предпочитаемого
+          часа игры const now = new Date(); const targetTime = new Date(now);
+          targetTime.setHours(preferredHour, 0, 0, 0); if (targetTime <= now) {
+          targetTime.setDate(targetTime.getDate() + 1); } return
+          Math.max(baseDelay, targetTime.getTime() - now.getTime()); } //
+          Отслеживание эффективности trackNotificationSent(type) { const
+          notification = { type, timestamp: Date.now(), status: 'sent' };
+          this.playerData.notifications.push(notification);
+          this.savePlayerData(); } trackNotificationEvent(event, type, data) {
+          // Аналитика для отслеживания эффективности console.log('Notification
+          event:', { event, type, data, timestamp: Date.now() }); } //
+          Вспомогательные методы loadPlayerData() { const data =
+          localStorage.getItem('playerNotificationData'); return data ?
+          JSON.parse(data) : { notifications: [], preferences: {}, behavior: {}
+          }; } savePlayerData() { localStorage.setItem('playerNotificationData',
+          JSON.stringify(this.playerData)); } getDaysSinceLastPlay() { const
+          lastPlay = this.playerData.behavior.lastPlayTime; if (!lastPlay)
+          return 0; return Math.floor((Date.now() - lastPlay) / (24 * 60 * 60 *
+          1000)); } getPreferredPlayTime() { // Анализ истории игр для
+          определения предпочитаемого времени return
+          this.playerData.behavior.preferredHour || 19; // 19:00 по умолчанию }
+          }
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>⚡ Моментальные retention стратегии</h2>
+
+        <div class="theory">
+          <h3>Немедленная реакция на поведение игрока</h3>
+          <p>
+            Моментальный retention — это способность игры мгновенно реагировать
+            на действия игрока, чтобы удержать его в критические моменты. Эти
+            механики срабатывают в реальном времени и предотвращают отток.
+          </p>
+
+          <h4>Критические моменты для вмешательства:</h4>
+          <ul>
+            <li>Игрок долго не может пройти уровень</li>
+            <li>Игрок не активен более определенного времени</li>
+            <li>Игрок пытается закрыть игру</li>
+            <li>Игрок совершает ошибки подряд</li>
+          </ul>
+        </div>
+
+        <div class="retention-strategies">
+          <div class="strategy-card">
+            <div class="strategy-icon">🚨</div>
+            <div class="strategy-title">Exit Intent Detection</div>
+            <div class="strategy-description">
+              Отслеживание попыток покинуть игру и показ мотивирующих сообщений
+            </div>
+          </div>
+
+          <div class="strategy-card">
+            <div class="strategy-icon">💡</div>
+            <div class="strategy-title">Smart Hints</div>
+            <div class="strategy-description">
+              Автоматические подсказки, когда игрок застревает на задаче
+            </div>
+          </div>
+
+          <div class="strategy-card">
+            <div class="strategy-icon">⏱️</div>
+            <div class="strategy-title">Activity Tracking</div>
+            <div class="strategy-description">
+              Мониторинг активности и вмешательство при длительном бездействии
+            </div>
+          </div>
+
+          <div class="strategy-card">
+            <div class="strategy-icon">🎁</div>
+            <div class="strategy-title">Dynamic Rewards</div>
+            <div class="strategy-description">
+              Адаптивные награды в моменты снижения мотивации
+            </div>
+          </div>
+
+          <div class="strategy-card">
+            <div class="strategy-icon">🔄</div>
+            <div class="strategy-title">Difficulty Adjustment</div>
+            <div class="strategy-description">
+              Автоматическая подстройка сложности под навыки игрока
+            </div>
+          </div>
+
+          <div class="strategy-card">
+            <div class="strategy-icon">🎵</div>
+            <div class="strategy-title">Mood Management</div>
+            <div class="strategy-description">
+              Изменение музыки, цветов и анимаций для поддержания настроения
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <h4>Демо: Система мониторинга активности игрока</h4>
+
+          <div class="activity-timer">
+            <h5 style="color: #667eea; margin-top: 0">
+              Отслеживание активности игрока
+            </h5>
+            <div>Время с последнего действия:</div>
+            <div class="timer-display" id="activity-timer">00:00</div>
+            <div id="activity-status" class="activity-status active">
+              Активен
+            </div>
+
+            <div class="demo-controls">
+              <button class="demo-btn success" onclick="simulateActivity()">
+                💪 Имитировать активность
+              </button>
+              <button class="demo-btn warning" onclick="startIdleSimulation()">
+                ⏸️ Имитировать бездействие
+              </button>
+              <button class="demo-btn danger" onclick="triggerExitIntent()">
+                🚪 Попытка выхода
+              </button>
+              <button class="demo-btn" onclick="resetActivity()">
+                🔄 Сброс
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Система мониторинга активности</div>
+          class PlayerActivityMonitor { constructor() { this.lastActivityTime =
+          Date.now(); this.isActive = true; this.activityLevel = 'active';
+          this.interventions = []; this.listeners = []; // Пороги времени (в
+          миллисекундах) this.thresholds = { idle: 30000, // 30 секунд away:
+          60000, // 1 минута critical: 120000 // 2 минуты };
+          this.setupActivityListeners(); this.startMonitoring(); } // Настройка
+          слушателей активности setupActivityListeners() { const activityEvents
+          = ['click', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+          activityEvents.forEach(event => { document.addEventListener(event, ()
+          => { this.recordActivity(); }, true); }); // Отслеживание попыток
+          покинуть страницу window.addEventListener('beforeunload', (e) => {
+          this.handleExitIntent(e); }); // Отслеживание потери фокуса
+          document.addEventListener('visibilitychange', () => { if
+          (document.hidden) { this.handlePageHidden(); } else {
+          this.handlePageVisible(); } }); } // Запись активности
+          recordActivity() { this.lastActivityTime = Date.now(); if
+          (this.activityLevel !== 'active') { this.activityLevel = 'active';
+          this.onActivityLevelChange('active'); } } // Основной цикл мониторинга
+          startMonitoring() { setInterval(() => { this.checkActivityLevel(); },
+          1000); } // Проверка уровня активности checkActivityLevel() { const
+          timeSinceActivity = Date.now() - this.lastActivityTime; let newLevel =
+          'active'; if (timeSinceActivity > this.thresholds.critical) { newLevel
+          = 'critical'; } else if (timeSinceActivity > this.thresholds.away) {
+          newLevel = 'away'; } else if (timeSinceActivity >
+          this.thresholds.idle) { newLevel = 'idle'; } if (newLevel !==
+          this.activityLevel) { this.activityLevel = newLevel;
+          this.onActivityLevelChange(newLevel); } } // Обработчик изменения
+          уровня активности onActivityLevelChange(level) { console.log(`Activity
+          level changed to: ${level}`); switch (level) { case 'idle':
+          this.handleIdleState(); break; case 'away': this.handleAwayState();
+          break; case 'critical': this.handleCriticalState(); break; case
+          'active': this.handleActiveState(); break; } // Уведомляем подписчиков
+          this.listeners.forEach(callback => callback(level)); } // Обработчики
+          состояний handleIdleState() { // Легкие напоминания
+          this.scheduleIntervention('gentle_reminder', 5000); }
+          handleAwayState() { // Более активные напоминания
+          this.scheduleIntervention('activity_prompt', 0); }
+          handleCriticalState() { // Экстренные меры
+          this.scheduleIntervention('retention_offer', 0); } handleActiveState()
+          { // Отменяем все запланированные вмешательства
+          this.cancelPendingInterventions(); } // Планирование вмешательств
+          scheduleIntervention(type, delay) { const intervention = { type,
+          scheduledTime: Date.now() + delay, id: Date.now() + Math.random() };
+          this.interventions.push(intervention); setTimeout(() => {
+          this.executeIntervention(type);
+          this.removeIntervention(intervention.id); }, delay); } // Выполнение
+          вмешательств executeIntervention(type) { switch (type) { case
+          'gentle_reminder': this.showGentleReminder(); break; case
+          'activity_prompt': this.showActivityPrompt(); break; case
+          'retention_offer': this.showRetentionOffer(); break; } } // Мягкое
+          напоминание showGentleReminder() { this.showTemporaryMessage('💭
+          Готовы продолжить?', 3000); } // Призыв к активности
+          showActivityPrompt() { this.showTemporaryMessage('🎮 Давайте сыграем
+          еще!', 5000); } // Предложение удержания showRetentionOffer() {
+          this.showRetentionModal(); } // Обработка попытки выхода
+          handleExitIntent(e) { if (this.activityLevel === 'away' ||
+          this.activityLevel === 'critical') { e.preventDefault(); e.returnValue
+          = 'Вы уверены, что хотите покинуть игру? Ваш прогресс может быть
+          потерян!'; // Записываем событие для аналитики this.trackExitIntent();
+          return e.returnValue; } } // Обработка скрытия страницы
+          handlePageHidden() { this.trackEvent('page_hidden'); // Можно
+          запланировать push-уведомление } handlePageVisible() {
+          this.recordActivity(); this.trackEvent('page_visible'); } // Показ
+          временного сообщения showTemporaryMessage(text, duration) { const
+          messageElement = document.createElement('div');
+          messageElement.textContent = text; messageElement.style.cssText = `
+          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+          background: #667eea; color: white; padding: 15px 25px; border-radius:
+          25px; font-weight: bold; z-index: 1000; box-shadow: 0 10px 30px
+          rgba(0,0,0,0.2); animation: slideDown 0.5s ease; `;
+          document.body.appendChild(messageElement); setTimeout(() => {
+          messageElement.style.animation = 'slideUp 0.5s ease forwards';
+          setTimeout(() => { document.body.removeChild(messageElement); }, 500);
+          }, duration); } // Показ модального окна удержания
+          showRetentionModal() { const modal =
+          document.getElementById('reengagement-modal'); if (modal) {
+          modal.style.display = 'flex'; } } // Аналитика trackEvent(eventType) {
+          console.log('Activity event:', { type: eventType, timestamp:
+          Date.now(), activityLevel: this.activityLevel, timeSinceLastActivity:
+          Date.now() - this.lastActivityTime }); } trackExitIntent() {
+          this.trackEvent('exit_intent'); } // Подписка на изменения
+          onActivityChange(callback) { this.listeners.push(callback); } //
+          Отписка offActivityChange(callback) { this.listeners =
+          this.listeners.filter(cb => cb !== callback); } // Получение текущего
+          состояния getActivityStatus() { return { level: this.activityLevel,
+          lastActivity: this.lastActivityTime, timeSinceActivity: Date.now() -
+          this.lastActivityTime, isActive: this.activityLevel === 'active' }; }
+          // Отмена вмешательств cancelPendingInterventions() {
+          this.interventions = []; } removeIntervention(id) { this.interventions
+          = this.interventions.filter(i => i.id !== id); } }
+        </div>
+
+        <div class="practice">
+          <h3>🎯 Практическое задание</h3>
+          <p><strong>Создайте комплексную систему retention:</strong></p>
+          <ol>
+            <li>
+              Реализуйте умную систему подсказок, которая активируется при
+              затруднениях
+            </li>
+            <li>
+              Добавьте адаптивную настройку сложности на основе успешности
+              игрока
+            </li>
+            <li>
+              Создайте систему emergency retention для критических моментов
+            </li>
+            <li>Интегрируйте push уведомления с поведенческими триггерами</li>
+          </ol>
+
+          <div class="code">
+            <div class="code-title">
+              Подсказка: Система адаптивных подсказок
+            </div>
+            class SmartHintSystem { constructor() { this.playerStruggles = [];
+            this.hintHistory = []; this.difficultyLevel = 1; } // Анализ
+            затруднений игрока analyzePlayerStruggles(attempts, timeSpent,
+            errorPattern) { const struggle = { attempts, timeSpent,
+            errorPattern, timestamp: Date.now() };
+            this.playerStruggles.push(struggle); // Определяем, нужна ли помощь
+            if (this.shouldOfferHint(struggle)) {
+            this.offerContextualHint(struggle); } } shouldOfferHint(struggle) {
+            return struggle.attempts > 3 && struggle.timeSpent > 30000; // 30
+            секунд } offerContextualHint(struggle) { const hint =
+            this.generateHint(struggle.errorPattern); this.showHint(hint); } }
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 50px">
+        <a href="guess-lesson-5d-part3.html" class="next-lesson">
+          Следующая часть: Email маркетинг и долгосрочный retention →
+        </a>
+      </div>
+    </div>
+
+    <!-- Модальное окно re-engagement -->
+    <div id="reengagement-modal" class="reengagement-modal">
+      <div class="reengagement-content">
+        <button class="modal-close" onclick="closeReengagementModal()">
+          ×
+        </button>
+        <h3 style="color: #667eea; margin-top: 0">🎮 Не уходите!</h3>
+        <p>У нас есть специальное предложение для вас!</p>
+        <div style="margin: 20px 0">
+          <div style="font-size: 2rem; margin-bottom: 10px">🎁</div>
+          <strong>Бонус за возвращение:</strong><br />
+          Получите +50% очков за следующие 10 минут игры!
+        </div>
+        <div
+          style="
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+          "
+        >
+          <button class="demo-btn success" onclick="acceptOffer()">
+            Принять предложение
+          </button>
+          <button class="demo-btn" onclick="closeReengagementModal()">
+            Может быть позже
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notification-demo" class="notification-demo">
+      <button class="close-btn" onclick="closeNotification()">×</button>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div id="notification-icon" style="font-size: 1.5rem">🔔</div>
+        <div>
+          <div
+            id="notification-title"
+            style="font-weight: bold; margin-bottom: 5px"
+          >
+            Уведомление
+          </div>
+          <div id="notification-body" style="font-size: 0.9rem; color: #666">
+            Текст уведомления
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Система демонстрации уведомлений
+      class NotificationDemo {
+        constructor() {
+          this.notificationElement =
+            document.getElementById("notification-demo");
+          this.notifications = {
+            achievement: {
+              icon: "🏆",
+              title: "Поздравляем!",
+              body: 'Вы разблокировали достижение "Мастер чисел"!',
+            },
+            social: {
+              icon: "👥",
+              title: "Активность друзей",
+              body: "Ваш друг Алексей побил ваш рекорд!",
+            },
+            "time-sensitive": {
+              icon: "⏰",
+              title: "Ограниченное предложение!",
+              body: "Бонусы за скорость! Осталось 2 часа.",
+            },
+            "re-engagement": {
+              icon: "🎮",
+              title: "Скучаем по вам!",
+              body: "Попробуйте побить новый рекорд!",
+            },
+          };
+        }
+
+        show(type) {
+          const notification = this.notifications[type];
+          if (!notification) return;
+
+          document.getElementById("notification-icon").textContent =
+            notification.icon;
+          document.getElementById("notification-title").textContent =
+            notification.title;
+          document.getElementById("notification-body").textContent =
+            notification.body;
+
+          this.notificationElement.classList.add("show");
+
+          // Автоматически скрываем через 5 секунд
+          setTimeout(() => {
+            this.hide();
+          }, 5000);
+
+          document.getElementById(
+            "notification-status"
+          ).textContent = `Показано уведомление: ${notification.title}`;
+        }
+
+        hide() {
+          this.notificationElement.classList.remove("show");
+        }
+      }
+
+      // Система мониторинга активности (упрощенная версия для демо)
+      class ActivityMonitorDemo {
+        constructor() {
+          this.startTime = Date.now();
+          this.isRunning = true;
+          this.currentLevel = "active";
+          this.timer = null;
+          this.startTimer();
+        }
+
+        startTimer() {
+          this.timer = setInterval(() => {
+            if (!this.isRunning) return;
+
+            const elapsed = Date.now() - this.startTime;
+            this.updateTimerDisplay(elapsed);
+            this.updateActivityLevel(elapsed);
+          }, 1000);
+        }
+
+        updateTimerDisplay(elapsed) {
+          const minutes = Math.floor(elapsed / 60000);
+          const seconds = Math.floor((elapsed % 60000) / 1000);
+          const display = `${minutes.toString().padStart(2, "0")}:${seconds
+            .toString()
+            .padStart(2, "0")}`;
+          document.getElementById("activity-timer").textContent = display;
+        }
+
+        updateActivityLevel(elapsed) {
+          let newLevel = "active";
+
+          if (elapsed > 120000) {
+            // 2 минуты
+            newLevel = "away";
+          } else if (elapsed > 60000) {
+            // 1 минута
+            newLevel = "idle";
+          }
+
+          if (newLevel !== this.currentLevel) {
+            this.currentLevel = newLevel;
+            this.updateStatusDisplay(newLevel);
+
+            if (newLevel === "away") {
+              this.triggerRetentionAction();
+            }
+          }
+        }
+
+        updateStatusDisplay(level) {
+          const statusElement = document.getElementById("activity-status");
+          statusElement.className = "activity-status " + level;
+
+          const statusTexts = {
+            active: "Активен",
+            idle: "Бездействует",
+            away: "Неактивен",
+          };
+
+          statusElement.textContent = statusTexts[level];
+        }
+
+        triggerRetentionAction() {
+          // Показываем модальное окно через 2 секунды бездействия
+          setTimeout(() => {
+            if (this.currentLevel === "away") {
+              document.getElementById("reengagement-modal").style.display =
+                "flex";
+            }
+          }, 2000);
+        }
+
+        resetActivity() {
+          this.startTime = Date.now();
+          this.currentLevel = "active";
+          this.updateStatusDisplay("active");
+          document.getElementById("reengagement-modal").style.display = "none";
+        }
+
+        simulateIdle() {
+          this.startTime = Date.now() - 70000; // Имитируем 70 секунд бездействия
+        }
+
+        pause() {
+          this.isRunning = false;
+        }
+
+        resume() {
+          this.isRunning = true;
+        }
+      }
+
+      // Инициализация
+      const notificationDemo = new NotificationDemo();
+      const activityMonitor = new ActivityMonitorDemo();
+
+      // Глобальные функции для демо
+      function showNotification(type) {
+        notificationDemo.show(type);
+      }
+
+      function closeNotification() {
+        notificationDemo.hide();
+      }
+
+      function simulateActivity() {
+        activityMonitor.resetActivity();
+      }
+
+      function startIdleSimulation() {
+        activityMonitor.simulateIdle();
+      }
+
+      function triggerExitIntent() {
+        document.getElementById("reengagement-modal").style.display = "flex";
+      }
+
+      function resetActivity() {
+        activityMonitor.resetActivity();
+      }
+
+      function closeReengagementModal() {
+        document.getElementById("reengagement-modal").style.display = "none";
+      }
+
+      function acceptOffer() {
+        alert("🎉 Отлично! Бонус активирован! Теперь вы получаете +50% очков!");
+        closeReengagementModal();
+        activityMonitor.resetActivity();
+      }
+
+      // Добавляем стили для анимаций
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes slideDown {
+                0% { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+            
+            @keyframes slideUp {
+                0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+                100% { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            }
+        `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>

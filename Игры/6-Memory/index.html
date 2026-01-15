@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Уроки создания игры Memory</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .back-to-games {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-games:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        width: 90%;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        color: #333;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #4a6fa5 0%, #2e4a73 100%);
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .course-info {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        border-left: 5px solid #4a6fa5;
+      }
+
+      .download-images {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        padding: 25px;
+        border-radius: 15px;
+        border-left: 5px solid #f39c12;
+        text-align: center;
+      }
+
+      .download-images h3 {
+        color: #8b4513;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .download-images p {
+        font-size: 1.05rem;
+        color: #8b4513;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .download-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        text-decoration: none;
+        padding: 15px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+      }
+
+      .download-link:hover {
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+      }
+
+      .bottom-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 40px;
+        align-items: stretch;
+      }
+
+      .play-game,
+      .download-images {
+        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .course-info h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .course-info p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+      }
+
+      .lessons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+      }
+
+      .lesson-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .lesson-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+      }
+
+      .lesson-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        border-color: #4a6fa5;
+      }
+
+      .lesson-number {
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+      }
+
+      .lesson-title {
+        font-size: 1.4rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .lesson-description {
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.5;
+      }
+
+      .lesson-topics {
+        margin-bottom: 20px;
+      }
+
+      .lesson-topics h4 {
+        font-size: 0.9rem;
+        color: #4a6fa5;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .lesson-topics ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .lesson-topics li {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        position: relative;
+        padding-left: 20px;
+      }
+
+      .lesson-topics li::before {
+        content: "•";
+        color: #4a6fa5;
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+      }
+
+      .lesson-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .lesson-link:hover {
+        background: linear-gradient(135deg, #3a5a95, #1e3a63);
+        transform: scale(1.05);
+      }
+
+      .play-game {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        border-radius: 15px;
+      }
+
+      .play-game h3 {
+        color: white;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+      }
+
+      .play-game-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        color: #22c55e;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .play-game-link:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .icon {
+        font-size: 1.2em;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        background: #f8f9fa;
+        color: #666;
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2.5rem;
+        }
+
+        .lessons-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .bottom-section {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../index.html" class="back-to-games">← Вернуться к играм</a>
+    <div class="container">
+      <div class="header">
+        <h1>🃏 Создание игры Memory</h1>
+        <p class="subtitle">
+          Пошаговые уроки по разработке интерактивной игры на JavaScript
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="course-info">
+          <h2><span class="icon">🎯</span> О курсе</h2>
+          <p>
+            В этих уроках вы создадите полнофункциональную игру Memory (найди
+            пары) с нуля. Изучите HTML структуру, CSS стилизацию, JavaScript
+            логику и современные подходы к веб-разработке. Каждый урок содержит
+            подробные объяснения, примеры кода и практические задания.
+          </p>
+        </div>
+
+        <div class="lessons-grid">
+          <div class="lesson-card">
+            <div class="lesson-number">1</div>
+            <div class="lesson-title">HTML структура</div>
+            <div class="lesson-description">
+              Создаем базовую HTML разметку для игры Memory с семантическими
+              элементами.
+            </div>
+            <div class="lesson-topics">
+              <h4>Изучаем:</h4>
+              <ul>
+                <li>Структура HTML документа</li>
+                <li>Семантическая разметка</li>
+                <li>ID и классы элементов</li>
+                <li>Подготовка к JavaScript</li>
+              </ul>
+            </div>
+            <a href="memory-lesson-1.html" class="lesson-link">
+              <span>Начать урок</span>
+              <span>→</span>
+            </a>
+          </div>
+
+          <div class="lesson-card">
+            <div class="lesson-number">2</div>
+            <div class="lesson-title">CSS стилизация</div>
+            <div class="lesson-description">
+              Создаем красивые стили для карточек, анимации и адаптивный дизайн.
+            </div>
+            <div class="lesson-topics">
+              <h4>Изучаем:</h4>
+              <ul>
+                <li>CSS Grid для игрового поля</li>
+                <li>Flexbox для центрирования</li>
+                <li>Анимации и переходы</li>
+                <li>Состояния карточек</li>
+              </ul>
+            </div>
+            <a href="memory-lesson-2.html" class="lesson-link">
+              <span>Начать урок</span>
+              <span>→</span>
+            </a>
+          </div>
+
+          <div class="lesson-card">
+            <div class="lesson-number">3</div>
+            <div class="lesson-title">JavaScript основы</div>
+            <div class="lesson-description">
+              Изучаем переменные, массивы и инициализацию игры.
+            </div>
+            <div class="lesson-topics">
+              <h4>Изучаем:</h4>
+              <ul>
+                <li>Переменные и типы данных</li>
+                <li>Работа с массивами</li>
+                <li>DOM элементы</li>
+                <li>Функции и события</li>
+              </ul>
+            </div>
+            <a href="memory-lesson-3.html" class="lesson-link">
+              <span>Начать урок</span>
+              <span>→</span>
+            </a>
+          </div>
+
+          <div class="lesson-card">
+            <div class="lesson-number">4</div>
+            <div class="lesson-title">JavaScript функции</div>
+            <div class="lesson-description">
+              Создаем функции для карточек, перемешивания и обработки кликов.
+            </div>
+            <div class="lesson-topics">
+              <h4>Изучаем:</h4>
+              <ul>
+                <li>Создание функций</li>
+                <li>Алгоритм перемешивания</li>
+                <li>Динамическое создание HTML</li>
+                <li>Обработка событий</li>
+              </ul>
+            </div>
+            <a href="memory-lesson-4.html" class="lesson-link">
+              <span>Начать урок</span>
+              <span>→</span>
+            </a>
+          </div>
+
+          <div class="lesson-card">
+            <div class="lesson-number">5</div>
+            <div class="lesson-title">Игровая логика</div>
+            <div class="lesson-description">
+              Завершаем игру: проверка совпадений, подсчет очков и условие
+              победы.
+            </div>
+            <div class="lesson-topics">
+              <h4>Изучаем:</h4>
+              <ul>
+                <li>Логика проверки совпадений</li>
+                <li>Управление состоянием игры</li>
+                <li>Условие завершения</li>
+                <li>Обратная связь с игроком</li>
+              </ul>
+            </div>
+            <a href="memory-lesson-5.html" class="lesson-link">
+              <span>Начать урок</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="bottom-section">
+          <div class="play-game">
+            <h3>🎮 Готовая игра</h3>
+            <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 20px">
+              Попробуйте сыграть в готовую версию игры Memory!
+            </p>
+            <a href="memory.html" class="play-game-link">
+              <span>🃏</span>
+              <span>Играть в Memory</span>
+            </a>
+          </div>
+
+          <div class="download-images">
+            <h3><span class="icon">📁</span> Дополнительные ресурсы</h3>
+            <p>
+              Для работы игры вам понадобятся картинки животных. Скачайте архив
+              и распакуйте в директорию с игрой.
+            </p>
+            <a href="img/img.zip" class="download-link" download>
+              <span>💾</span>
+              <span>Скачать картинки (img.zip)</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>
+          📚 Курс по созданию игры Memory | Изучайте веб-разработку на практике
+          | HTML + CSS + JavaScript
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

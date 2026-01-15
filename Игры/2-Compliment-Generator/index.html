@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Уроки создания игры "Генератор комплиментов"</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .back-to-games {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-games:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #ff9a9e 0%,
+          #fecfef 50%,
+          #fecfef 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .container {
+        max-width: 1000px;
+        width: 90%;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        color: #333;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .course-info {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        border-left: 5px solid #ff6b6b;
+      }
+
+      .course-info h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.8rem;
+      }
+
+      .course-info p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+        margin-bottom: 15px;
+      }
+
+      .course-info ul {
+        margin-left: 20px;
+        color: #555;
+      }
+
+      .course-info li {
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+      }
+
+      .lessons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+      }
+
+      .lesson-card {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+
+      .lesson-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        border-color: #ff6b6b;
+      }
+
+      .lesson-number {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+
+      .lesson-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .lesson-description {
+        color: #666;
+        line-height: 1.6;
+        font-size: 1rem;
+      }
+
+      .final-game-card {
+        background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(253, 203, 110, 0.3);
+        border: 2px solid #e17055;
+        margin-bottom: 30px;
+      }
+
+      .final-game-card h3 {
+        color: #d63031;
+        margin-bottom: 15px;
+        font-size: 1.8rem;
+      }
+
+      .final-game-card p {
+        color: #d63031;
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+      }
+
+      .play-game-btn {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .play-game-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+      }
+
+      .features-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .feature-item {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #ff6b6b;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .feature-item strong {
+        color: #ff6b6b;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .skill-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        margin: 3px;
+        font-weight: 500;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .header .subtitle {
+          font-size: 1.1rem;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .lessons-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../index.html" class="back-to-games">← Вернуться к играм</a>
+    <div class="container">
+      <div class="header">
+        <h1>😊 Генератор комплиментов</h1>
+        <p class="subtitle">Создай приложение для хорошего настроения!</p>
+      </div>
+
+      <div class="content">
+        <div class="course-info">
+          <h2>🎯 О курсе</h2>
+          <p>
+            Добро пожаловать в увлекательный курс по созданию "Генератора
+            комплиментов"! Эта игра научит вас создавать интерактивные
+            веб-приложения с богатым функционалом и красивым пользовательским
+            интерфейсом.
+          </p>
+          <p><strong>Что вы изучите:</strong></p>
+          <div class="features-list">
+            <div class="feature-item">
+              <strong>HTML формы</strong>
+              Поля ввода, кнопки и интерактивные элементы
+            </div>
+            <div class="feature-item">
+              <strong>Advanced CSS</strong>
+              Градиенты, карточки, адаптивная сетка
+            </div>
+            <div class="feature-item">
+              <strong>JavaScript объекты</strong>
+              Работа с данными и категориями
+            </div>
+            <div class="feature-item">
+              <strong>Состояние приложения</strong>
+              Переменные, счётчики, локальное хранение
+            </div>
+            <div class="feature-item">
+              <strong>Пользовательский опыт</strong>
+              Персонализация, избранное, статистика
+            </div>
+            <div class="feature-item">
+              <strong>Интерактивность</strong>
+              Динамическое обновление интерфейса
+            </div>
+          </div>
+
+          <p style="margin-top: 20px">
+            <strong>Навыки, которые вы получите:</strong>
+          </p>
+          <div style="margin-top: 10px">
+            <span class="skill-badge">🏗️ Структуры данных</span>
+            <span class="skill-badge">🎨 CSS Grid & Flexbox</span>
+            <span class="skill-badge">⚡ Event Handling</span>
+            <span class="skill-badge">📊 Управление состоянием</span>
+            <span class="skill-badge">🎭 DOM манипуляции</span>
+            <span class="skill-badge">💾 Локальные данные</span>
+          </div>
+        </div>
+
+        <div class="final-game-card">
+          <h3>✨ Попробуйте финальную версию!</h3>
+          <p>
+            Посмотрите, какое крутое приложение у вас получится после
+            прохождения курса
+          </p>
+          <a href="game/index copy.html" class="play-game-btn">
+            🎮 Попробовать сейчас
+          </a>
+        </div>
+
+        <div class="lessons-grid">
+          <a href="compliment-lesson-1.html" class="lesson-card">
+            <div class="lesson-number">1</div>
+            <div class="lesson-title">HTML основы</div>
+            <div class="lesson-description">
+              Изучаем структуру приложения, формы, поля ввода и базовые элементы
+              интерфейса.
+            </div>
+          </a>
+
+          <a href="compliment-lesson-2.html" class="lesson-card">
+            <div class="lesson-number">2</div>
+            <div class="lesson-title">CSS стилизация</div>
+            <div class="lesson-description">
+              Создаём красивый дизайн с градиентами, карточками, сеткой и
+              адаптивностью.
+            </div>
+          </a>
+
+          <a href="compliment-lesson-3.html" class="lesson-card">
+            <div class="lesson-number">3</div>
+            <div class="lesson-title">JavaScript логика</div>
+            <div class="lesson-description">
+              Работаем с массивами данных, случайным выбором и обработкой
+              пользовательского ввода.
+            </div>
+          </a>
+
+          <a href="compliment-lesson-4.html" class="lesson-card">
+            <div class="lesson-number">4</div>
+            <div class="lesson-title">Категории и статистика</div>
+            <div class="lesson-description">
+              Добавляем систему категорий, счётчики, переключение состояний и
+              статистику.
+            </div>
+          </a>
+
+          <a href="compliment-lesson-5.html" class="lesson-card">
+            <div class="lesson-number">5</div>
+            <div class="lesson-title">Финальные функции</div>
+            <div class="lesson-description">
+              Создаём систему избранного, персонализацию, спецэффекты и полируем
+              приложение.
+            </div>
+          </a>
+        </div>
+
+        <div
+          class="course-info"
+          style="
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            border-left-color: #17a2b8;
+          "
+        >
+          <h2 style="color: #0c5460">🚀 Почему этот курс особенный?</h2>
+          <ul>
+            <li>Пошаговое изучение от простого к сложному</li>
+            <li>Реальный проект, который можно показать друзьям</li>
+            <li>Современные технологии и лучшие практики</li>
+            <li>Интерактивные примеры в каждом уроке</li>
+            <li>Полное объяснение каждого блока кода</li>
+            <li>Готовое приложение в результате</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

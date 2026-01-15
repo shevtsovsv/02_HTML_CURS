@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5d-1: Психология и мотивация | Угадай число</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        overflow-x: hidden;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.1) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(255, 255, 255, 0.1) 75%
+        );
+        background-size: 20px 20px;
+        animation: headerPattern 20s linear infinite;
+      }
+
+      @keyframes headerPattern {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(20px);
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: white;
+        font-size: 2.5rem;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.5rem;
+        font-size: 1.2rem;
+      }
+
+      .lesson-content {
+        background: white;
+        margin: 2rem auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-width: 1000px;
+        position: relative;
+      }
+
+      .section {
+        padding: 40px 50px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-left: 20px;
+      }
+
+      .section h2::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ecf0f1;
+      }
+
+      .theory {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 5px solid #667eea;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 10px;
+        position: relative;
+      }
+
+      .theory::before {
+        content: "🧠";
+        position: absolute;
+        top: 15px;
+        left: -15px;
+        background: #667eea;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .practice {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .practice::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(76, 175, 80, 0.1) 0%,
+          transparent 50%
+        );
+        animation: practiceGlow 3s ease-in-out infinite alternate;
+      }
+
+      @keyframes practiceGlow {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        100% {
+          transform: rotate(180deg) scale(1.1);
+        }
+      }
+
+      .code {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        margin: -20px -20px 20px -20px;
+        font-weight: bold;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 2px solid #667eea;
+      }
+
+      .demo {
+        border: 3px solid #667eea;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+        text-align: center;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+      }
+
+      .demo h4 {
+        color: #667eea;
+        margin-top: 0;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Типы игроков стили */
+      .player-types {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin: 25px 0;
+      }
+
+      .player-type {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 3px solid transparent;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        position: relative;
+        transition: all 0.4s ease;
+        cursor: pointer;
+        overflow: hidden;
+      }
+
+      .player-type::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+        z-index: -1;
+        border-radius: 20px;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .player-type:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+      }
+
+      .player-type:hover::before {
+        opacity: 1;
+      }
+
+      .player-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .player-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+
+      .player-description {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .player-motivations {
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      .player-motivations h5 {
+        margin: 0 0 10px 0;
+        color: #667eea;
+        font-weight: bold;
+      }
+
+      .player-motivations ul {
+        margin: 0;
+        padding-left: 20px;
+        text-align: left;
+      }
+
+      /* Механики мотивации */
+      .motivation-mechanics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .mechanic-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .mechanic-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+      }
+
+      .mechanic-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+          from 0deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        animation: cardRotate 4s linear infinite;
+      }
+
+      @keyframes cardRotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .mechanic-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .mechanic-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .mechanic-description {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+        line-height: 1.5;
+      }
+
+      /* SDT диаграмма */
+      .sdt-diagram {
+        background: #f8f9fa;
+        border: 2px solid #667eea;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 25px 0;
+        text-align: center;
+      }
+
+      .sdt-needs {
+        display: flex;
+        justify-content: space-around;
+        margin: 30px 0;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .sdt-need {
+        flex: 1;
+        min-width: 200px;
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        border: 2px solid #667eea;
+        border-radius: 15px;
+        padding: 25px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .sdt-need:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+      }
+
+      .sdt-need-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+      }
+
+      .sdt-need-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .sdt-need-description {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .sdt-examples {
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        text-align: left;
+      }
+
+      .sdt-examples h6 {
+        margin: 0 0 10px 0;
+        color: #667eea;
+        font-weight: bold;
+      }
+
+      .sdt-examples ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      /* Интерактивные элементы */
+      .interactive-demo {
+        background: linear-gradient(135deg, #f1f3f4 0%, #e8eaf6 100%);
+        border: 3px solid #667eea;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 30px 0;
+        text-align: center;
+      }
+
+      .motivation-meter {
+        width: 100%;
+        height: 30px;
+        background: #e0e0e0;
+        border-radius: 15px;
+        margin: 20px 0;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .motivation-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          #f44336 0%,
+          #ff9800 50%,
+          #4caf50 100%
+        );
+        border-radius: 15px;
+        transition: width 0.5s ease;
+        position: relative;
+      }
+
+      .motivation-fill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: motivationShine 2s infinite;
+      }
+
+      @keyframes motivationShine {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .motivation-controls {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .motivation-btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .motivation-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .motivation-btn:active {
+        transform: translateY(0);
+      }
+
+      .next-lesson {
+        display: inline-block;
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: bold;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        margin-top: 20px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+      }
+
+      /* Адаптивность */
+      @media (max-width: 768px) {
+        .container {
+          padding: 0 15px;
+        }
+
+        .section {
+          padding: 30px 25px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .player-types {
+          grid-template-columns: 1fr;
+        }
+
+        .motivation-mechanics {
+          grid-template-columns: 1fr;
+        }
+
+        .sdt-needs {
+          flex-direction: column;
+        }
+
+        .motivation-controls {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="container">
+        <h1>🧠 Психология и мотивация</h1>
+        <div class="subtitle">Урок 5d-1: Понимаем, что движет игроками</div>
+      </div>
+    </div>
+
+    <div class="lesson-content">
+      <div class="section">
+        <h2>🎯 Зачем изучать психологию игроков?</h2>
+
+        <div class="theory">
+          <h3>Игры — это не только развлечение</h3>
+          <p>
+            Современные игры — это сложные психологические системы, которые
+            мотивируют людей тратить время, деньги и эмоции. Понимание
+            психологии игроков помогает создавать более вовлекающие и значимые
+            игровые опыты.
+          </p>
+
+          <h4>Ключевые принципы игровой психологии:</h4>
+          <ul>
+            <li>
+              <strong>Внутренняя мотивация</strong> — игроки должны хотеть
+              играть сами
+            </li>
+            <li>
+              <strong>Прогрессия и развитие</strong> — ощущение роста и
+              улучшения
+            </li>
+            <li>
+              <strong>Социальное взаимодействие</strong> — связь с другими
+              людьми
+            </li>
+            <li>
+              <strong>Мастерство</strong> — возможность совершенствования
+              навыков
+            </li>
+          </ul>
+        </div>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+          "
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+              color: white;
+              padding: 20px;
+              border-radius: 15px;
+            "
+          >
+            <h4 style="margin-top: 0">📊 Что дает понимание мотивации</h4>
+            <ul style="margin: 0; padding-left: 20px">
+              <li>Увеличение времени в игре</li>
+              <li>Повышение лояльности игроков</li>
+              <li>Улучшение монетизации</li>
+              <li>Создание сообщества</li>
+            </ul>
+          </div>
+          <div
+            style="
+              background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+              color: white;
+              padding: 20px;
+              border-radius: 15px;
+            "
+          >
+            <h4 style="margin-top: 0">⚠️ Этические аспекты</h4>
+            <ul style="margin: 0; padding-left: 20px">
+              <li>Не злоупотреблять психологией</li>
+              <li>Создавать позитивный опыт</li>
+              <li>Уважать время игроков</li>
+              <li>Избегать манипуляций</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🎮 Типы игроков</h2>
+
+        <div class="theory">
+          <h3>Классификация Бартла</h3>
+          <p>
+            Ричард Бартл выделил четыре основных типа игроков, которые
+            мотивированы разными аспектами игрового процесса. Понимание этих
+            типов помогает создавать контент для всех категорий игроков.
+          </p>
+        </div>
+
+        <div class="player-types">
+          <div class="player-type" data-type="achiever">
+            <div class="player-icon">🏆</div>
+            <div class="player-title">Достигатор (Achiever)</div>
+            <div class="player-description">
+              Любит достигать целей, собирать награды и прогрессировать. Ценит
+              четкие задачи и измеримые результаты.
+            </div>
+            <div class="player-motivations">
+              <h5>Что их мотивирует:</h5>
+              <ul>
+                <li>Очки и рейтинги</li>
+                <li>Достижения и медали</li>
+                <li>Прогресс и уровни</li>
+                <li>Коллекционирование</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="player-type" data-type="explorer">
+            <div class="player-icon">🗺️</div>
+            <div class="player-title">Исследователь (Explorer)</div>
+            <div class="player-description">
+              Стремится открывать новое, изучать механики игры и находить
+              скрытое содержание.
+            </div>
+            <div class="player-motivations">
+              <h5>Что их мотивирует:</h5>
+              <ul>
+                <li>Скрытые секреты</li>
+                <li>Новые возможности</li>
+                <li>Глубокие механики</li>
+                <li>Исследование мира</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="player-type" data-type="socializer">
+            <div class="player-icon">👥</div>
+            <div class="player-title">Социализатор (Socializer)</div>
+            <div class="player-description">
+              Играет ради общения с другими людьми. Ценит социальные связи и
+              совместную деятельность.
+            </div>
+            <div class="player-motivations">
+              <h5>Что их мотивирует:</h5>
+              <ul>
+                <li>Чаты и общение</li>
+                <li>Командная игра</li>
+                <li>Гильдии и кланы</li>
+                <li>Помощь новичкам</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="player-type" data-type="killer">
+            <div class="player-icon">⚔️</div>
+            <div class="player-title">Воин (Killer)</div>
+            <div class="player-description">
+              Любит соревнование и доминирование. Стремится превзойти других
+              игроков и показать свою силу.
+            </div>
+            <div class="player-motivations">
+              <h5>Что их мотивирует:</h5>
+              <ul>
+                <li>PvP сражения</li>
+                <li>Лидерборды</li>
+                <li>Престиж и статус</li>
+                <li>Влияние на других</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <h4>Интерактивная диагностика типа игрока</h4>
+          <p>
+            Пройдите мини-тест, чтобы определить свой доминирующий тип игрока:
+          </p>
+
+          <div
+            id="player-test"
+            style="text-align: left; max-width: 600px; margin: 0 auto"
+          >
+            <div class="test-question" style="margin: 20px 0; display: none">
+              <h5 style="color: #667eea">
+                Что вас больше всего привлекает в играх?
+              </h5>
+              <div class="test-options">
+                <label
+                  style="
+                    display: block;
+                    margin: 10px 0;
+                    cursor: pointer;
+                    padding: 10px;
+                    border-radius: 5px;
+                    transition: background 0.3s;
+                  "
+                >
+                  <input
+                    type="radio"
+                    name="q1"
+                    value="achiever"
+                    style="margin-right: 10px"
+                  />
+                  Получение достижений и высоких очков
+                </label>
+                <label
+                  style="
+                    display: block;
+                    margin: 10px 0;
+                    cursor: pointer;
+                    padding: 10px;
+                    border-radius: 5px;
+                  "
+                >
+                  <input
+                    type="radio"
+                    name="q1"
+                    value="explorer"
+                    style="margin-right: 10px"
+                  />
+                  Открытие новых мест и секретов
+                </label>
+                <label
+                  style="
+                    display: block;
+                    margin: 10px 0;
+                    cursor: pointer;
+                    padding: 10px;
+                    border-radius: 5px;
+                  "
+                >
+                  <input
+                    type="radio"
+                    name="q1"
+                    value="socializer"
+                    style="margin-right: 10px"
+                  />
+                  Общение и игра с друзьями
+                </label>
+                <label
+                  style="
+                    display: block;
+                    margin: 10px 0;
+                    cursor: pointer;
+                    padding: 10px;
+                    border-radius: 5px;
+                  "
+                >
+                  <input
+                    type="radio"
+                    name="q1"
+                    value="killer"
+                    style="margin-right: 10px"
+                  />
+                  Соревнование и победы над другими
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin: 20px 0">
+            <button class="motivation-btn" onclick="startPlayerTest()">
+              Начать тест
+            </button>
+            <div id="test-result" style="margin-top: 20px; display: none"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🎯 Теория самоопределения (SDT)</h2>
+
+        <div class="theory">
+          <h3>Три базовые психологические потребности</h3>
+          <p>
+            Теория самоопределения (Self-Determination Theory) определяет три
+            основные психологические потребности, которые мотивируют
+            человеческое поведение. В играх эти потребности особенно важны для
+            создания долгосрочной мотивации.
+          </p>
+        </div>
+
+        <div class="sdt-diagram">
+          <h3 style="color: #667eea; margin-top: 0">
+            Три столпа внутренней мотивации
+          </h3>
+
+          <div class="sdt-needs">
+            <div class="sdt-need">
+              <div class="sdt-need-icon">🎯</div>
+              <div class="sdt-need-title">Автономия</div>
+              <div class="sdt-need-description">
+                Чувство выбора и контроля над своими действиями. Игрок должен
+                ощущать, что сам принимает решения.
+              </div>
+              <div class="sdt-examples">
+                <h6>В играх:</h6>
+                <ul>
+                  <li>Множественные пути решения</li>
+                  <li>Кастомизация персонажа</li>
+                  <li>Свобода исследования</li>
+                  <li>Выбор стратегии</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="sdt-need">
+              <div class="sdt-need-icon">💪</div>
+              <div class="sdt-need-title">Компетентность</div>
+              <div class="sdt-need-description">
+                Ощущение мастерства и эффективности. Игрок должен чувствовать,
+                что может справиться с вызовами.
+              </div>
+              <div class="sdt-examples">
+                <h6>В играх:</h6>
+                <ul>
+                  <li>Прогрессивная сложность</li>
+                  <li>Четкий фидбек</li>
+                  <li>Система навыков</li>
+                  <li>Достижимые цели</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="sdt-need">
+              <div class="sdt-need-icon">❤️</div>
+              <div class="sdt-need-title">Связанность</div>
+              <div class="sdt-need-description">
+                Потребность в социальных связях и принадлежности к группе.
+                Ощущение важности для других.
+              </div>
+              <div class="sdt-examples">
+                <h6>В играх:</h6>
+                <ul>
+                  <li>Мультиплеер</li>
+                  <li>Гильдии и кланы</li>
+                  <li>Система наставничества</li>
+                  <li>Совместные достижения</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="
+              background: rgba(102, 126, 234, 0.1);
+              border-radius: 10px;
+              padding: 20px;
+              margin-top: 25px;
+            "
+          >
+            <h4 style="color: #667eea; margin: 0">💡 Важно помнить:</h4>
+            <p style="margin: 10px 0 0 0">
+              Когда все три потребности удовлетворены, игроки испытывают
+              внутреннюю мотивацию — самый устойчивый и здоровый тип мотивации.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>⚡ Механики мотивации</h2>
+
+        <div class="theory">
+          <h3>Инструменты создания вовлеченности</h3>
+          <p>
+            Различные игровые механики могут усиливать разные типы мотивации.
+            Важно использовать их сбалансированно, чтобы не создавать
+            зависимость, а поощрять здоровое игровое поведение.
+          </p>
+        </div>
+
+        <div class="motivation-mechanics">
+          <div class="mechanic-card">
+            <div class="mechanic-icon">🎰</div>
+            <div class="mechanic-title">Переменное подкрепление</div>
+            <div class="mechanic-description">
+              Награды выдаются случайным образом. Создает сильную
+              психологическую привязанность, но может привести к зависимости.
+            </div>
+          </div>
+
+          <div class="mechanic-card">
+            <div class="mechanic-icon">📈</div>
+            <div class="mechanic-title">Прогрессия</div>
+            <div class="mechanic-description">
+              Постепенное улучшение характеристик и способностей. Дает ощущение
+              роста и развития.
+            </div>
+          </div>
+
+          <div class="mechanic-card">
+            <div class="mechanic-icon">⏰</div>
+            <div class="mechanic-title">Дефицит времени</div>
+            <div class="mechanic-description">
+              Ограниченное время для действий создает срочность. Эффективно, но
+              может вызывать стресс.
+            </div>
+          </div>
+
+          <div class="mechanic-card">
+            <div class="mechanic-icon">🏅</div>
+            <div class="mechanic-title">Статус и престиж</div>
+            <div class="mechanic-description">
+              Видимые символы достижений. Удовлетворяет потребность в признании
+              и самоутверждении.
+            </div>
+          </div>
+
+          <div class="mechanic-card">
+            <div class="mechanic-icon">🔗</div>
+            <div class="mechanic-title">Социальное обязательство</div>
+            <div class="mechanic-description">
+              Ответственность перед другими игроками. Мотивирует через
+              социальные связи.
+            </div>
+          </div>
+
+          <div class="mechanic-card">
+            <div class="mechanic-icon">🎯</div>
+            <div class="mechanic-title">Ясные цели</div>
+            <div class="mechanic-description">
+              Четко определенные, достижимые задачи. Дают направление и фокус.
+            </div>
+          </div>
+        </div>
+
+        <div class="interactive-demo">
+          <h4>Демо: Симулятор мотивации игрока</h4>
+          <p>
+            Попробуйте разные механики и посмотрите, как они влияют на
+            мотивацию:
+          </p>
+
+          <div style="text-align: left; max-width: 500px; margin: 0 auto">
+            <h5 style="color: #667eea">Уровень мотивации игрока:</h5>
+            <div class="motivation-meter">
+              <div
+                class="motivation-fill"
+                id="motivation-level"
+                style="width: 50%"
+              ></div>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.9rem;
+                color: #666;
+                margin-bottom: 20px;
+              "
+            >
+              <span>Низкая</span>
+              <span>Средняя</span>
+              <span>Высокая</span>
+            </div>
+          </div>
+
+          <div class="motivation-controls">
+            <button
+              class="motivation-btn"
+              onclick="applyMechanic('reward', 15)"
+            >
+              🎁 Дать награду
+            </button>
+            <button
+              class="motivation-btn"
+              onclick="applyMechanic('progress', 10)"
+            >
+              📈 Показать прогресс
+            </button>
+            <button
+              class="motivation-btn"
+              onclick="applyMechanic('social', 12)"
+            >
+              👥 Социальное событие
+            </button>
+            <button
+              class="motivation-btn"
+              onclick="applyMechanic('achievement', 20)"
+            >
+              🏆 Достижение
+            </button>
+            <button
+              class="motivation-btn"
+              onclick="applyMechanic('challenge', -5)"
+            >
+              ⚔️ Сложный вызов
+            </button>
+            <button class="motivation-btn" onclick="resetMotivation()">
+              🔄 Сброс
+            </button>
+          </div>
+
+          <div
+            id="motivation-feedback"
+            style="
+              margin-top: 20px;
+              min-height: 30px;
+              color: #667eea;
+              font-weight: bold;
+            "
+          >
+            Начальный уровень мотивации: Средний
+          </div>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Система мотивации игрока</div>
+          class PlayerMotivationSystem { constructor() { // Базовые потребности
+          SDT (0-100) this.autonomy = 50; // Автономия this.competence = 50; //
+          Компетентность this.relatedness = 50; // Связанность // Дополнительные
+          факторы this.engagement = 50; this.satisfaction = 50; this.burnout =
+          0; // Выгорание (чем выше, тем хуже) // История действий для анализа
+          this.actionHistory = []; this.sessionStart = Date.now(); } //
+          Применение игровой механики applyGameMechanic(mechanicType, intensity
+          = 1) { const mechanic = this.getMechanicEffects(mechanicType); //
+          Применяем эффекты на базовые потребности this.autonomy =
+          this.clamp(this.autonomy + mechanic.autonomy * intensity, 0, 100);
+          this.competence = this.clamp(this.competence + mechanic.competence *
+          intensity, 0, 100); this.relatedness = this.clamp(this.relatedness +
+          mechanic.relatedness * intensity, 0, 100); // Обновляем общие метрики
+          this.updateEngagement(); this.updateSatisfaction();
+          this.updateBurnout(mechanicType); // Записываем действие
+          this.recordAction(mechanicType, intensity); return
+          this.getMotivationLevel(); } // Определение эффектов механик
+          getMechanicEffects(mechanicType) { const effects = { 'reward': {
+          autonomy: -2, // Внешние награды могут снижать автономию competence:
+          5, // Но повышают ощущение компетентности relatedness: 0 }, 'choice':
+          { autonomy: 10, // Выбор увеличивает автономию competence: 2, // И
+          немного компетентность relatedness: 0 }, 'progression': { autonomy: 1,
+          competence: 8, // Прогресс сильно влияет на компетентность
+          relatedness: 0 }, 'social_interaction': { autonomy: 0, competence: 1,
+          relatedness: 10 // Социальное взаимодействие укрепляет связи },
+          'challenge': { autonomy: 2, competence: -3, // Сложность временно
+          снижает ощущение компетентности relatedness: 0 }, 'achievement': {
+          autonomy: 3, competence: 7, relatedness: 2 // Достижения видят другие
+          }, 'customization': { autonomy: 8, // Кастомизация = выбор и контроль
+          competence: 1, relatedness: 1 }, 'cooperation': { autonomy: -1, //
+          Кооперация ограничивает свободу действий competence: 3, relatedness: 8
+          }, 'competition': { autonomy: 2, competence: -2, // Может снижать
+          уверенность при поражениях relatedness: 4 // Но создает социальные
+          связи } }; return effects[mechanicType] || { autonomy: 0, competence:
+          0, relatedness: 0 }; } // Обновление уровня вовлеченности
+          updateEngagement() { // Вовлеченность зависит от баланса всех трех
+          потребностей const balance = this.calculateBalance(); const average =
+          (this.autonomy + this.competence + this.relatedness) / 3; // Чем лучше
+          баланс, тем выше вовлеченность this.engagement = average * balance; }
+          // Расчет баланса потребностей calculateBalance() { const needs =
+          [this.autonomy, this.competence, this.relatedness]; const max =
+          Math.max(...needs); const min = Math.min(...needs); // Баланс от 0.5
+          до 1.0, где 1.0 = идеальный баланс return 1.0 - (max - min) / 200; }
+          // Обновление удовлетворенности updateSatisfaction() { //
+          Удовлетворенность = взвешенная сумма потребностей минус выгорание
+          this.satisfaction = this.clamp( (this.autonomy * 0.3 + this.competence
+          * 0.4 + this.relatedness * 0.3) - this.burnout, 0, 100 ); } //
+          Обновление выгорания updateBurnout(mechanicType) { // Некоторые
+          механики могут вызывать выгорание при частом использовании const
+          burnoutMechanics = ['reward', 'challenge', 'time_pressure']; if
+          (burnoutMechanics.includes(mechanicType)) { this.burnout =
+          this.clamp(this.burnout + 0.5, 0, 50); } // Выгорание естественным
+          образом уменьшается со временем this.burnout = Math.max(0,
+          this.burnout - 0.1); } // Получение общего уровня мотивации
+          getMotivationLevel() { return { total: this.clamp((this.engagement +
+          this.satisfaction) / 2, 0, 100), autonomy: this.autonomy, competence:
+          this.competence, relatedness: this.relatedness, engagement:
+          this.engagement, satisfaction: this.satisfaction, burnout:
+          this.burnout, balance: this.calculateBalance() }; } // Анализ
+          мотивационных трендов analyzeTrends() { const recentActions =
+          this.actionHistory.slice(-10); const analysis = { dominantNeed:
+          this.getDominantNeed(), recommendations:
+          this.generateRecommendations(), riskFactors: this.identifyRisks(),
+          sessionLength: Date.now() - this.sessionStart }; return analysis; } //
+          Определение доминирующей потребности getDominantNeed() { const needs =
+          { autonomy: this.autonomy, competence: this.competence, relatedness:
+          this.relatedness }; return Object.keys(needs).reduce((a, b) =>
+          needs[a] > needs[b] ? a : b); } // Генерация рекомендаций
+          generateRecommendations() { const recommendations = []; if
+          (this.autonomy < 40) { recommendations.push("Добавить больше
+          возможностей выбора и контроля"); } if (this.competence < 40) {
+          recommendations.push("Предложить задачи подходящего уровня
+          сложности"); } if (this.relatedness < 40) {
+          recommendations.push("Усилить социальные элементы игры"); } if
+          (this.burnout > 30) { recommendations.push("Снизить интенсивность
+          стимулирования"); } return recommendations; } // Выявление факторов
+          риска identifyRisks() { const risks = []; if (this.burnout > 25)
+          risks.push("Высокий риск выгорания"); if (this.calculateBalance() <
+          0.7) risks.push("Дисбаланс потребностей"); if (this.satisfaction < 30)
+          risks.push("Низкая удовлетворенность"); return risks; } // Запись
+          действия recordAction(mechanicType, intensity) {
+          this.actionHistory.push({ type: mechanicType, intensity, timestamp:
+          Date.now(), resultingMotivation: this.getMotivationLevel().total });
+          // Ограничиваем историю последними 100 действиями if
+          (this.actionHistory.length > 100) { this.actionHistory.shift(); } } //
+          Вспомогательная функция ограничения значений clamp(value, min, max) {
+          return Math.min(Math.max(value, min), max); } }
+        </div>
+
+        <div class="practice">
+          <h3>🎯 Практическое задание</h3>
+          <p>
+            <strong>Создайте персонализированную систему мотивации:</strong>
+          </p>
+          <ol>
+            <li>
+              Определите тип игрока на основе его поведения в первые 5 минут
+              игры
+            </li>
+            <li>Адаптируйте игровые механики под выявленные предпочтения</li>
+            <li>
+              Реализуйте систему мониторинга трех базовых потребностей SDT
+            </li>
+            <li>Добавьте механизм предотвращения выгорания</li>
+          </ol>
+
+          <div class="code">
+            <div class="code-title">Подсказка: Определение типа игрока</div>
+            class PlayerTypeDetector { constructor() { this.behaviorData = [];
+            this.weights = { achiever: 0, explorer: 0, socializer: 0, killer: 0
+            }; } // Анализ поведения trackBehavior(action, context = {}) { const
+            behavior = { action, timestamp: Date.now(), context };
+            this.behaviorData.push(behavior); this.updateWeights(action,
+            context); // Анализируем каждые 10 действий if
+            (this.behaviorData.length % 10 === 0) { return
+            this.calculatePlayerType(); } return null; } updateWeights(action,
+            context) { // Различные действия указывают на разные типы игроков
+            switch (action) { case 'check_leaderboard': this.weights.achiever +=
+            2; this.weights.killer += 1; break; case 'explore_menu':
+            this.weights.explorer += 2; break; case 'share_result':
+            this.weights.socializer += 3; break; case 'competitive_mode':
+            this.weights.killer += 3; break; // ... другие действия } } }
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 50px">
+        <a href="guess-lesson-5d-part2.html" class="next-lesson">
+          Следующая часть: Системы уведомлений и retention →
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // Система тестирования типа игрока
+      class PlayerTypeTest {
+        constructor() {
+          this.questions = [
+            {
+              question: "Что вас больше всего привлекает в играх?",
+              answers: [
+                {
+                  text: "Получение достижений и высоких очков",
+                  type: "achiever",
+                },
+                { text: "Открытие новых мест и секретов", type: "explorer" },
+                { text: "Общение и игра с друзьями", type: "socializer" },
+                { text: "Соревнование и победы над другими", type: "killer" },
+              ],
+            },
+            {
+              question: "В многопользовательской игре вы предпочитаете:",
+              answers: [
+                { text: "Быть лучшим в рейтинге", type: "achiever" },
+                { text: "Исследовать мир с друзьями", type: "explorer" },
+                { text: "Помогать новичкам", type: "socializer" },
+                { text: "Доминировать в PvP", type: "killer" },
+              ],
+            },
+            {
+              question: "Какая награда вас больше мотивирует?",
+              answers: [
+                { text: "Редкое достижение", type: "achiever" },
+                { text: "Доступ к новому контенту", type: "explorer" },
+                { text: "Признание сообщества", type: "socializer" },
+                { text: "Превосходство над соперниками", type: "killer" },
+              ],
+            },
+          ];
+
+          this.currentQuestion = 0;
+          this.scores = {
+            achiever: 0,
+            explorer: 0,
+            socializer: 0,
+            killer: 0,
+          };
+          this.isStarted = false;
+        }
+
+        startTest() {
+          this.isStarted = true;
+          this.currentQuestion = 0;
+          this.scores = { achiever: 0, explorer: 0, socializer: 0, killer: 0 };
+          this.showQuestion();
+        }
+
+        showQuestion() {
+          const container = document.getElementById("player-test");
+          const question = this.questions[this.currentQuestion];
+
+          container.innerHTML = `
+                    <div class="test-question">
+                        <h5 style="color: #667eea; margin-bottom: 20px;">${
+                          question.question
+                        }</h5>
+                        <div class="test-options">
+                            ${question.answers
+                              .map(
+                                (answer, index) => `
+                                <label style="display: block; margin: 10px 0; cursor: pointer; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; transition: all 0.3s;" onclick="selectAnswer('${answer.type}', ${index})">
+                                    <input type="radio" name="q${this.currentQuestion}" value="${answer.type}" style="margin-right: 10px;">
+                                    ${answer.text}
+                                </label>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <small style="color: #666;">Вопрос ${
+                              this.currentQuestion + 1
+                            } из ${this.questions.length}</small>
+                        </div>
+                    </div>
+                `;
+
+          // Добавляем обработчики для подсветки
+          container.querySelectorAll("label").forEach((label) => {
+            label.addEventListener("mouseenter", () => {
+              label.style.borderColor = "#667eea";
+              label.style.background = "#f8f9ff";
+            });
+            label.addEventListener("mouseleave", () => {
+              if (!label.querySelector("input").checked) {
+                label.style.borderColor = "#e0e0e0";
+                label.style.background = "white";
+              }
+            });
+          });
+        }
+
+        selectAnswer(type, answerIndex) {
+          this.scores[type]++;
+
+          // Подсвечиваем выбранный ответ
+          const container = document.getElementById("player-test");
+          container.querySelectorAll("label").forEach((label, index) => {
+            if (index === answerIndex) {
+              label.style.borderColor = "#4caf50";
+              label.style.background = "#e8f5e8";
+            } else {
+              label.style.opacity = "0.5";
+            }
+          });
+
+          // Переходим к следующему вопросу
+          setTimeout(() => {
+            this.currentQuestion++;
+            if (this.currentQuestion < this.questions.length) {
+              this.showQuestion();
+            } else {
+              this.showResult();
+            }
+          }, 1000);
+        }
+
+        showResult() {
+          const dominantType = Object.keys(this.scores).reduce((a, b) =>
+            this.scores[a] > this.scores[b] ? a : b
+          );
+
+          const typeInfo = {
+            achiever: {
+              title: "Достигатор",
+              icon: "🏆",
+              description: "Вы мотивированы достижениями и прогрессом.",
+              tips: "Ставьте четкие цели, отслеживайте прогресс, собирайте коллекции.",
+            },
+            explorer: {
+              title: "Исследователь",
+              icon: "🗺️",
+              description: "Вас привлекает открытие нового.",
+              tips: "Ищите скрытые функции, экспериментируйте с настройками, изучайте глубокие механики.",
+            },
+            socializer: {
+              title: "Социализатор",
+              icon: "👥",
+              description: "Игры для вас — способ общения.",
+              tips: "Делитесь результатами, играйте с друзьями, помогайте новичкам.",
+            },
+            killer: {
+              title: "Воин",
+              icon: "⚔️",
+              description: "Вы любите соревнование и доминирование.",
+              tips: "Сравнивайте результаты с другими, стремитесь к лидерству, принимайте вызовы.",
+            },
+          };
+
+          const info = typeInfo[dominantType];
+
+          const container = document.getElementById("player-test");
+          container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%); border-radius: 15px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">${
+                          info.icon
+                        }</div>
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Ваш тип: ${
+                          info.title
+                        }</h3>
+                        <p style="color: #666; margin-bottom: 20px; font-size: 1.1rem;">${
+                          info.description
+                        }</p>
+                        <div style="background: white; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                            <h5 style="color: #4caf50; margin-bottom: 10px;">💡 Рекомендации:</h5>
+                            <p style="color: #555; margin: 0; line-height: 1.6;">${
+                              info.tips
+                            }</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; margin-top: 20px; font-size: 0.9rem; color: #666;">
+                            ${Object.keys(this.scores)
+                              .map(
+                                (type) => `
+                                <div>
+                                    <strong>${typeInfo[type].title}</strong><br>
+                                    ${this.scores[type]}/${this.questions.length}
+                                </div>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                    </div>
+                `;
+        }
+      }
+
+      // Система симуляции мотивации
+      class MotivationSimulator {
+        constructor() {
+          this.currentLevel = 50;
+          this.history = [];
+        }
+
+        applyMechanic(type, change) {
+          const oldLevel = this.currentLevel;
+          this.currentLevel = Math.max(
+            0,
+            Math.min(100, this.currentLevel + change)
+          );
+
+          const messages = {
+            reward: "Награда получена! Игрок чувствует удовлетворение.",
+            progress: "Прогресс виден! Усиливается ощущение компетентности.",
+            social:
+              "Социальное взаимодействие! Укрепляется чувство принадлежности.",
+            achievement: "Достижение разблокировано! Большой прилив мотивации!",
+            challenge: "Сложная задача... Временное снижение уверенности.",
+          };
+
+          this.updateUI();
+          this.showFeedback(messages[type] || "Действие выполнено.");
+
+          this.history.push({
+            type,
+            change,
+            level: this.currentLevel,
+            timestamp: Date.now(),
+          });
+        }
+
+        updateUI() {
+          const fill = document.getElementById("motivation-level");
+          fill.style.width = this.currentLevel + "%";
+
+          // Изменяем цвет в зависимости от уровня
+          if (this.currentLevel < 30) {
+            fill.style.background =
+              "linear-gradient(90deg, #f44336 0%, #e57373 100%)";
+          } else if (this.currentLevel < 70) {
+            fill.style.background =
+              "linear-gradient(90deg, #ff9800 0%, #ffb74d 100%)";
+          } else {
+            fill.style.background =
+              "linear-gradient(90deg, #4caf50 0%, #81c784 100%)";
+          }
+        }
+
+        showFeedback(message) {
+          const feedback = document.getElementById("motivation-feedback");
+          feedback.textContent = message;
+
+          feedback.style.transform = "scale(1.1)";
+          setTimeout(() => {
+            feedback.style.transform = "scale(1)";
+          }, 200);
+        }
+
+        reset() {
+          this.currentLevel = 50;
+          this.history = [];
+          this.updateUI();
+          this.showFeedback("Мотивация сброшена до исходного уровня.");
+        }
+      }
+
+      // Инициализация
+      const playerTest = new PlayerTypeTest();
+      const motivationSim = new MotivationSimulator();
+
+      // Глобальные функции для кнопок
+      function startPlayerTest() {
+        playerTest.startTest();
+      }
+
+      function selectAnswer(type, index) {
+        playerTest.selectAnswer(type, index);
+      }
+
+      function applyMechanic(type, change) {
+        motivationSim.applyMechanic(type, change);
+      }
+
+      function resetMotivation() {
+        motivationSim.reset();
+      }
+
+      // Инициализация UI
+      motivationSim.updateUI();
+    </script>
+  </body>
+</html>

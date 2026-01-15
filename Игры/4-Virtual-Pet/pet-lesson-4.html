@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 4: Эволюция и мини-игры</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #a8e6cf 0%,
+          #dcedc1 50%,
+          #ffd3a5 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "🌟🎮🏆";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #9b59b6;
+      }
+
+      .section h2 {
+        color: #9b59b6;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(155, 89, 182, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #9b59b6;
+      }
+
+      .evolution-demo {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .evolution-demo h3 {
+        color: #155724;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .evolution-stages {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .evolution-stage {
+        background: white;
+        border-radius: 15px;
+        padding: 15px;
+        min-width: 120px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+      }
+
+      .evolution-stage:hover {
+        transform: translateY(-5px);
+        border-color: #28a745;
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+      }
+
+      .evolution-stage.active {
+        border-color: #9b59b6;
+        box-shadow: 0 8px 20px rgba(155, 89, 182, 0.3);
+      }
+
+      .evolution-emoji {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .evolution-name {
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 5px;
+      }
+
+      .evolution-age {
+        font-size: 0.8rem;
+        color: #666;
+      }
+
+      .minigame-demo {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .minigame-demo h4 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+      }
+
+      .color-sequence {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 15px 0;
+      }
+
+      .color-button {
+        width: 60px;
+        height: 60px;
+        border: 3px solid #333;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .color-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .color-button.red {
+        background: #ff6b6b;
+      }
+      .color-button.green {
+        background: #51cf66;
+      }
+      .color-button.blue {
+        background: #339af0;
+      }
+      .color-button.yellow {
+        background: #ffd43b;
+      }
+
+      .color-button.flash {
+        animation: flash 0.5s ease-in-out;
+      }
+
+      @keyframes flash {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .game-controls {
+        margin: 20px 0;
+      }
+
+      .game-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        margin: 0 10px;
+        transition: all 0.3s ease;
+      }
+
+      .game-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .game-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .achievements-demo {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .achievements-demo h4 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+      }
+
+      .achievement-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .achievement {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 12px;
+        border-left: 4px solid #007bff;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+
+      .achievement.unlocked {
+        border-left-color: #28a745;
+        background: rgba(212, 237, 218, 0.9);
+      }
+
+      .achievement.unlocked::before {
+        content: "🏆 ";
+      }
+
+      .achievement::before {
+        content: "🔒 ";
+      }
+
+      .js-keyword {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .js-function {
+        color: #9b59b6;
+        font-weight: 600;
+      }
+
+      .js-string {
+        color: #2ecc71;
+      }
+
+      .js-number {
+        color: #e67e22;
+      }
+
+      .js-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        border: 2px solid #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "🌟";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .tips-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .tips-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .tip-item {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .evolution-stages {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .color-sequence {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🌟 Урок 4: Эволюция и мини-игры</h1>
+        <p class="lesson-info">
+          Добавляем развитие питомца и увлекательные игры
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы добавим самые захватывающие функции нашего тамагочи!
+            Создадим систему эволюции питомца по стадиям развития, мини-игры для
+            развития интеллекта и систему достижений для мотивации игрока.
+          </p>
+          <p>
+            Ты изучишь продвинутые концепции JavaScript: интервалы времени,
+            сложные алгоритмы, игровую логику и систему наград.
+          </p>
+        </div>
+
+        <div class="evolution-demo">
+          <h3>Демонстрация эволюции питомца</h3>
+          <p>Кликай на стадии, чтобы увидеть развитие питомца!</p>
+          <div class="evolution-stages">
+            <div class="evolution-stage active" onclick="setDemoStage('egg')">
+              <span class="evolution-emoji">🥚</span>
+              <div class="evolution-name">Яйцо</div>
+              <div class="evolution-age">0-2 мин</div>
+            </div>
+            <div class="evolution-stage" onclick="setDemoStage('baby')">
+              <span class="evolution-emoji">🐣</span>
+              <div class="evolution-name">Птенчик</div>
+              <div class="evolution-age">2-5 мин</div>
+            </div>
+            <div class="evolution-stage" onclick="setDemoStage('child')">
+              <span class="evolution-emoji">🐤</span>
+              <div class="evolution-name">Малыш</div>
+              <div class="evolution-age">5-10 мин</div>
+            </div>
+            <div class="evolution-stage" onclick="setDemoStage('teen')">
+              <span class="evolution-emoji">🐦</span>
+              <div class="evolution-name">Подросток</div>
+              <div class="evolution-age">10-20 мин</div>
+            </div>
+            <div class="evolution-stage" onclick="setDemoStage('adult')">
+              <span class="evolution-emoji">🦅</span>
+              <div class="evolution-name">Взрослый</div>
+              <div class="evolution-age">20+ мин</div>
+            </div>
+          </div>
+          <p id="stageDescription">
+            Начальная стадия. Питомец только появился на свет!
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🌱 Система эволюции</h2>
+          <p>
+            Система эволюции делает игру увлекательной надолго. Питомец растёт и
+            развивается в зависимости от времени и заботы игрока.
+          </p>
+
+          <div class="code-title">🌱 Объект стадий эволюции</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Определяем все стадии развития питомца</span>
+<span class="js-keyword">const</span> evolutionStages = {
+  <span class="js-string">egg</span>: {
+    <span class="js-string">emoji</span>: <span class="js-string">"🥚"</span>,
+    <span class="js-string">name</span>: <span class="js-string">"Яйцо"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Начальная стадия. Питомец только появился!"</span>,
+    <span class="js-string">minAge</span>: <span class="js-number">0</span>,
+    <span class="js-string">maxAge</span>: <span class="js-number">2</span>,
+    <span class="js-string">requirements</span>: { <span class="js-string">level</span>: <span class="js-number">1</span> }
+  },
+  
+  <span class="js-string">baby</span>: {
+    <span class="js-string">emoji</span>: <span class="js-string">"🐣"</span>,
+    <span class="js-string">name</span>: <span class="js-string">"Птенчик"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Маленький и беззащитный, нуждается в заботе"</span>,
+    <span class="js-string">minAge</span>: <span class="js-number">2</span>,
+    <span class="js-string">maxAge</span>: <span class="js-number">5</span>,
+    <span class="js-string">requirements</span>: { <span class="js-string">level</span>: <span class="js-number">3</span>, <span class="js-string">happiness</span>: <span class="js-number">50</span> }
+  },
+  
+  <span class="js-string">child</span>: {
+    <span class="js-string">emoji</span>: <span class="js-string">"🐤"</span>,
+    <span class="js-string">name</span>: <span class="js-string">"Малыш"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Активный и любознательный, любит играть"</span>,
+    <span class="js-string">minAge</span>: <span class="js-number">5</span>,
+    <span class="js-string">maxAge</span>: <span class="js-number">10</span>,
+    <span class="js-string">requirements</span>: { <span class="js-string">level</span>: <span class="js-number">7</span>, <span class="js-string">happiness</span>: <span class="js-number">70</span> }
+  },
+  
+  <span class="js-string">teen</span>: {
+    <span class="js-string">emoji</span>: <span class="js-string">"🐦"</span>,
+    <span class="js-string">name</span>: <span class="js-string">"Подросток"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Независимый и умный, готов к испытаниям"</span>,
+    <span class="js-string">minAge</span>: <span class="js-number">10</span>,
+    <span class="js-string">maxAge</span>: <span class="js-number">20</span>,
+    <span class="js-string">requirements</span>: { <span class="js-string">level</span>: <span class="js-number">15</span>, <span class="js-string">intelligence</span>: <span class="js-number">50</span> }
+  },
+  
+  <span class="js-string">adult</span>: {
+    <span class="js-string">emoji</span>: <span class="js-string">"🦅"</span>,
+    <span class="js-string">name</span>: <span class="js-string">"Взрослый"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Мудрый и сильный, достиг максимального развития"</span>,
+    <span class="js-string">minAge</span>: <span class="js-number">20</span>,
+    <span class="js-string">maxAge</span>: <span class="js-number">Infinity</span>,
+    <span class="js-string">requirements</span>: { <span class="js-string">level</span>: <span class="js-number">25</span>, <span class="js-string">intelligence</span>: <span class="js-number">80</span> }
+  }
+};</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📈 Функция проверки эволюции</h2>
+          <p>
+            Эта функция будет автоматически проверять, может ли питомец перейти
+            на следующую стадию развития. Учитывается возраст, уровень и другие
+            характеристики.
+          </p>
+
+          <div class="code-title">📈 Логика эволюции</div>
+          <div class="code-example">
+            <pre><span class="js-function">function</span> <span class="js-function">checkEvolution</span>() {
+  <span class="js-comment">// Получаем текущую и следующую стадии</span>
+  <span class="js-keyword">const</span> currentStage = evolutionStages[pet.stage];
+  <span class="js-keyword">const</span> stageNames = <span class="js-function">Object.keys</span>(evolutionStages);
+  <span class="js-keyword">const</span> currentIndex = stageNames.<span class="js-function">indexOf</span>(pet.stage);
+  
+  <span class="js-comment">// Если это последняя стадия, эволюция невозможна</span>
+  <span class="js-keyword">if</span> (currentIndex === stageNames.length - <span class="js-number">1</span>) <span class="js-keyword">return</span>;
+  
+  <span class="js-keyword">const</span> nextStageName = stageNames[currentIndex + <span class="js-number">1</span>];
+  <span class="js-keyword">const</span> nextStage = evolutionStages[nextStageName];
+  
+  <span class="js-comment">// Проверяем возраст</span>
+  <span class="js-keyword">const</span> ageInMinutes = pet.age;
+  <span class="js-keyword">if</span> (ageInMinutes < nextStage.minAge) <span class="js-keyword">return</span>;
+  
+  <span class="js-comment">// Проверяем требования для эволюции</span>
+  <span class="js-keyword">let</span> canEvolve = <span class="js-keyword">true</span>;
+  
+  <span class="js-keyword">if</span> (nextStage.requirements.level && pet.level < nextStage.requirements.level) {
+    canEvolve = <span class="js-keyword">false</span>;
+  }
+  
+  <span class="js-keyword">if</span> (nextStage.requirements.happiness && pet.stats.happiness < nextStage.requirements.happiness) {
+    canEvolve = <span class="js-keyword">false</span>;
+  }
+  
+  <span class="js-keyword">if</span> (nextStage.requirements.intelligence && pet.intelligence < nextStage.requirements.intelligence) {
+    canEvolve = <span class="js-keyword">false</span>;
+  }
+  
+  <span class="js-comment">// Если все требования выполнены - эволюция!</span>
+  <span class="js-keyword">if</span> (canEvolve) {
+    <span class="js-function">evolve</span>(nextStageName);
+  }
+}
+
+<span class="js-function">function</span> <span class="js-function">evolve</span>(newStage) {
+  <span class="js-keyword">const</span> oldStage = evolutionStages[pet.stage];
+  pet.stage = newStage;
+  pet.emoji = evolutionStages[newStage].emoji;
+  
+  <span class="js-comment">// Показываем красивое сообщение об эволюции</span>
+  <span class="js-function">showEvolutionAnimation</span>(oldStage.emoji, pet.emoji);
+  <span class="js-function">showMessage</span>(<span class="js-string">`🌟 Поздравляем! ${pet.name} эволюционировал в ${evolutionStages[newStage].name}!`</span>);
+  
+  <span class="js-comment">// Даём бонусы за эволюцию</span>
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">20</span>);
+  <span class="js-function">addExperience</span>(<span class="js-number">50</span>);
+  
+  <span class="js-function">updateDisplay</span>();
+  <span class="js-function">checkAchievement</span>(<span class="js-string">"evolution_" + newStage</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="minigame-demo">
+          <h4>Мини-игра: Последовательность цветов</h4>
+          <p>Запомни последовательность и повтори её!</p>
+          <div class="color-sequence">
+            <div class="color-button red" onclick="playerClick('red')"></div>
+            <div
+              class="color-button green"
+              onclick="playerClick('green')"
+            ></div>
+            <div class="color-button blue" onclick="playerClick('blue')"></div>
+            <div
+              class="color-button yellow"
+              onclick="playerClick('yellow')"
+            ></div>
+          </div>
+          <div class="game-controls">
+            <button class="game-btn" onclick="startColorGame()">
+              Начать игру
+            </button>
+            <button class="game-btn" onclick="resetColorGame()">
+              Сбросить
+            </button>
+          </div>
+          <div
+            id="gameMessage"
+            style="margin-top: 10px; font-weight: bold; color: #856404"
+          >
+            Нажми "Начать игру" для начала!
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🧠 Мини-игра на память</h2>
+          <p>
+            Мини-игра развивает интеллект питомца и делает игру более
+            интерактивной. Игрок должен запомнить и повторить последовательность
+            цветов.
+          </p>
+
+          <div class="code-title">🧠 Логика мини-игры</div>
+          <div class="code-example">
+            <pre><span class="js-comment">// Переменные для мини-игры</span>
+<span class="js-keyword">let</span> gameSequence = [];
+<span class="js-keyword">let</span> playerSequence = [];
+<span class="js-keyword">let</span> gameActive = <span class="js-keyword">false</span>;
+<span class="js-keyword">let</span> gameLevel = <span class="js-number">1</span>;
+
+<span class="js-keyword">const</span> colors = [<span class="js-string">'red'</span>, <span class="js-string">'green'</span>, <span class="js-string">'blue'</span>, <span class="js-string">'yellow'</span>];
+
+<span class="js-function">function</span> <span class="js-function">startColorGame</span>() {
+  <span class="js-keyword">if</span> (!pet.isAlive) <span class="js-keyword">return</span>;
+  
+  <span class="js-comment">// Проверяем энергию для игры</span>
+  <span class="js-keyword">if</span> (pet.stats.energy < <span class="js-number">30</span>) {
+    <span class="js-function">showMessage</span>(<span class="js-string">"😴 Слишком устал для мини-игр!"</span>);
+    <span class="js-keyword">return</span>;
+  }
+  
+  gameActive = <span class="js-keyword">true</span>;
+  gameSequence = [];
+  playerSequence = [];
+  gameLevel = <span class="js-number">1</span>;
+  
+  <span class="js-comment">// Генерируем первый цвет</span>
+  <span class="js-function">addColorToSequence</span>();
+  <span class="js-function">playSequence</span>();
+}
+
+<span class="js-function">function</span> <span class="js-function">addColorToSequence</span>() {
+  <span class="js-keyword">const</span> randomColor = colors[<span class="js-function">Math.floor</span>(<span class="js-function">Math.random</span>() * colors.length)];
+  gameSequence.<span class="js-function">push</span>(randomColor);
+}
+
+<span class="js-function">function</span> <span class="js-function">playSequence</span>() {
+  <span class="js-keyword">let</span> i = <span class="js-number">0</span>;
+  
+  <span class="js-keyword">const</span> interval = <span class="js-function">setInterval</span>(() => {
+    <span class="js-keyword">if</span> (i >= gameSequence.length) {
+      <span class="js-function">clearInterval</span>(interval);
+      <span class="js-function">showMessage</span>(<span class="js-string">"Теперь повтори последовательность!"</span>);
+      <span class="js-keyword">return</span>;
+    }
+    
+    <span class="js-comment">// Подсвечиваем цвет</span>
+    <span class="js-keyword">const</span> colorButton = <span class="js-function">document.querySelector</span>(<span class="js-string">`.color-button.${gameSequence[i]}`</span>);
+    colorButton.classList.<span class="js-function">add</span>(<span class="js-string">'flash'</span>);
+    
+    <span class="js-function">setTimeout</span>(() => {
+      colorButton.classList.<span class="js-function">remove</span>(<span class="js-string">'flash'</span>);
+    }, <span class="js-number">400</span>);
+    
+    i++;
+  }, <span class="js-number">600</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Обработка ввода игрока</h2>
+          <p>
+            Проверяем правильность ввода игрока и награждаем за успешное
+            прохождение мини-игры.
+          </p>
+
+          <div class="code-title">🎮 Проверка ввода</div>
+          <div class="code-example">
+            <pre><span class="js-function">function</span> <span class="js-function">playerClick</span>(color) {
+  <span class="js-keyword">if</span> (!gameActive) <span class="js-keyword">return</span>;
+  
+  playerSequence.<span class="js-function">push</span>(color);
+  
+  <span class="js-comment">// Проверяем текущий ввод</span>
+  <span class="js-keyword">const</span> currentIndex = playerSequence.length - <span class="js-number">1</span>;
+  
+  <span class="js-keyword">if</span> (playerSequence[currentIndex] !== gameSequence[currentIndex]) {
+    <span class="js-comment">// Ошибка!</span>
+    <span class="js-function">gameOver</span>();
+    <span class="js-keyword">return</span>;
+  }
+  
+  <span class="js-comment">// Если последовательность завершена правильно</span>
+  <span class="js-keyword">if</span> (playerSequence.length === gameSequence.length) {
+    <span class="js-function">levelComplete</span>();
+  }
+}
+
+<span class="js-function">function</span> <span class="js-function">levelComplete</span>() {
+  gameLevel++;
+  playerSequence = [];
+  
+  <span class="js-comment">// Награды за прохождение уровня</span>
+  pet.intelligence = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.intelligence + <span class="js-number">5</span>);
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">10</span>);
+  pet.stats.energy = <span class="js-function">Math.max</span>(<span class="js-number">0</span>, pet.stats.energy - <span class="js-number">10</span>);
+  
+  <span class="js-function">showMessage</span>(<span class="js-string">`🎉 Уровень ${gameLevel - 1} пройден! Интеллект +5`</span>);
+  <span class="js-function">addExperience</span>(<span class="js-number">10</span>);
+  
+  <span class="js-comment">// Проверяем, не слишком ли сложно</span>
+  <span class="js-keyword">if</span> (gameLevel > <span class="js-number">5</span>) {
+    <span class="js-function">gameWin</span>();
+    <span class="js-keyword">return</span>;
+  }
+  
+  <span class="js-comment">// Добавляем новый цвет и продолжаем</span>
+  <span class="js-function">setTimeout</span>(() => {
+    <span class="js-function">addColorToSequence</span>();
+    <span class="js-function">playSequence</span>();
+  }, <span class="js-number">1000</span>);
+}
+
+<span class="js-function">function</span> <span class="js-function">gameOver</span>() {
+  gameActive = <span class="js-keyword">false</span>;
+  <span class="js-function">showMessage</span>(<span class="js-string">`💥 Ошибка! Достигнут уровень ${gameLevel - 1}`</span>);
+  
+  <span class="js-comment">// Небольшая награда за попытку</span>
+  <span class="js-keyword">if</span> (gameLevel > <span class="js-number">1</span>) {
+    pet.intelligence = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.intelligence + <span class="js-number">1</span>);
+    <span class="js-function">addExperience</span>(<span class="js-number">2</span>);
+  }
+}
+
+<span class="js-function">function</span> <span class="js-function">gameWin</span>() {
+  gameActive = <span class="js-keyword">false</span>;
+  <span class="js-function">showMessage</span>(<span class="js-string">"🏆 Потрясающе! Все уровни пройдены!"</span>);
+  
+  <span class="js-comment">// Большая награда за полное прохождение</span>
+  pet.intelligence = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.intelligence + <span class="js-number">20</span>);
+  pet.stats.happiness = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.stats.happiness + <span class="js-number">30</span>);
+  <span class="js-function">addExperience</span>(<span class="js-number">50</span>);
+  
+  <span class="js-function">checkAchievement</span>(<span class="js-string">"memory_master"</span>);
+}</pre>
+          </div>
+        </div>
+
+        <div class="achievements-demo">
+          <h4>Система достижений</h4>
+          <div class="achievement-list">
+            <div class="achievement unlocked">
+              Первые шаги - Покормить питомца
+            </div>
+            <div class="achievement unlocked">
+              Друг навеки - Поиграть 10 раз
+            </div>
+            <div class="achievement">Мастер памяти - Пройти мини-игру</div>
+            <div class="achievement">Эволюция - Достичь стадии взрослого</div>
+            <div class="achievement">
+              Заботливый хозяин - 100 действий ухода
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🏆 Система достижений</h2>
+          <p>
+            Достижения мотивируют игрока продолжать играть и ухаживать за
+            питомцем. Каждое достижение даёт награду и чувство прогресса.
+          </p>
+
+          <div class="code-title">🏆 База достижений</div>
+          <div class="code-example">
+            <pre><span class="js-keyword">const</span> achievements = {
+  <span class="js-string">first_feed</span>: {
+    <span class="js-string">name</span>: <span class="js-string">"Первые шаги"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Покормить питомца в первый раз"</span>,
+    <span class="js-string">icon</span>: <span class="js-string">"🍎"</span>,
+    <span class="js-string">unlocked</span>: <span class="js-keyword">false</span>,
+    <span class="js-string">reward</span>: { <span class="js-string">experience</span>: <span class="js-number">10</span> }
+  },
+  
+  <span class="js-string">friend_forever</span>: {
+    <span class="js-string">name</span>: <span class="js-string">"Друг навеки"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Поиграть с питомцем 10 раз"</span>,
+    <span class="js-string">icon</span>: <span class="js-string">"🤗"</span>,
+    <span class="js-string">unlocked</span>: <span class="js-keyword">false</span>,
+    <span class="js-string">requirement</span>: <span class="js-number">10</span>,
+    <span class="js-string">current</span>: <span class="js-number">0</span>,
+    <span class="js-string">reward</span>: { <span class="js-string">experience</span>: <span class="js-number">25</span> }
+  },
+  
+  <span class="js-string">memory_master</span>: {
+    <span class="js-string">name</span>: <span class="js-string">"Мастер памяти"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Пройти мини-игру на память полностью"</span>,
+    <span class="js-string">icon</span>: <span class="js-string">"🧠"</span>,
+    <span class="js-string">unlocked</span>: <span class="js-keyword">false</span>,
+    <span class="js-string">reward</span>: { <span class="js-string">experience</span>: <span class="js-number">50</span>, <span class="js-string">intelligence</span>: <span class="js-number">10</span> }
+  },
+  
+  <span class="js-string">evolution_adult</span>: {
+    <span class="js-string">name</span>: <span class="js-string">"Полная эволюция"</span>,
+    <span class="js-string">description</span>: <span class="js-string">"Достичь взрослой стадии развития"</span>,
+    <span class="js-string">icon</span>: <span class="js-string">"🦅"</span>,
+    <span class="js-string">unlocked</span>: <span class="js-keyword">false</span>,
+    <span class="js-string">reward</span>: { <span class="js-string">experience</span>: <span class="js-number">100</span> }
+  }
+};
+
+<span class="js-function">function</span> <span class="js-function">checkAchievement</span>(achievementId) {
+  <span class="js-keyword">const</span> achievement = achievements[achievementId];
+  
+  <span class="js-keyword">if</span> (!achievement || achievement.unlocked) <span class="js-keyword">return</span>;
+  
+  <span class="js-comment">// Проверяем условия разблокировки</span>
+  <span class="js-keyword">let</span> unlockCondition = <span class="js-keyword">true</span>;
+  
+  <span class="js-keyword">if</span> (achievement.requirement) {
+    achievement.current = (achievement.current || <span class="js-number">0</span>) + <span class="js-number">1</span>;
+    unlockCondition = achievement.current >= achievement.requirement;
+  }
+  
+  <span class="js-keyword">if</span> (unlockCondition) {
+    <span class="js-function">unlockAchievement</span>(achievementId);
+  }
+}
+
+<span class="js-function">function</span> <span class="js-function">unlockAchievement</span>(achievementId) {
+  <span class="js-keyword">const</span> achievement = achievements[achievementId];
+  achievement.unlocked = <span class="js-keyword">true</span>;
+  
+  <span class="js-comment">// Показываем уведомление</span>
+  <span class="js-function">showAchievementNotification</span>(achievement);
+  
+  <span class="js-comment">// Даём награды</span>
+  <span class="js-keyword">if</span> (achievement.reward.experience) {
+    <span class="js-function">addExperience</span>(achievement.reward.experience);
+  }
+  
+  <span class="js-keyword">if</span> (achievement.reward.intelligence) {
+    pet.intelligence = <span class="js-function">Math.min</span>(<span class="js-number">100</span>, pet.intelligence + achievement.reward.intelligence);
+  }
+  
+  <span class="js-function">updateAchievementsDisplay</span>();
+}</pre>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>🌟 Твоё задание</h3>
+          <p>Добавь в свой тамагочи продвинутые функции:</p>
+
+          <ol class="task-list">
+            <li>Объект evolutionStages с 5 стадиями развития</li>
+            <li>Функцию checkEvolution() для автоматической эволюции</li>
+            <li>Мини-игру на память с последовательностью цветов</li>
+            <li>Систему интеллекта питомца (новая характеристика)</li>
+            <li>Базу достижений с условиями разблокировки</li>
+            <li>Функции для проверки и разблокировки достижений</li>
+            <li>Автоматические проверки эволюции каждую минуту</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #856404">
+            💡 Используй setInterval для автоматических проверок эволюции!
+          </p>
+        </div>
+
+        <div class="tips-section">
+          <h3>💡 Секреты геймдизайна</h3>
+
+          <div class="tip-item">
+            <strong>Прогрессия:</strong> Эволюция должна чувствоваться как
+            достижение. Добавляй красивые анимации и звуки для важных моментов.
+          </div>
+
+          <div class="tip-item">
+            <strong>Баланс сложности:</strong> Мини-игры должны быть достаточно
+            сложными, чтобы быть интересными, но не слишком трудными для детей.
+          </div>
+
+          <div class="tip-item">
+            <strong>Мотивация:</strong> Достижения создают долгосрочные цели.
+            Делай их разнообразными: простые для новичков, сложные для опытных
+            игроков.
+          </div>
+
+          <div class="tip-item">
+            <strong>Обратная связь:</strong> Всегда показывай игроку результат
+            его действий. Используй анимации, звуки и сообщения для создания
+            отзывчивого интерфейса.
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="pet-lesson-5.html" class="next-lesson">
+            💾 Следующий урок: Сохранение и полировка →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо функции для этого урока
+      let currentDemoStage = "egg";
+      let demoGameSequence = [];
+      let demoPlayerSequence = [];
+      let demoGameActive = false;
+      let demoGameLevel = 1;
+
+      const stageDescriptions = {
+        egg: "Начальная стадия. Питомец только появился на свет!",
+        baby: "Маленький и беззащитный, нуждается в постоянной заботе.",
+        child: "Активный и любознательный, обожает играть и исследовать.",
+        teen: "Независимый и умный, готов к серьёзным испытаниям.",
+        adult: "Мудрый и сильный, достиг пика своего развития.",
+      };
+
+      function setDemoStage(stage) {
+        // Убираем активный класс у всех
+        document.querySelectorAll(".evolution-stage").forEach((el) => {
+          el.classList.remove("active");
+        });
+
+        // Добавляем активный класс к выбранному
+        event.target.closest(".evolution-stage").classList.add("active");
+
+        currentDemoStage = stage;
+        document.getElementById("stageDescription").textContent =
+          stageDescriptions[stage];
+
+        // Анимация смены стадии
+        const description = document.getElementById("stageDescription");
+        description.style.animation = "fadeIn 0.5s ease";
+      }
+
+      // Мини-игра демо
+      const demoColors = ["red", "green", "blue", "yellow"];
+
+      function startColorGame() {
+        demoGameActive = true;
+        demoGameSequence = [];
+        demoPlayerSequence = [];
+        demoGameLevel = 1;
+
+        document.getElementById("gameMessage").textContent =
+          "Запоминай последовательность...";
+
+        addColorToSequence();
+        playSequence();
+      }
+
+      function addColorToSequence() {
+        const randomColor =
+          demoColors[Math.floor(Math.random() * demoColors.length)];
+        demoGameSequence.push(randomColor);
+      }
+
+      function playSequence() {
+        let i = 0;
+
+        const interval = setInterval(() => {
+          if (i >= demoGameSequence.length) {
+            clearInterval(interval);
+            document.getElementById("gameMessage").textContent =
+              "Теперь повтори последовательность!";
+            return;
+          }
+
+          const colorButton = document.querySelector(
+            `.color-button.${demoGameSequence[i]}`
+          );
+          colorButton.classList.add("flash");
+
+          setTimeout(() => {
+            colorButton.classList.remove("flash");
+          }, 400);
+
+          i++;
+        }, 600);
+      }
+
+      function playerClick(color) {
+        if (!demoGameActive) return;
+
+        demoPlayerSequence.push(color);
+
+        const currentIndex = demoPlayerSequence.length - 1;
+
+        if (
+          demoPlayerSequence[currentIndex] !== demoGameSequence[currentIndex]
+        ) {
+          gameOver();
+          return;
+        }
+
+        if (demoPlayerSequence.length === demoGameSequence.length) {
+          levelComplete();
+        }
+      }
+
+      function levelComplete() {
+        demoGameLevel++;
+        demoPlayerSequence = [];
+
+        document.getElementById("gameMessage").textContent = `🎉 Уровень ${
+          demoGameLevel - 1
+        } пройден!`;
+
+        if (demoGameLevel > 3) {
+          gameWin();
+          return;
+        }
+
+        setTimeout(() => {
+          addColorToSequence();
+          playSequence();
+        }, 1500);
+      }
+
+      function gameOver() {
+        demoGameActive = false;
+        document.getElementById(
+          "gameMessage"
+        ).textContent = `💥 Ошибка! Достигнут уровень ${demoGameLevel - 1}`;
+      }
+
+      function gameWin() {
+        demoGameActive = false;
+        document.getElementById("gameMessage").textContent =
+          "🏆 Все уровни пройдены! Потрясающе!";
+      }
+
+      function resetColorGame() {
+        demoGameActive = false;
+        demoGameSequence = [];
+        demoPlayerSequence = [];
+        document.getElementById("gameMessage").textContent =
+          'Нажми "Начать игру" для начала!';
+      }
+
+      // Анимация появления секций
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .evolution-demo, .minigame-demo, .achievements-demo"
+        );
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+
+        // Добавляем интерактивность достижениям
+        setTimeout(() => {
+          const achievements = document.querySelectorAll(".achievement");
+          achievements.forEach((achievement, index) => {
+            setTimeout(() => {
+              if (index < 2) {
+                // Первые два достижения "разблокированы"
+                achievement.classList.add("unlocked");
+                achievement.style.animation = "achievementUnlock 0.5s ease";
+              }
+            }, index * 200);
+          });
+        }, 1000);
+      });
+
+      // Добавляем CSS анимации
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes achievementUnlock {
+          0% { transform: scale(0.8); opacity: 0; }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateX(-10px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>

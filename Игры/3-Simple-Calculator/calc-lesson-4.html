@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 4: Система квестов и геймификация</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-menu {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-menu:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-number {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 30px;
+        border-radius: 15px;
+        background: #f8f9fa;
+        border-left: 5px solid #667eea;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section h3 {
+        color: #34495e;
+        margin-bottom: 15px;
+        margin-top: 25px;
+        font-size: 1.4rem;
+      }
+
+      .section p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 25px;
+        border-radius: 10px;
+        margin: 20px 0;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        line-height: 1.5;
+        border-left: 4px solid #667eea;
+      }
+
+      .code-block pre {
+        margin: 0;
+      }
+
+      .highlight {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #f39c12;
+        margin: 20px 0;
+      }
+
+      .highlight h4 {
+        color: #8b4513;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      .highlight p {
+        color: #8b4513;
+        margin: 0;
+      }
+
+      .demo-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 30px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-quest {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        color: #333;
+        max-width: 500px;
+        margin: 0 auto;
+        backdrop-filter: blur(10px);
+      }
+
+      .js-concept {
+        background: #fff3cd;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        margin: 15px 0;
+      }
+
+      .js-concept strong {
+        color: #856404;
+        font-size: 1.1rem;
+      }
+
+      .js-concept p {
+        color: #856404;
+        margin-top: 8px;
+      }
+
+      .demo-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        color: #d63384;
+        font-weight: bold;
+      }
+
+      .demo-problem {
+        background: #ffeaa7;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 15px 0;
+        border: 2px solid #e17055;
+      }
+
+      .demo-input {
+        margin: 15px 0;
+      }
+
+      .demo-input input {
+        padding: 10px;
+        border: 2px solid #74b9ff;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        text-align: center;
+        width: 100px;
+      }
+
+      .demo-btn {
+        background: linear-gradient(135deg, #00b894, #00a085);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 5px;
+        font-weight: 600;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding: 20px 0;
+        border-top: 1px solid #eee;
+      }
+
+      .nav-btn {
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .demo-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-menu"> ← Вернуться к урокам </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>🎮 Система квестов и геймификация</h1>
+        <p class="lesson-number">Урок 4 из 5</p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            В этом уроке мы превратим обычный калькулятор в увлекательную игру!
+            Создадим систему математических квестов с разными уровнями
+            сложности, добавим подсчёт очков, статистику игрока и систему
+            прогрессии.
+          </p>
+
+          <div class="highlight">
+            <h4>💡 Что вы узнаете:</h4>
+            <p>
+              • Генерацию случайных математических задач<br />
+              • Систему уровней сложности<br />
+              • Подсчёт очков и статистики<br />
+              • Проверку правильности ответов<br />
+              • Игровую механику прогрессии
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📚 Игровые концепции</h2>
+
+          <div class="js-concept">
+            <strong>Math.random()</strong>
+            <p>
+              Генерация случайных чисел для создания уникальных математических
+              задач
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>Math.floor()</strong>
+            <p>
+              Округление вниз до целого числа для получения целых чисел в
+              задачах
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>switch statement</strong>
+            <p>
+              Конструкция для выбора математической операции в зависимости от
+              условий
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>Объекты настроек</strong>
+            <p>
+              Хранение параметров уровней сложности в удобной структуре данных
+            </p>
+          </div>
+
+          <div class="js-concept">
+            <strong>Игровые переменные</strong>
+            <p>
+              Отслеживание состояния игры: очки, уровень, серии правильных
+              ответов
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Игровые переменные</h2>
+          <p>Создаём переменные для хранения состояния игры:</p>
+
+          <div class="code-block">
+            <pre>
+// Игровые переменные
+let difficulty = 'easy';
+let currentProblem = {};
+let level = 1;
+let score = 0;
+let streak = 0;
+let totalSolved = 0;
+
+// Настройки уровней сложности
+const difficultySettings = {
+    easy: { 
+        min: 1, 
+        max: 10, 
+        operations: ['+', '-'] 
+    },
+    medium: { 
+        min: 1, 
+        max: 50, 
+        operations: ['+', '-', '*'] 
+    },
+    hard: { 
+        min: 1, 
+        max: 100, 
+        operations: ['+', '-', '*', '/'] 
+    }
+};</pre
+            >
+          </div>
+
+          <div class="js-concept">
+            <strong>Объект настроек</strong>
+            <p>
+              Каждый уровень имеет min/max значения чисел и доступные операции.
+              Это позволяет легко изменять сложность
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎲 Генерация задач</h2>
+          <p>Создаём функцию для генерации случайных математических задач:</p>
+
+          <div class="code-block">
+            <pre>
+function generateProblem() {
+    const settings = difficultySettings[difficulty];
+    
+    // Выбираем случайную операцию
+    const operation = settings.operations[
+        Math.floor(Math.random() * settings.operations.length)
+    ];
+    
+    // Генерируем случайные числа
+    let num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
+    let num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
+    
+    // Для деления делаем так, чтобы результат был целым
+    if (operation === '/') {
+        num1 = num2 * Math.floor(Math.random() * 10 + 1);
+    }
+    
+    // Вычисляем правильный ответ
+    let answer;
+    switch (operation) {
+        case '+': answer = num1 + num2; break;
+        case '-': answer = num1 - num2; break;
+        case '*': answer = num1 * num2; break;
+        case '/': answer = num1 / num2; break;
+    }
+    
+    // Сохраняем задачу
+    currentProblem = { num1, num2, operation, answer };
+    
+    // Отображаем задачу
+    const displayOp = operation === '*' ? '×' : operation;
+    document.getElementById('mathProblem').textContent = `${num1} ${displayOp} ${num2} = ?`;
+    
+    // Очищаем поле ввода и сообщения
+    document.getElementById('answerInput').value = '';
+    document.getElementById('feedback').textContent = 'Введи ответ и нажми "Проверить"!';
+    document.getElementById('feedback').className = 'feedback';
+}</pre
+            >
+          </div>
+
+          <div class="highlight">
+            <h4>🧮 Логика генерации:</h4>
+            <p>
+              • Выбираем случайную операцию из доступных для уровня<br />
+              • Для деления создаём числа так, чтобы результат был целым<br />
+              • Заменяем * на × для красивого отображения<br />
+              • Сохраняем правильный ответ для проверки
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>✅ Проверка ответов</h2>
+          <p>Создаём систему проверки ответов и начисления очков:</p>
+
+          <div class="code-block">
+            <pre>
+function checkAnswer() {
+    const userAnswer = parseFloat(document.getElementById('answerInput').value);
+    const feedback = document.getElementById('feedback');
+    
+    // Проверяем, что введено число
+    if (isNaN(userAnswer)) {
+        feedback.textContent = '❌ Введи число!';
+        feedback.className = 'feedback wrong';
+        return;
+    }
+    
+    // Проверяем правильность ответа (с небольшой погрешностью для дробей)
+    if (Math.abs(userAnswer - currentProblem.answer) < 0.01) {
+        // Правильный ответ!
+        streak++;
+        totalSolved++;
+        
+        // Начисляем очки в зависимости от сложности и серии
+        const basePoints = {
+            easy: 10,
+            medium: 25,
+            hard: 50
+        };
+        
+        const points = basePoints[difficulty] + (streak * 5);
+        score += points;
+        
+        feedback.textContent = `🎉 Правильно! +${points} очков! Серия: ${streak}`;
+        feedback.className = 'feedback correct';
+        
+        // Проверяем повышение уровня
+        checkLevelUp();
+        
+        // Генерируем новую задачу через 1.5 секунды
+        setTimeout(() => generateProblem(), 1500);
+        
+    } else {
+        // Неправильный ответ
+        streak = 0;
+        feedback.textContent = `❌ Неверно! Правильный ответ: ${currentProblem.answer}`;
+        feedback.className = 'feedback wrong';
+    }
+    
+    // Обновляем статистику
+    updateStats();
+}</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 Система прогрессии</h2>
+          <p>Добавляем повышение уровня и обновление статистики:</p>
+
+          <div class="code-block">
+            <pre>
+function checkLevelUp() {
+    // Каждые 10 решённых задач - новый уровень
+    const newLevel = Math.floor(totalSolved / 10) + 1;
+    
+    if (newLevel > level) {
+        level = newLevel;
+        
+        // Показываем поздравление
+        setTimeout(() => {
+            alert(`🚀 Поздравляем! Ты достиг ${level} уровня!`);
+        }, 200);
+        
+        // Можно добавить особые эффекты
+        createLevelUpEffect();
+    }
+}
+
+function updateStats() {
+    // Обновляем отображение статистики
+    document.getElementById('level').textContent = level;
+    document.getElementById('score').textContent = score;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('total').textContent = totalSolved;
+}
+
+function createLevelUpEffect() {
+    // Создаём визуальный эффект повышения уровня
+    const effect = document.createElement('div');
+    effect.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        color: #00b894;
+        font-weight: bold;
+        z-index: 1000;
+        animation: levelUp 2s ease-out forwards;
+    `;
+    effect.textContent = `LEVEL UP! 🚀`;
+    document.body.appendChild(effect);
+    
+    setTimeout(() => effect.remove(), 2000);
+}</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>⚙️ Управление сложностью</h2>
+          <p>Функция для переключения уровней сложности:</p>
+
+          <div class="code-block">
+            <pre>
+function setDifficulty(newDifficulty) {
+    difficulty = newDifficulty;
+    
+    // Обновляем активную кнопку
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(newDifficulty).classList.add('active');
+    
+    // Генерируем новую задачу с новой сложностью
+    generateProblem();
+    
+    // Показываем уведомление
+    const difficultyNames = {
+        easy: 'Лёгкий',
+        medium: 'Средний', 
+        hard: 'Сложный'
+    };
+    
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = `🎯 Установлен ${difficultyNames[newDifficulty]} уровень сложности!`;
+    feedback.className = 'feedback';
+    
+    setTimeout(() => {
+        feedback.textContent = 'Введи ответ и нажми "Проверить"!';
+    }, 2000);
+}</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>⌨️ Поддержка Enter</h2>
+          <p>Добавляем удобство - проверку ответа по нажатию Enter:</p>
+
+          <div class="code-block">
+            <pre>
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        checkAnswer();
+    }
+}
+
+// Добавляем обработчик в HTML поле ввода:
+// &lt;input onkeypress="handleKeyPress(event)"&gt;</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎮 Интерактивная демонстрация</h2>
+          <p>Попробуй нашу систему квестов в действии:</p>
+
+          <div class="demo-container">
+            <div class="demo-quest">
+              <h3 style="margin-bottom: 15px; color: #667eea">
+                🎯 Математические квесты
+              </h3>
+
+              <div class="demo-stats">
+                <div class="stat-card">
+                  <div style="font-size: 1.3rem" id="demoLevel">1</div>
+                  <div style="font-size: 0.8rem">Уровень</div>
+                </div>
+                <div class="stat-card">
+                  <div style="font-size: 1.3rem" id="demoScore">0</div>
+                  <div style="font-size: 0.8rem">Очки</div>
+                </div>
+                <div class="stat-card">
+                  <div style="font-size: 1.3rem" id="demoStreak">0</div>
+                  <div style="font-size: 0.8rem">Серия</div>
+                </div>
+                <div class="stat-card">
+                  <div style="font-size: 1.3rem" id="demoTotal">0</div>
+                  <div style="font-size: 0.8rem">Всего</div>
+                </div>
+              </div>
+
+              <div style="margin: 15px 0">
+                <button
+                  class="demo-btn"
+                  onclick="setDemoDifficulty('easy')"
+                  id="demoEasy"
+                  style="background: #00b894"
+                >
+                  😊 Лёгкий
+                </button>
+                <button
+                  class="demo-btn"
+                  onclick="setDemoDifficulty('medium')"
+                  id="demoMedium"
+                >
+                  😎 Средний
+                </button>
+                <button
+                  class="demo-btn"
+                  onclick="setDemoDifficulty('hard')"
+                  id="demoHard"
+                >
+                  🤯 Сложный
+                </button>
+              </div>
+
+              <div class="demo-problem">
+                <div
+                  style="font-weight: bold; color: #d63031; margin-bottom: 10px"
+                >
+                  🎯 Твоя задача:
+                </div>
+                <div style="font-size: 1.5rem; margin: 10px 0" id="demoProblem">
+                  2 + 3 = ?
+                </div>
+                <div class="demo-input">
+                  <input
+                    type="number"
+                    id="demoAnswer"
+                    placeholder="?"
+                    onkeypress="if(event.key==='Enter') checkDemoAnswer()"
+                  />
+                  <button class="demo-btn" onclick="checkDemoAnswer()">
+                    ✅ Проверить
+                  </button>
+                </div>
+                <div
+                  style="margin-top: 10px; font-weight: bold"
+                  id="demoFeedback"
+                >
+                  Введи ответ и нажми "Проверить"!
+                </div>
+              </div>
+
+              <button
+                class="demo-btn"
+                onclick="generateDemoProblem()"
+                style="background: #74b9ff"
+              >
+                🎲 Новая задача
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📈 Расширенная статистика</h2>
+          <p>Добавим более детальную статистику игрока:</p>
+
+          <div class="code-block">
+            <pre>
+// Дополнительные статистические переменные
+let correctAnswers = 0;
+let wrongAnswers = 0;
+let bestStreak = 0;
+let timeSpent = 0;
+let sessionStart = Date.now();
+
+function updateDetailedStats() {
+    // Обновляем лучшую серию
+    if (streak > bestStreak) {
+        bestStreak = streak;
+    }
+    
+    // Подсчитываем время сессии
+    timeSpent = Math.floor((Date.now() - sessionStart) / 1000);
+    
+    // Можно добавить отображение дополнительной статистики
+    const accuracy = totalSolved > 0 ? Math.round((correctAnswers / totalSolved) * 100) : 0;
+    
+    console.log(`Точность: ${accuracy}%, Лучшая серия: ${bestStreak}, Время: ${timeSpent}с`);
+}
+
+function getPlayerRank() {
+    // Система рангов основанная на очках
+    if (score < 100) return { rank: 'Новичок', icon: '🔰' };
+    if (score < 500) return { rank: 'Ученик', icon: '📚' };
+    if (score < 1000) return { rank: 'Математик', icon: '🧮' };
+    if (score < 2000) return { rank: 'Эксперт', icon: '⭐' };
+    return { rank: 'Гений', icon: '👑' };
+}</pre
+            >
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎓 Итоги урока</h2>
+          <ul style="font-size: 1.1rem; line-height: 1.8">
+            <li>
+              <strong>Генерация задач:</strong> Создали систему случайных
+              математических примеров
+            </li>
+            <li>
+              <strong>Уровни сложности:</strong> Настроили разные параметры для
+              каждого уровня
+            </li>
+            <li>
+              <strong>Система очков:</strong> Реализовали подсчёт очков с
+              бонусами за серии
+            </li>
+            <li>
+              <strong>Прогрессия:</strong> Добавили повышение уровня игрока
+            </li>
+            <li>
+              <strong>Статистика:</strong> Отслеживаем детальную информацию о
+              игре
+            </li>
+            <li>
+              <strong>Интерактивность:</strong> Обработали пользовательский ввод
+              и обратную связь
+            </li>
+          </ul>
+
+          <div class="highlight">
+            <h4>🚀 Что дальше?</h4>
+            <p>
+              В финальном уроке мы добавим систему достижений, визуальные
+              эффекты, анимации и сделаем последние штрихи для создания
+              полноценного игрового приложения!
+            </p>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <a href="calc-lesson-3.html" class="nav-btn"> ← Предыдущий урок </a>
+          <a href="calc-lesson-5.html" class="nav-btn"> Следующий урок → </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демонстрационная система квестов
+      let demoDifficulty = "easy";
+      let demoCurrentProblem = {};
+      let demoLevel = 1;
+      let demoScore = 0;
+      let demoStreak = 0;
+      let demoTotal = 0;
+
+      const demoDifficultySettings = {
+        easy: { min: 1, max: 10, operations: ["+", "-"] },
+        medium: { min: 1, max: 50, operations: ["+", "-", "*"] },
+        hard: { min: 1, max: 100, operations: ["+", "-", "*", "/"] },
+      };
+
+      function generateDemoProblem() {
+        const settings = demoDifficultySettings[demoDifficulty];
+        const operation =
+          settings.operations[
+            Math.floor(Math.random() * settings.operations.length)
+          ];
+
+        let num1 =
+          Math.floor(Math.random() * (settings.max - settings.min + 1)) +
+          settings.min;
+        let num2 =
+          Math.floor(Math.random() * (settings.max - settings.min + 1)) +
+          settings.min;
+
+        if (operation === "/") {
+          num1 = num2 * Math.floor(Math.random() * 10 + 1);
+        }
+
+        let answer;
+        switch (operation) {
+          case "+":
+            answer = num1 + num2;
+            break;
+          case "-":
+            answer = num1 - num2;
+            break;
+          case "*":
+            answer = num1 * num2;
+            break;
+          case "/":
+            answer = num1 / num2;
+            break;
+        }
+
+        demoCurrentProblem = { num1, num2, operation, answer };
+
+        const displayOp = operation === "*" ? "×" : operation;
+        document.getElementById(
+          "demoProblem"
+        ).textContent = `${num1} ${displayOp} ${num2} = ?`;
+        document.getElementById("demoAnswer").value = "";
+        document.getElementById("demoFeedback").textContent =
+          'Введи ответ и нажми "Проверить"!';
+        document.getElementById("demoFeedback").style.color = "#333";
+      }
+
+      function checkDemoAnswer() {
+        const userAnswer = parseFloat(
+          document.getElementById("demoAnswer").value
+        );
+        const feedback = document.getElementById("demoFeedback");
+
+        if (isNaN(userAnswer)) {
+          feedback.textContent = "❌ Введи число!";
+          feedback.style.color = "#e17055";
+          return;
+        }
+
+        if (Math.abs(userAnswer - demoCurrentProblem.answer) < 0.01) {
+          demoStreak++;
+          demoTotal++;
+
+          const basePoints = { easy: 10, medium: 25, hard: 50 };
+          const points = basePoints[demoDifficulty] + demoStreak * 5;
+          demoScore += points;
+
+          feedback.textContent = `🎉 Правильно! +${points} очков!`;
+          feedback.style.color = "#00b894";
+
+          const newLevel = Math.floor(demoTotal / 5) + 1;
+          if (newLevel > demoLevel) {
+            demoLevel = newLevel;
+            setTimeout(() => alert(`🚀 Уровень ${demoLevel}!`), 100);
+          }
+
+          updateDemoStats();
+          setTimeout(() => generateDemoProblem(), 1500);
+        } else {
+          demoStreak = 0;
+          feedback.textContent = `❌ Неверно! Ответ: ${demoCurrentProblem.answer}`;
+          feedback.style.color = "#e17055";
+          updateDemoStats();
+        }
+      }
+
+      function updateDemoStats() {
+        document.getElementById("demoLevel").textContent = demoLevel;
+        document.getElementById("demoScore").textContent = demoScore;
+        document.getElementById("demoStreak").textContent = demoStreak;
+        document.getElementById("demoTotal").textContent = demoTotal;
+      }
+
+      function setDemoDifficulty(newDifficulty) {
+        demoDifficulty = newDifficulty;
+
+        document
+          .querySelectorAll("#demoEasy, #demoMedium, #demoHard")
+          .forEach((btn) => {
+            btn.style.background = "#6c5ce7";
+          });
+        document.getElementById(
+          "demo" +
+            newDifficulty.charAt(0).toUpperCase() +
+            newDifficulty.slice(1)
+        ).style.background = "#00b894";
+
+        generateDemoProblem();
+
+        const names = { easy: "Лёгкий", medium: "Средний", hard: "Сложный" };
+        document.getElementById(
+          "demoFeedback"
+        ).textContent = `🎯 ${names[newDifficulty]} уровень!`;
+        document.getElementById("demoFeedback").style.color = "#667eea";
+      }
+
+      // Инициализация демо
+      document.addEventListener("DOMContentLoaded", function () {
+        generateDemoProblem();
+
+        // CSS для анимации повышения уровня
+        const style = document.createElement("style");
+        style.textContent = `
+          @keyframes levelUp {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
+      });
+    </script>
+  </body>
+</html>

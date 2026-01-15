@@ -19,12 +19,16 @@ import "./ProjectPage.css"; // Импортируем стили из новог
 const InterfaceHeader = ({
   currentStepIndex,
   totalSteps,
+  completedStepsCount,
   onPrev,
   onNext,
   isNextDisabled,
   courseSlug,
   onShowExample,
 }) => {
+  const progressPercentage =
+    totalSteps > 0 ? Math.round((completedStepsCount / totalSteps) * 100) : 0;
+
   return (
     <header className="interface-header">
       <div className="header-course-link">
@@ -34,8 +38,21 @@ const InterfaceHeader = ({
           <span style={{ color: "var(--text-light)" }}>&larr; Загрузка...</span>
         )}
       </div>
-      <div className="step-counter">
-        Шаг {currentStepIndex + 1} из {totalSteps}
+      <div className="step-info">
+        <div className="step-counter">
+          Шаг {currentStepIndex + 1} из {totalSteps}
+        </div>
+        <div className="progress-indicator">
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+          <span className="progress-text">
+            {completedStepsCount}/{totalSteps} выполнено ({progressPercentage}%)
+          </span>
+        </div>
       </div>
       <div className="header-actions">
         <button onClick={onPrev} disabled={currentStepIndex === 0}>
@@ -83,9 +100,28 @@ const ProjectPage = observer(() => {
         .map((p) => p.step_id);
 
       setCompletedSteps(new Set(completedIds));
-      setCurrentStepIndex(0); // Всегда начинаем с первого шага
+
+      // --- НОВАЯ ЛОГИКА: Начинаем с последнего пройденного шага + 1 ---
+      const lastCompletedIndex = projectStore.lastCompletedStepIndex;
+      let startStepIndex = 0;
+
+      if (lastCompletedIndex >= 0) {
+        // Если есть пройденные шаги, переходим к следующему после последнего пройденного
+        const nextStepIndex = lastCompletedIndex + 1;
+        const totalSteps = projectStore.currentProject.steps?.length || 0;
+
+        if (nextStepIndex < totalSteps) {
+          // Есть непройденные шаги - переходим к следующему
+          startStepIndex = nextStepIndex;
+        } else {
+          // Все шаги пройдены - остаемся на последнем
+          startStepIndex = lastCompletedIndex;
+        }
+      }
+
+      setCurrentStepIndex(startStepIndex);
     }
-  }, [projectStore.currentProject]);
+  }, [projectStore.currentProject, projectStore.lastCompletedStepIndex]);
 
   // Эффект №3: ТОЛЬКО для реакции на результат проверки.
   useEffect(() => {
@@ -104,8 +140,8 @@ const ProjectPage = observer(() => {
         if (currentStepIndex < project.steps.length - 1) {
           goToNextStep();
         } else {
-        //   toastSuccess("Поздравляем! Вы завершили проект!");
-		  navigate(`/projects/${projectId}/complete`);
+          //   toastSuccess("Поздравляем! Вы завершили проект!");
+          navigate(`/projects/${projectId}/complete`);
         }
       }, 1500);
       return () => clearTimeout(timer);
@@ -165,6 +201,7 @@ const ProjectPage = observer(() => {
       <InterfaceHeader
         currentStepIndex={currentStepIndex}
         totalSteps={project.steps.length}
+        completedStepsCount={completedSteps.size}
         onPrev={goToPrevStep}
         onNext={goToNextStep}
         isNextDisabled={!isCurrentStepCompleted && !isLastStep}
@@ -177,7 +214,11 @@ const ProjectPage = observer(() => {
         minSize={300} // Минимальный размер каждой панели
         gutterSize={10}
       >
-        <TaskPanel project={project} currentStep={currentStep} onCheck={handleCheck} />
+        <TaskPanel
+          project={project}
+          currentStep={currentStep}
+          onCheck={handleCheck}
+        />
         <Workspace project={project} currentStep={currentStep} />
       </Split>
       <ExampleModal

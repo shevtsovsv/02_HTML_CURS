@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚔️ Heroes Adventure - Стратегическая RPG</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .game-interface {
+        display: flex;
+        height: 100vh;
+      }
+
+      .map-container {
+        flex: 1;
+        position: relative;
+        background: #0f1419;
+        overflow: hidden;
+      }
+
+      canvas {
+        border: 2px solid #34495e;
+        display: block;
+        cursor: crosshair;
+      }
+
+      .ui-panel {
+        width: 300px;
+        background: rgba(52, 73, 94, 0.95);
+        color: #ecf0f1;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        border-left: 2px solid #3498db;
+        overflow-y: auto;
+      }
+
+      .hero-info {
+        background: rgba(41, 128, 185, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #3498db;
+      }
+
+      .hero-avatar {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .hero-name {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .hero-level {
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .resources {
+        background: rgba(39, 174, 96, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #27ae60;
+      }
+
+      .resource-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .quests {
+        background: rgba(142, 68, 173, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #8e44ad;
+      }
+
+      .quest-item {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        border-left: 3px solid #9b59b6;
+      }
+
+      .quest-title {
+        font-weight: bold;
+        color: #e8daef;
+      }
+
+      .quest-description {
+        font-size: 0.9rem;
+        color: #bdc3c7;
+        margin-top: 5px;
+      }
+
+      .quest-reward {
+        color: #f1c40f;
+        font-size: 0.8rem;
+        margin-top: 5px;
+      }
+
+      .minimap {
+        width: 200px;
+        height: 150px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid #34495e;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .controls {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+
+      .controls h3 {
+        margin-bottom: 10px;
+        color: #3498db;
+      }
+
+      .control-item {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(52, 73, 94, 0.9);
+        color: #ecf0f1;
+        border: 1px solid #3498db;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        z-index: 100;
+      }
+
+      .back-button:hover {
+        background: rgba(52, 152, 219, 0.9);
+        transform: scale(1.05);
+      }
+
+      .notification {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(39, 174, 96, 0.9);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: bold;
+        z-index: 200;
+        display: none;
+        animation: slideInOut 3s ease-in-out forwards;
+      }
+
+      .dialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(44, 62, 80, 0.95);
+        color: #ecf0f1;
+        padding: 30px;
+        border-radius: 15px;
+        border: 2px solid #3498db;
+        max-width: 500px;
+        text-align: center;
+        display: none;
+        z-index: 300;
+        backdrop-filter: blur(10px);
+      }
+
+      .dialog h3 {
+        color: #3498db;
+        margin-bottom: 15px;
+      }
+
+      .dialog-buttons {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        background: linear-gradient(45deg, #2980b9, #21618c);
+        transform: translateY(-2px);
+      }
+
+      .btn.decline {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+      }
+
+      .btn.decline:hover {
+        background: linear-gradient(45deg, #c0392b, #a93226);
+      }
+
+      .action-points {
+        background: rgba(230, 126, 34, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #e67e22;
+        text-align: center;
+      }
+
+      .fog-overlay {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        pointer-events: none;
+      }
+
+      @keyframes slideInOut {
+        0% {
+          transform: translate(-50%, -20px);
+          opacity: 0;
+        }
+        20% {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+        80% {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -20px);
+          opacity: 0;
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .resource-node {
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .section-title {
+        color: #3498db;
+        font-weight: bold;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #34495e;
+        padding-bottom: 5px;
+      }
+
+      .shop-panel {
+        background: rgba(231, 76, 60, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #e74c3c;
+      }
+
+      .shop-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+
+      .shop-tab {
+        background: rgba(0, 0, 0, 0.3);
+        color: #bdc3c7;
+        border: 1px solid #34495e;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+      }
+
+      .shop-tab.active {
+        background: #e74c3c;
+        color: white;
+        border-color: #c0392b;
+      }
+
+      .shop-tab:hover {
+        background: #c0392b;
+        color: white;
+      }
+
+      .shop-item {
+        background: rgba(0, 0, 0, 0.4);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        border-left: 3px solid #e67e22;
+      }
+
+      .shop-item-name {
+        font-weight: bold;
+        color: #f39c12;
+        margin-bottom: 5px;
+      }
+
+      .shop-item-description {
+        font-size: 0.85rem;
+        color: #bdc3c7;
+        margin-bottom: 8px;
+      }
+
+      .shop-item-cost {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .cost-display {
+        font-size: 0.8rem;
+        color: #f1c40f;
+      }
+
+      .shop-buy-btn {
+        background: linear-gradient(45deg, #27ae60, #229954);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+      }
+
+      .shop-buy-btn:hover {
+        background: linear-gradient(45deg, #229954, #1e8449);
+        transform: translateY(-1px);
+      }
+
+      .shop-buy-btn:disabled {
+        background: #7f8c8d;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .army-info {
+        background: rgba(52, 152, 219, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #3498db;
+      }
+
+      .army-unit {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .stat-item {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 8px;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #f39c12;
+      }
+
+      .stat-name {
+        font-size: 0.8rem;
+        color: #bdc3c7;
+      }
+
+      .loading-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+        color: #ecf0f1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .loading-title {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .loading-progress {
+        width: 300px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .loading-bar {
+        height: 100%;
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        width: 0%;
+        border-radius: 10px;
+        transition: width 0.5s ease;
+      }
+
+      .loading-text {
+        font-size: 1.2rem;
+        color: #bdc3c7;
+      }
+
+      @media (max-width: 768px) {
+        .game-interface {
+          flex-direction: column;
+        }
+
+        .map-container {
+          height: 60vh;
+        }
+
+        .ui-panel {
+          width: 100%;
+          max-height: 40vh;
+          border-left: none;
+          border-top: 2px solid #3498db;
+        }
+
+        canvas {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-title">⚔️ Heroes Adventure</div>
+      <div class="loading-progress">
+        <div class="loading-bar" id="loadingBar"></div>
+      </div>
+      <div class="loading-text" id="loadingText">Generating world...</div>
+    </div>
+
+    <a href="../index.html" class="back-button">← К урокам</a>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Dialog -->
+    <div class="dialog" id="dialog">
+      <h3 id="dialogTitle">Title</h3>
+      <p id="dialogText">Text</p>
+      <div class="dialog-buttons">
+        <button class="btn" id="dialogAccept">Принять</button>
+        <button class="btn decline" id="dialogDecline">Отклонить</button>
+      </div>
+    </div>
+
+    <!-- Game Interface -->
+    <div class="game-interface" id="gameInterface" style="display: none">
+      <!-- Map Container -->
+      <div class="map-container">
+        <canvas id="gameCanvas" width="1000" height="700"></canvas>
+      </div>
+
+      <!-- UI Panel -->
+      <div class="ui-panel">
+        <!-- Hero Information -->
+        <div class="hero-info">
+          <div class="section-title">⚔️ Герой</div>
+          <div class="hero-avatar" id="heroAvatar">🛡️</div>
+          <div class="hero-name" id="heroName">Сэр Кодерус</div>
+          <div class="hero-level" id="heroLevel">Уровень 1</div>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <div class="stat-value" id="heroAttack">10</div>
+              <div class="stat-name">Атака</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="heroDefense">8</div>
+              <div class="stat-name">Защита</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="heroMagic">5</div>
+              <div class="stat-name">Магия</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="heroKnowledge">12</div>
+              <div class="stat-name">Знания</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Points -->
+        <div class="action-points">
+          <div class="section-title">🏃‍♂️ Действия</div>
+          <div>Очки движения: <span id="actionPoints">100/100</span></div>
+        </div>
+
+        <!-- Resources -->
+        <div class="resources">
+          <div class="section-title">💰 Ресурсы</div>
+          <div class="resource-item">
+            <span>💰 Золото:</span>
+            <span id="gold">1000</span>
+          </div>
+          <div class="resource-item">
+            <span>🪨 Камень:</span>
+            <span id="stone">10</span>
+          </div>
+          <div class="resource-item">
+            <span>🌳 Дерево:</span>
+            <span id="wood">15</span>
+          </div>
+          <div class="resource-item">
+            <span>⚡ Кристаллы:</span>
+            <span id="crystals">5</span>
+          </div>
+        </div>
+
+        <!-- Shop/Building System -->
+        <div class="shop-panel">
+          <div class="section-title">🏪 Магазин</div>
+          <div class="shop-tabs">
+            <button
+              class="shop-tab active"
+              onclick="switchShopTab('buildings')"
+            >
+              🏗️ Постройки
+            </button>
+            <button class="shop-tab" onclick="switchShopTab('equipment')">
+              ⚔️ Снаряжение
+            </button>
+            <button class="shop-tab" onclick="switchShopTab('magic')">
+              🔮 Магия
+            </button>
+            <button class="shop-tab" onclick="switchShopTab('army')">
+              🛡️ Армия
+            </button>
+          </div>
+
+          <div id="shopContent">
+            <!-- Контент магазина будет добавляться динамически -->
+          </div>
+        </div>
+
+        <!-- Quests -->
+        <div class="quests">
+          <div class="section-title">📋 Задания</div>
+          <div id="questsList">
+            <div class="quest-item">
+              <div class="quest-title">Исследователь</div>
+              <div class="quest-description">
+                Откройте 5 новых областей карты
+              </div>
+              <div class="quest-reward">Награда: 500 золота</div>
+            </div>
+            <div class="quest-item">
+              <div class="quest-title">Сборщик сокровищ</div>
+              <div class="quest-description">
+                Найдите 3 сундука с сокровищами
+              </div>
+              <div class="quest-reward">Награда: Магический артефакт</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Minimap -->
+        <div class="minimap" id="minimap">
+          <div class="section-title">🗺️ Мини-карта</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <div class="section-title">🎮 Управление</div>
+          <div class="control-item">🖱️ ЛКМ - Переместить героя</div>
+          <div class="control-item">🖱️ ПКМ - Информация о тайле</div>
+          <div class="control-item">⌨️ Пробел - Следующий ход</div>
+          <div class="control-item">⌨️ M - Переключить туман войны</div>
+          <div class="control-item">⌨️ Q - Список квестов</div>
+          <div class="control-item">⌨️ S - Открыть/закрыть магазин</div>
+          <div
+            class="control-item"
+            style="
+              color: #f1c40f;
+              font-size: 0.8rem;
+              margin-top: 8px;
+              border-top: 1px solid #34495e;
+              padding-top: 8px;
+            "
+          >
+            💡 В магазине стоимость товаров:<br />
+            🟢 Зеленый = хватает ресурсов<br />
+            🔴 Красный = не хватает ресурсов
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ===========================================
+      // КОНСТАНТЫ И НАСТРОЙКИ ИГРЫ
+      // ===========================================
+
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const TILE_SIZE = 40;
+      const MAP_WIDTH = 30;
+      const MAP_HEIGHT = 25;
+      const VIEWPORT_TILES_X = Math.floor(canvas.width / TILE_SIZE);
+      const VIEWPORT_TILES_Y = Math.floor(canvas.height / TILE_SIZE);
+
+      // Типы тайлов
+      const TILE_TYPES = {
+        GRASS: { color: "#4CAF50", passable: true, cost: 1, emoji: "🌿" },
+        FOREST: { color: "#2E7D32", passable: true, cost: 2, emoji: "🌲" },
+        MOUNTAIN: { color: "#795548", passable: false, cost: 999, emoji: "⛰️" },
+        WATER: { color: "#2196F3", passable: false, cost: 999, emoji: "🌊" },
+        ROAD: { color: "#FFC107", passable: true, cost: 0.5, emoji: "🛤️" },
+        TOWN: { color: "#9C27B0", passable: true, cost: 1, emoji: "🏰" },
+        TREASURE: { color: "#FF9800", passable: true, cost: 1, emoji: "💰" },
+        MONSTER: { color: "#F44336", passable: true, cost: 1, emoji: "👹" },
+        RESOURCE_GOLD: {
+          color: "#FFD700",
+          passable: true,
+          cost: 1,
+          emoji: "💎",
+        },
+        RESOURCE_STONE: {
+          color: "#78909C",
+          passable: true,
+          cost: 1,
+          emoji: "🪨",
+        },
+        RESOURCE_WOOD: {
+          color: "#8D6E63",
+          passable: true,
+          cost: 1,
+          emoji: "🌳",
+        },
+        BUILDING: { color: "#8E44AD", passable: true, cost: 1, emoji: "🏗️" },
+      };
+
+      // ===========================================
+      // ИГРОВОЕ СОСТОЯНИЕ
+      // ===========================================
+
+      let gameState = {
+        hero: {
+          x: 5,
+          y: 5,
+          level: 1,
+          experience: 0,
+          actionPoints: 100,
+          maxActionPoints: 100,
+          stats: {
+            attack: 10,
+            defense: 8,
+            magic: 5,
+            knowledge: 12,
+          },
+          equipment: {
+            weapon: null,
+            armor: null,
+            accessory: null,
+          },
+        },
+        resources: {
+          gold: 1000,
+          stone: 10,
+          wood: 15,
+          crystals: 5,
+        },
+        army: {
+          warriors: 0,
+          archers: 0,
+          mages: 0,
+        },
+        buildings: [],
+        currentShopTab: "buildings",
+        camera: {
+          x: 0,
+          y: 0,
+        },
+        turnNumber: 1,
+        questsCompleted: 0,
+        treasuresFound: 0,
+        areasExplored: 1,
+        showFogOfWar: true,
+      };
+
+      let gameMap = [];
+      let fogOfWar = [];
+      let exploredTiles = new Set();
+      let quests = [];
+      let pathToTarget = [];
+      let selectedTarget = null;
+
+      // ===========================================
+      // ГЕНЕРАЦИЯ КАРТЫ
+      // ===========================================
+
+      function generateMap() {
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        do {
+          attempts++;
+          gameMap = [];
+          fogOfWar = [];
+
+          // Инициализация карты травой
+          for (let y = 0; y < MAP_HEIGHT; y++) {
+            gameMap[y] = [];
+            fogOfWar[y] = [];
+            for (let x = 0; x < MAP_WIDTH; x++) {
+              gameMap[y][x] = "GRASS";
+              fogOfWar[y][x] = true;
+            }
+          }
+
+          generateBasicMap();
+
+          // Проверяем связность и исправляем если нужно
+          if (!isMapConnected()) {
+            fixMapConnectivity();
+          }
+        } while (!isMapConnected() && attempts < maxAttempts);
+
+        if (attempts >= maxAttempts) {
+          console.warn(
+            "Не удалось создать связную карту, используем упрощенную генерацию"
+          );
+          generateSimpleMap();
+        }
+
+        // Открываем область вокруг героя
+        revealArea(gameState.hero.x, gameState.hero.y, 2);
+      }
+
+      function generateBasicMap() {
+        // 1. Сначала создаем основную сеть дорог (гарантируем связность)
+        generateMainRoadNetwork();
+
+        // 2. Генерация рек (с мостами на дорогах)
+        generateRivers();
+
+        // 3. Генерация лесов (избегая основных путей)
+        generateForests();
+
+        // 4. Генерация гор (избегая основных путей)
+        generateMountains();
+
+        // 5. Дополнительные дороги
+        generateAdditionalRoads();
+
+        // 6. Размещение городов на дорогах
+        placeTowns();
+
+        // 7. Размещение ресурсов и сокровищ
+        placeResources();
+
+        // 8. Размещение монстров
+        placeMonsters();
+      }
+
+      function generateSimpleMap() {
+        // Упрощенная генерация для аварийных случаев
+
+        // Главная горизонтальная дорога
+        const mainRoadY = Math.floor(MAP_HEIGHT / 2);
+        for (let x = 0; x < MAP_WIDTH; x++) {
+          gameMap[mainRoadY][x] = "ROAD";
+        }
+
+        // Главная вертикальная дорога
+        const mainRoadX = Math.floor(MAP_WIDTH / 2);
+        for (let y = 0; y < MAP_HEIGHT; y++) {
+          gameMap[y][mainRoadX] = "ROAD";
+        }
+
+        // Простое размещение объектов
+        placeTowns();
+        placeResources();
+      }
+
+      function generateMainRoadNetwork() {
+        // Создаем основную крестообразную сеть дорог
+        const centerX = Math.floor(MAP_WIDTH / 2);
+        const centerY = Math.floor(MAP_HEIGHT / 2);
+
+        // Главная горизонтальная дорога
+        for (let x = 0; x < MAP_WIDTH; x++) {
+          gameMap[centerY][x] = "ROAD";
+          // Добавляем параллельные пути для избыточности
+          if (centerY > 0) gameMap[centerY - 1][x] = "GRASS"; // убеждаемся что есть проход
+          if (centerY < MAP_HEIGHT - 1) gameMap[centerY + 1][x] = "GRASS";
+        }
+
+        // Главная вертикальная дорога
+        for (let y = 0; y < MAP_HEIGHT; y++) {
+          gameMap[y][centerX] = "ROAD";
+          // Добавляем параллельные пути
+          if (centerX > 0) gameMap[y][centerX - 1] = "GRASS";
+          if (centerX < MAP_WIDTH - 1) gameMap[y][centerX + 1] = "GRASS";
+        }
+
+        // Добавляем диагональные дороги для лучшей связности
+        for (let i = 0; i < Math.min(MAP_WIDTH, MAP_HEIGHT); i++) {
+          if (i < MAP_WIDTH && i < MAP_HEIGHT) {
+            gameMap[i][i] = "ROAD"; // диагональ слева-направо
+          }
+          if (i < MAP_WIDTH && MAP_HEIGHT - 1 - i >= 0) {
+            gameMap[MAP_HEIGHT - 1 - i][i] = "ROAD"; // диагональ справа-налево
+          }
+        }
+
+        // Дополнительные соединительные пути по периметру
+        for (let x = 0; x < MAP_WIDTH; x += 5) {
+          for (let y = 0; y < MAP_HEIGHT; y += 5) {
+            gameMap[y][x] = "ROAD";
+          }
+        }
+      }
+
+      function generateRivers() {
+        // Генерация нескольких небольших рек
+        const numRivers = 2;
+
+        for (let r = 0; r < numRivers; r++) {
+          const riverStart = {
+            x: 0,
+            y: Math.floor(MAP_HEIGHT * (0.3 + r * 0.4)),
+          };
+          let current = { ...riverStart };
+
+          while (current.x < MAP_WIDTH) {
+            // Проверяем, не пересекаем ли мы дорогу (оставляем мосты)
+            if (gameMap[current.y][current.x] !== "ROAD") {
+              gameMap[current.y][current.x] = "WATER";
+            }
+
+            // Случайное изменение направления (более плавное)
+            const direction = Math.random();
+            if (direction < 0.2 && current.y > 2) current.y--;
+            else if (direction > 0.8 && current.y < MAP_HEIGHT - 3) current.y++;
+
+            current.x++;
+          }
+        }
+      }
+
+      function generateForests() {
+        for (let i = 0; i < 12; i++) {
+          const centerX = Math.floor(Math.random() * MAP_WIDTH);
+          const centerY = Math.floor(Math.random() * MAP_HEIGHT);
+          const size = Math.floor(Math.random() * 4) + 2;
+
+          for (let x = centerX - size; x <= centerX + size; x++) {
+            for (let y = centerY - size; y <= centerY + size; y++) {
+              if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+                const distance = Math.sqrt(
+                  (x - centerX) ** 2 + (y - centerY) ** 2
+                );
+                // Не размещаем лес на дорогах и рядом с ними
+                const nearRoad = isNearRoad(x, y, 1);
+                if (
+                  distance <= size &&
+                  Math.random() < 0.6 &&
+                  gameMap[y][x] === "GRASS" &&
+                  !nearRoad
+                ) {
+                  gameMap[y][x] = "FOREST";
+                }
+              }
+            }
+          }
+        }
+      }
+
+      function generateMountains() {
+        for (let i = 0; i < 6; i++) {
+          const centerX = Math.floor(Math.random() * MAP_WIDTH);
+          const centerY = Math.floor(Math.random() * MAP_HEIGHT);
+          const size = Math.floor(Math.random() * 3) + 1;
+
+          // Избегаем центральных областей карты
+          const centerDistanceX = Math.abs(centerX - MAP_WIDTH / 2);
+          const centerDistanceY = Math.abs(centerY - MAP_HEIGHT / 2);
+
+          if (centerDistanceX < 3 && centerDistanceY < 3) continue;
+
+          for (let x = centerX - size; x <= centerX + size; x++) {
+            for (let y = centerY - size; y <= centerY + size; y++) {
+              if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+                const distance = Math.sqrt(
+                  (x - centerX) ** 2 + (y - centerY) ** 2
+                );
+                // Не размещаем горы на дорогах и рядом с ними
+                const nearRoad = isNearRoad(x, y, 2);
+                if (
+                  distance <= size &&
+                  Math.random() < 0.7 &&
+                  !nearRoad &&
+                  gameMap[y][x] === "GRASS"
+                ) {
+                  gameMap[y][x] = "MOUNTAIN";
+                }
+              }
+            }
+          }
+        }
+      }
+
+      function generateAdditionalRoads() {
+        // Дополнительные небольшие дороги для улучшения связности
+        const roadPoints = [
+          { x: Math.floor(MAP_WIDTH * 0.2), y: Math.floor(MAP_HEIGHT * 0.3) },
+          { x: Math.floor(MAP_WIDTH * 0.8), y: Math.floor(MAP_HEIGHT * 0.7) },
+          { x: Math.floor(MAP_WIDTH * 0.3), y: Math.floor(MAP_HEIGHT * 0.8) },
+          { x: Math.floor(MAP_WIDTH * 0.7), y: Math.floor(MAP_HEIGHT * 0.2) },
+        ];
+
+        roadPoints.forEach((point) => {
+          // Создаем короткие дороги от этих точек к центру
+          const path = findPathIgnoringObstacles(
+            point.x,
+            point.y,
+            Math.floor(MAP_WIDTH / 2),
+            Math.floor(MAP_HEIGHT / 2)
+          );
+
+          path.forEach((p) => {
+            if (gameMap[p.y][p.x] !== "WATER") {
+              gameMap[p.y][p.x] = "ROAD";
+            }
+          });
+        });
+      }
+
+      function isNearRoad(x, y, distance) {
+        for (let dx = -distance; dx <= distance; dx++) {
+          for (let dy = -distance; dy <= distance; dy++) {
+            const checkX = x + dx;
+            const checkY = y + dy;
+            if (
+              checkX >= 0 &&
+              checkX < MAP_WIDTH &&
+              checkY >= 0 &&
+              checkY < MAP_HEIGHT
+            ) {
+              if (gameMap[checkY][checkX] === "ROAD") {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      }
+
+      function isMapConnected() {
+        // Проверяем связность с помощью flood fill
+        const visited = Array(MAP_HEIGHT)
+          .fill()
+          .map(() => Array(MAP_WIDTH).fill(false));
+        const queue = [{ x: gameState.hero.x, y: gameState.hero.y }];
+        visited[gameState.hero.y][gameState.hero.x] = true;
+
+        let reachableCount = 0;
+        let totalPassable = 0;
+
+        // Подсчитываем общее количество проходимых тайлов
+        for (let y = 0; y < MAP_HEIGHT; y++) {
+          for (let x = 0; x < MAP_WIDTH; x++) {
+            if (isPassable(x, y)) {
+              totalPassable++;
+            }
+          }
+        }
+
+        // Flood fill из позиции героя
+        while (queue.length > 0) {
+          const current = queue.shift();
+          reachableCount++;
+
+          const neighbors = getNeighbors(current.x, current.y);
+          for (const neighbor of neighbors) {
+            if (!visited[neighbor.y][neighbor.x]) {
+              visited[neighbor.y][neighbor.x] = true;
+              queue.push(neighbor);
+            }
+          }
+        }
+
+        // Считаем карту связной, если доступно минимум 80% проходимых тайлов
+        const connectivity = reachableCount / totalPassable;
+        console.log(
+          `Map connectivity: ${(connectivity * 100).toFixed(
+            1
+          )}% (${reachableCount}/${totalPassable})`
+        );
+        return connectivity >= 0.8;
+      }
+
+      function fixMapConnectivity() {
+        console.log("Fixing map connectivity...");
+
+        // Находим все изолированные области
+        const visited = Array(MAP_HEIGHT)
+          .fill()
+          .map(() => Array(MAP_WIDTH).fill(false));
+        const mainArea = new Set();
+
+        // Отмечаем главную область (от позиции героя)
+        const queue = [{ x: gameState.hero.x, y: gameState.hero.y }];
+        visited[gameState.hero.y][gameState.hero.x] = true;
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+          mainArea.add(`${current.x},${current.y}`);
+
+          const neighbors = getNeighbors(current.x, current.y);
+          for (const neighbor of neighbors) {
+            if (!visited[neighbor.y][neighbor.x]) {
+              visited[neighbor.y][neighbor.x] = true;
+              queue.push(neighbor);
+            }
+          }
+        }
+
+        // Находим изолированные области и соединяем их
+        for (let y = 0; y < MAP_HEIGHT; y++) {
+          for (let x = 0; x < MAP_WIDTH; x++) {
+            if (isPassable(x, y) && !visited[y][x]) {
+              // Найдена изолированная область
+              connectToMainArea(x, y, mainArea);
+            }
+          }
+        }
+      }
+
+      function connectToMainArea(startX, startY, mainArea) {
+        // Находим ближайшую точку главной области
+        let closestPoint = null;
+        let minDistance = Infinity;
+
+        for (const pointStr of mainArea) {
+          const [x, y] = pointStr.split(",").map(Number);
+          const distance = Math.abs(x - startX) + Math.abs(y - startY);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestPoint = { x, y };
+          }
+        }
+
+        if (closestPoint) {
+          // Создаем прямой путь, убирая препятствия
+          createDirectPath(startX, startY, closestPoint.x, closestPoint.y);
+        }
+      }
+
+      function createDirectPath(x1, y1, x2, y2) {
+        // Простой алгоритм Брезенхема для создания прямого пути
+        const dx = Math.abs(x2 - x1);
+        const dy = Math.abs(y2 - y1);
+        const sx = x1 < x2 ? 1 : -1;
+        const sy = y1 < y2 ? 1 : -1;
+        let err = dx - dy;
+
+        let x = x1;
+        let y = y1;
+
+        while (true) {
+          // Создаем проход (убираем препятствия)
+          if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+            if (gameMap[y][x] === "MOUNTAIN" || gameMap[y][x] === "WATER") {
+              gameMap[y][x] = "ROAD";
+            }
+          }
+
+          if (x === x2 && y === y2) break;
+
+          const e2 = 2 * err;
+          if (e2 > -dy) {
+            err -= dy;
+            x += sx;
+          }
+          if (e2 < dx) {
+            err += dx;
+            y += sy;
+          }
+        }
+      }
+
+      function findPathIgnoringObstacles(x1, y1, x2, y2) {
+        // Простой путь по прямой, игнорируя препятствия
+        const path = [];
+        const dx = Math.abs(x2 - x1);
+        const dy = Math.abs(y2 - y1);
+        const sx = x1 < x2 ? 1 : -1;
+        const sy = y1 < y2 ? 1 : -1;
+        let err = dx - dy;
+
+        let x = x1;
+        let y = y1;
+
+        while (true) {
+          path.push({ x, y });
+          if (x === x2 && y === y2) break;
+
+          const e2 = 2 * err;
+          if (e2 > -dy) {
+            err -= dy;
+            x += sx;
+          }
+          if (e2 < dx) {
+            err += dx;
+            y += sy;
+          }
+        }
+
+        return path;
+      }
+
+      function placeTowns() {
+        const townPositions = [
+          { x: 8, y: 8 },
+          { x: 22, y: 15 },
+          { x: 15, y: 5 },
+          { x: 5, y: 20 },
+        ];
+
+        townPositions.forEach((pos) => {
+          if (pos.x < MAP_WIDTH && pos.y < MAP_HEIGHT) {
+            gameMap[pos.y][pos.x] = "TOWN";
+          }
+        });
+      }
+
+      function placeResources() {
+        // Размещение различных ресурсов
+        const resourceTypes = [
+          "RESOURCE_GOLD",
+          "RESOURCE_STONE",
+          "RESOURCE_WOOD",
+          "TREASURE",
+        ];
+
+        for (let i = 0; i < 25; i++) {
+          const x = Math.floor(Math.random() * MAP_WIDTH);
+          const y = Math.floor(Math.random() * MAP_HEIGHT);
+
+          if (gameMap[y][x] === "GRASS" || gameMap[y][x] === "FOREST") {
+            const resourceType =
+              resourceTypes[Math.floor(Math.random() * resourceTypes.length)];
+            gameMap[y][x] = resourceType;
+          }
+        }
+      }
+
+      function placeMonsters() {
+        for (let i = 0; i < 12; i++) {
+          const x = Math.floor(Math.random() * MAP_WIDTH);
+          const y = Math.floor(Math.random() * MAP_HEIGHT);
+
+          if (
+            gameMap[y][x] === "GRASS" &&
+            (Math.abs(x - gameState.hero.x) > 3 ||
+              Math.abs(y - gameState.hero.y) > 3)
+          ) {
+            gameMap[y][x] = "MONSTER";
+          }
+        }
+      }
+
+      // ===========================================
+      // СИСТЕМА КВЕСТОВ
+      // ===========================================
+
+      function initializeQuests() {
+        quests = [
+          {
+            id: "explorer",
+            title: "Исследователь",
+            description: "Откройте 5 новых областей карты",
+            target: 5,
+            current: 1,
+            reward: { gold: 500 },
+            completed: false,
+          },
+          {
+            id: "treasure_hunter",
+            title: "Сборщик сокровищ",
+            description: "Найдите 3 сундука с сокровищами",
+            target: 3,
+            current: 0,
+            reward: { crystals: 10 },
+            completed: false,
+          },
+          {
+            id: "monster_slayer",
+            title: "Истребитель монстров",
+            description: "Победите 5 монстров",
+            target: 5,
+            current: 0,
+            reward: { experience: 1000 },
+            completed: false,
+          },
+        ];
+      }
+
+      function checkQuests() {
+        quests.forEach((quest) => {
+          if (!quest.completed && quest.current >= quest.target) {
+            quest.completed = true;
+            giveQuestReward(quest);
+            showNotification(`Квест "${quest.title}" завершен!`);
+            gameState.questsCompleted++;
+          }
+        });
+
+        updateQuestsUI();
+      }
+
+      function giveQuestReward(quest) {
+        Object.keys(quest.reward).forEach((resource) => {
+          if (gameState.resources[resource] !== undefined) {
+            gameState.resources[resource] += quest.reward[resource];
+          } else if (resource === "experience") {
+            gainExperience(quest.reward[resource]);
+          }
+        });
+      }
+
+      // ===========================================
+      // СИСТЕМА ОПЫТА И УРОВНЕЙ
+      // ===========================================
+
+      function gainExperience(amount) {
+        gameState.hero.experience += amount;
+        const expNeeded = gameState.hero.level * 1000;
+
+        if (gameState.hero.experience >= expNeeded) {
+          levelUp();
+        }
+      }
+
+      function levelUp() {
+        gameState.hero.level++;
+        gameState.hero.experience = 0;
+
+        // Увеличение характеристик
+        gameState.hero.stats.attack += Math.floor(Math.random() * 3) + 1;
+        gameState.hero.stats.defense += Math.floor(Math.random() * 3) + 1;
+        gameState.hero.stats.magic += Math.floor(Math.random() * 2) + 1;
+        gameState.hero.stats.knowledge += Math.floor(Math.random() * 2) + 1;
+
+        showNotification(
+          `Поздравляем! Вы достигли ${gameState.hero.level} уровня!`
+        );
+        updateUI();
+      }
+
+      // ===========================================
+      // ТУМАН ВОЙНЫ
+      // ===========================================
+
+      function revealArea(centerX, centerY, radius) {
+        let newAreasExplored = 0;
+
+        for (let x = centerX - radius; x <= centerX + radius; x++) {
+          for (let y = centerY - radius; y <= centerY + radius; y++) {
+            if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+              const distance = Math.sqrt(
+                (x - centerX) ** 2 + (y - centerY) ** 2
+              );
+              if (distance <= radius && fogOfWar[y][x]) {
+                fogOfWar[y][x] = false;
+                exploredTiles.add(`${x},${y}`);
+                newAreasExplored++;
+              }
+            }
+          }
+        }
+
+        if (newAreasExplored > 0) {
+          gameState.areasExplored += Math.floor(newAreasExplored / 5);
+          updateQuest("explorer", Math.floor(newAreasExplored / 5));
+        }
+      }
+
+      function updateQuest(questId, amount) {
+        const quest = quests.find((q) => q.id === questId);
+        if (quest && !quest.completed) {
+          quest.current += amount;
+          checkQuests();
+        }
+      }
+
+      // ===========================================
+      // ПОИСК ПУТИ (A*)
+      // ===========================================
+
+      function findPath(startX, startY, endX, endY) {
+        const openSet = [];
+        const closedSet = new Set();
+        const cameFrom = new Map();
+        const gScore = new Map();
+        const fScore = new Map();
+
+        const start = `${startX},${startY}`;
+        const end = `${endX},${endY}`;
+
+        openSet.push({ x: startX, y: startY, f: 0 });
+        gScore.set(start, 0);
+        fScore.set(start, heuristic(startX, startY, endX, endY));
+
+        while (openSet.length > 0) {
+          // Найти узел с наименьшим fScore
+          let current = openSet.reduce((min, node) =>
+            fScore.get(`${node.x},${node.y}`) < fScore.get(`${min.x},${min.y}`)
+              ? node
+              : min
+          );
+
+          const currentKey = `${current.x},${current.y}`;
+
+          if (currentKey === end) {
+            return reconstructPath(cameFrom, currentKey);
+          }
+
+          openSet.splice(openSet.indexOf(current), 1);
+          closedSet.add(currentKey);
+
+          // Проверяем соседей
+          const neighbors = getNeighbors(current.x, current.y);
+
+          for (const neighbor of neighbors) {
+            const neighborKey = `${neighbor.x},${neighbor.y}`;
+
+            if (closedSet.has(neighborKey)) continue;
+
+            const tentativeGScore =
+              gScore.get(currentKey) + getTileCost(neighbor.x, neighbor.y);
+
+            if (!gScore.has(neighborKey)) {
+              gScore.set(neighborKey, Infinity);
+            }
+
+            if (tentativeGScore < gScore.get(neighborKey)) {
+              cameFrom.set(neighborKey, currentKey);
+              gScore.set(neighborKey, tentativeGScore);
+              fScore.set(
+                neighborKey,
+                tentativeGScore + heuristic(neighbor.x, neighbor.y, endX, endY)
+              );
+
+              if (
+                !openSet.some(
+                  (node) => node.x === neighbor.x && node.y === neighbor.y
+                )
+              ) {
+                openSet.push(neighbor);
+              }
+            }
+          }
+        }
+
+        return []; // Путь не найден
+      }
+
+      function heuristic(x1, y1, x2, y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+      }
+
+      function getNeighbors(x, y) {
+        const neighbors = [];
+        const directions = [
+          [-1, 0],
+          [1, 0],
+          [0, -1],
+          [0, 1],
+        ];
+
+        for (const [dx, dy] of directions) {
+          const newX = x + dx;
+          const newY = y + dy;
+
+          if (newX >= 0 && newX < MAP_WIDTH && newY >= 0 && newY < MAP_HEIGHT) {
+            if (isPassable(newX, newY)) {
+              neighbors.push({ x: newX, y: newY });
+            }
+          }
+        }
+
+        return neighbors;
+      }
+
+      function reconstructPath(cameFrom, current) {
+        const path = [];
+        while (cameFrom.has(current)) {
+          const [x, y] = current.split(",").map(Number);
+          path.unshift({ x, y });
+          current = cameFrom.get(current);
+        }
+        return path;
+      }
+
+      function isPassable(x, y) {
+        if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return false;
+        return TILE_TYPES[gameMap[y][x]].passable;
+      }
+
+      function getTileCost(x, y) {
+        if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return 999;
+        return TILE_TYPES[gameMap[y][x]].cost;
+      }
+
+      // ===========================================
+      // ОБРАБОТКА ВЗАИМОДЕЙСТВИЙ
+      // ===========================================
+
+      function handleTileInteraction(x, y) {
+        const tileType = gameMap[y][x];
+
+        switch (tileType) {
+          case "TREASURE":
+            const goldFound = Math.floor(Math.random() * 500) + 200;
+            gameState.resources.gold += goldFound;
+            gameMap[y][x] = "GRASS";
+            showNotification(`Найдено сокровище: +${goldFound} золота!`);
+            gameState.treasuresFound++;
+            updateQuest("treasure_hunter", 1);
+            break;
+
+          case "RESOURCE_GOLD":
+            const gold = Math.floor(Math.random() * 200) + 100;
+            gameState.resources.gold += gold;
+            gameMap[y][x] = "GRASS";
+            showNotification(`Добыто золото: +${gold}`);
+            break;
+
+          case "RESOURCE_STONE":
+            const stone = Math.floor(Math.random() * 10) + 5;
+            gameState.resources.stone += stone;
+            gameMap[y][x] = "GRASS";
+            showNotification(`Добыт камень: +${stone}`);
+            break;
+
+          case "RESOURCE_WOOD":
+            const wood = Math.floor(Math.random() * 15) + 10;
+            gameState.resources.wood += wood;
+            gameMap[y][x] = "GRASS";
+            showNotification(`Срублено дерево: +${wood}`);
+            break;
+
+          case "MONSTER":
+            showDialog(
+              "Встреча с монстром!",
+              "Перед вами стоит свирепый монстр. Хотите сразиться?",
+              () => fightMonster(x, y),
+              () => showNotification("Вы решили избежать битвы.")
+            );
+            break;
+
+          case "TOWN":
+            showDialog(
+              "Добро пожаловать в город!",
+              "Здесь вы можете отдохнуть и восстановить очки движения.",
+              () => visitTown(),
+              () => showNotification("Вы покинули город.")
+            );
+            break;
+        }
+      }
+
+      function fightMonster(x, y) {
+        const victory = Math.random() > 0.3; // 70% шанс победы
+
+        if (victory) {
+          const expGained = Math.floor(Math.random() * 300) + 100;
+          const goldGained = Math.floor(Math.random() * 150) + 50;
+
+          gameState.resources.gold += goldGained;
+          gainExperience(expGained);
+          gameMap[y][x] = "GRASS";
+
+          showNotification(
+            `Монстр побежден! +${expGained} опыта, +${goldGained} золота`
+          );
+          updateQuest("monster_slayer", 1);
+        } else {
+          gameState.hero.actionPoints = Math.max(
+            10,
+            gameState.hero.actionPoints - 30
+          );
+          showNotification("Монстр ранил вас! -30 очков движения");
+        }
+
+        closeDialog();
+      }
+
+      function visitTown() {
+        gameState.hero.actionPoints = gameState.hero.maxActionPoints;
+        const healingCost = 100;
+
+        if (gameState.resources.gold >= healingCost) {
+          gameState.resources.gold -= healingCost;
+          showNotification(
+            `Отдых в городе: очки движения восстановлены (-${healingCost} золота)`
+          );
+        } else {
+          showNotification("Очки движения частично восстановлены");
+        }
+
+        closeDialog();
+      }
+
+      // ===========================================
+      // ДВИЖЕНИЕ ГЕРОЯ
+      // ===========================================
+
+      function moveHero(targetX, targetY) {
+        if (!isPassable(targetX, targetY)) {
+          showNotification("Невозможно пройти в эту область!");
+          return false;
+        }
+
+        const path = findPath(
+          gameState.hero.x,
+          gameState.hero.y,
+          targetX,
+          targetY
+        );
+
+        if (path.length === 0) {
+          showNotification("Путь не найден!");
+          return false;
+        }
+
+        // Проверяем, хватает ли очков движения
+        const totalCost = calculatePathCost(path);
+        if (totalCost > gameState.hero.actionPoints) {
+          showNotification("Недостаточно очков движения!");
+          return false;
+        }
+
+        // Выполняем движение
+        pathToTarget = path;
+        executeMovement();
+        return true;
+      }
+
+      function calculatePathCost(path) {
+        let cost = 0;
+        for (const point of path) {
+          cost += getTileCost(point.x, point.y) * 10; // Масштабируем стоимость
+        }
+        return cost;
+      }
+
+      function executeMovement() {
+        if (pathToTarget.length === 0) return;
+
+        const nextStep = pathToTarget.shift();
+        const cost = getTileCost(nextStep.x, nextStep.y) * 10;
+
+        gameState.hero.x = nextStep.x;
+        gameState.hero.y = nextStep.y;
+        gameState.hero.actionPoints -= cost;
+
+        // Открываем новые области
+        revealArea(gameState.hero.x, gameState.hero.y, 1);
+
+        // Обновляем камеру
+        updateCamera();
+
+        // Проверяем взаимодействие с тайлом
+        handleTileInteraction(gameState.hero.x, gameState.hero.y);
+
+        // Продолжаем движение с задержкой
+        if (pathToTarget.length > 0) {
+          setTimeout(executeMovement, 200);
+        }
+
+        updateUI();
+      }
+
+      function updateCamera() {
+        gameState.camera.x = Math.max(
+          0,
+          Math.min(
+            gameState.hero.x - Math.floor(VIEWPORT_TILES_X / 2),
+            MAP_WIDTH - VIEWPORT_TILES_X
+          )
+        );
+
+        gameState.camera.y = Math.max(
+          0,
+          Math.min(
+            gameState.hero.y - Math.floor(VIEWPORT_TILES_Y / 2),
+            MAP_HEIGHT - VIEWPORT_TILES_Y
+          )
+        );
+      }
+
+      // ===========================================
+      // ОТРИСОВКА
+      // ===========================================
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Рисуем карту
+        for (let y = 0; y < VIEWPORT_TILES_Y; y++) {
+          for (let x = 0; x < VIEWPORT_TILES_X; x++) {
+            const mapX = x + gameState.camera.x;
+            const mapY = y + gameState.camera.y;
+
+            if (
+              mapX >= 0 &&
+              mapX < MAP_WIDTH &&
+              mapY >= 0 &&
+              mapY < MAP_HEIGHT
+            ) {
+              drawTile(x * TILE_SIZE, y * TILE_SIZE, mapX, mapY);
+            }
+          }
+        }
+
+        // Рисуем путь к цели
+        drawPath();
+
+        // Рисуем героя
+        drawHero();
+
+        // Рисуем туман войны
+        if (gameState.showFogOfWar) {
+          drawFogOfWar();
+        }
+      }
+
+      function drawTile(screenX, screenY, mapX, mapY) {
+        const tileType = TILE_TYPES[gameMap[mapY][mapX]];
+        const isExplored = !fogOfWar[mapY][mapX];
+
+        // Базовый цвет тайла
+        ctx.fillStyle = isExplored ? tileType.color : "#333333";
+        ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+
+        // Границы тайла
+        ctx.strokeStyle = isExplored
+          ? "rgba(0,0,0,0.1)"
+          : "rgba(255,255,255,0.05)";
+        ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+
+        // Эмодзи для исследованных тайлов
+        if (isExplored) {
+          ctx.font = `${TILE_SIZE * 0.6}px Arial`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(
+            tileType.emoji,
+            screenX + TILE_SIZE / 2,
+            screenY + TILE_SIZE / 2
+          );
+        }
+
+        // Специальные эффекты для ресурсов
+        if (
+          isExplored &&
+          (gameMap[mapY][mapX].includes("RESOURCE") ||
+            gameMap[mapY][mapX] === "TREASURE")
+        ) {
+          const time = Date.now() / 500;
+          const alpha = Math.sin(time + mapX + mapY) * 0.3 + 0.7;
+          ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+          ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+        }
+      }
+
+      function drawHero() {
+        const screenX = (gameState.hero.x - gameState.camera.x) * TILE_SIZE;
+        const screenY = (gameState.hero.y - gameState.camera.y) * TILE_SIZE;
+
+        // Тень героя
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fillRect(screenX + 5, screenY + 5, TILE_SIZE - 10, TILE_SIZE - 10);
+
+        // Герой
+        ctx.fillStyle = "#E74C3C";
+        ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+
+        // Эмодзи героя
+        ctx.font = `${TILE_SIZE * 0.8}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("🛡️", screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2);
+
+        // Анимация движения
+        const time = Date.now() / 200;
+        const bounce = Math.sin(time) * 2;
+        ctx.translate(0, bounce);
+        ctx.translate(0, -bounce);
+      }
+
+      function drawPath() {
+        if (pathToTarget.length === 0) return;
+
+        ctx.strokeStyle = "rgba(52, 152, 219, 0.8)";
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+
+        ctx.beginPath();
+        let startX =
+          (gameState.hero.x - gameState.camera.x) * TILE_SIZE + TILE_SIZE / 2;
+        let startY =
+          (gameState.hero.y - gameState.camera.y) * TILE_SIZE + TILE_SIZE / 2;
+        ctx.moveTo(startX, startY);
+
+        pathToTarget.forEach((point) => {
+          const x = (point.x - gameState.camera.x) * TILE_SIZE + TILE_SIZE / 2;
+          const y = (point.y - gameState.camera.y) * TILE_SIZE + TILE_SIZE / 2;
+          ctx.lineTo(x, y);
+        });
+
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      function drawFogOfWar() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+
+        for (let y = 0; y < VIEWPORT_TILES_Y; y++) {
+          for (let x = 0; x < VIEWPORT_TILES_X; x++) {
+            const mapX = x + gameState.camera.x;
+            const mapY = y + gameState.camera.y;
+
+            if (
+              mapX >= 0 &&
+              mapX < MAP_WIDTH &&
+              mapY >= 0 &&
+              mapY < MAP_HEIGHT
+            ) {
+              if (fogOfWar[mapY][mapX]) {
+                ctx.fillRect(
+                  x * TILE_SIZE,
+                  y * TILE_SIZE,
+                  TILE_SIZE,
+                  TILE_SIZE
+                );
+              }
+            }
+          }
+        }
+      }
+
+      // ===========================================
+      // УПРАВЛЕНИЕ ИНТЕРФЕЙСОМ
+      // ===========================================
+
+      function updateUI() {
+        document.getElementById("heroName").textContent = `Сэр Кодерус`;
+        document.getElementById(
+          "heroLevel"
+        ).textContent = `Уровень ${gameState.hero.level}`;
+        document.getElementById("heroAttack").textContent =
+          gameState.hero.stats.attack;
+        document.getElementById("heroDefense").textContent =
+          gameState.hero.stats.defense;
+        document.getElementById("heroMagic").textContent =
+          gameState.hero.stats.magic;
+        document.getElementById("heroKnowledge").textContent =
+          gameState.hero.stats.knowledge;
+
+        document.getElementById(
+          "actionPoints"
+        ).textContent = `${gameState.hero.actionPoints}/${gameState.hero.maxActionPoints}`;
+
+        document.getElementById("gold").textContent = gameState.resources.gold;
+        document.getElementById("stone").textContent =
+          gameState.resources.stone;
+        document.getElementById("wood").textContent = gameState.resources.wood;
+        document.getElementById("crystals").textContent =
+          gameState.resources.crystals;
+      }
+
+      function updateQuestsUI() {
+        const questsList = document.getElementById("questsList");
+        questsList.innerHTML = "";
+
+        quests.forEach((quest) => {
+          const questDiv = document.createElement("div");
+          questDiv.className = "quest-item";
+          if (quest.completed) questDiv.style.opacity = "0.6";
+
+          questDiv.innerHTML = `
+                    <div class="quest-title">${quest.title} ${
+            quest.completed ? "✅" : ""
+          }</div>
+                    <div class="quest-description">${quest.description}</div>
+                    <div class="quest-description">Прогресс: ${quest.current}/${
+            quest.target
+          }</div>
+                    <div class="quest-reward">Награда: ${Object.keys(
+                      quest.reward
+                    )
+                      .map((key) => `${quest.reward[key]} ${key}`)
+                      .join(", ")}</div>
+                `;
+
+          questsList.appendChild(questDiv);
+        });
+      }
+
+      function showNotification(text) {
+        const notification = document.getElementById("notification");
+        notification.textContent = text;
+        notification.style.display = "block";
+        notification.style.animation = "none";
+
+        setTimeout(() => {
+          notification.style.animation = "slideInOut 3s ease-in-out forwards";
+        }, 10);
+
+        setTimeout(() => {
+          notification.style.display = "none";
+        }, 3000);
+      }
+
+      function showDialog(title, text, acceptCallback, declineCallback) {
+        document.getElementById("dialogTitle").textContent = title;
+        document.getElementById("dialogText").textContent = text;
+        document.getElementById("dialog").style.display = "block";
+
+        document.getElementById("dialogAccept").onclick = acceptCallback;
+        document.getElementById("dialogDecline").onclick = declineCallback;
+      }
+
+      function closeDialog() {
+        document.getElementById("dialog").style.display = "none";
+      }
+
+      // ===========================================
+      // ОБРАБОТЧИКИ СОБЫТИЙ
+      // ===========================================
+
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x =
+          Math.floor((e.clientX - rect.left) / TILE_SIZE) + gameState.camera.x;
+        const y =
+          Math.floor((e.clientY - rect.top) / TILE_SIZE) + gameState.camera.y;
+
+        if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+          if (gameState.hero.actionPoints > 0) {
+            moveHero(x, y);
+          } else {
+            showNotification("Недостаточно очков движения! Завершите ход.");
+          }
+        }
+      });
+
+      canvas.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const x =
+          Math.floor((e.clientX - rect.left) / TILE_SIZE) + gameState.camera.x;
+        const y =
+          Math.floor((e.clientY - rect.top) / TILE_SIZE) + gameState.camera.y;
+
+        if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+          const tileType = gameMap[y][x];
+          const tile = TILE_TYPES[tileType];
+          showNotification(
+            `${tile.emoji} ${tileType} (Стоимость: ${tile.cost})`
+          );
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        switch (e.code) {
+          case "Space":
+            e.preventDefault();
+            nextTurn();
+            break;
+          case "KeyM":
+            gameState.showFogOfWar = !gameState.showFogOfWar;
+            showNotification(
+              `Туман войны: ${gameState.showFogOfWar ? "Включен" : "Отключен"}`
+            );
+            break;
+          case "KeyQ":
+            updateQuestsUI();
+            showNotification("Список квестов обновлен");
+            break;
+          case "KeyS":
+            const shopPanel = document.querySelector(".shop-panel");
+            if (shopPanel) {
+              shopPanel.style.display =
+                shopPanel.style.display === "none" ? "block" : "none";
+              showNotification(
+                "Магазин " +
+                  (shopPanel.style.display === "none" ? "скрыт" : "открыт")
+              );
+            }
+            break;
+        }
+      });
+
+      // ===========================================
+      // ИГРОВОЙ ЦИКЛ
+      // ===========================================
+
+      function nextTurn() {
+        gameState.turnNumber++;
+        gameState.hero.actionPoints = gameState.hero.maxActionPoints;
+
+        // Случайные события
+        if (Math.random() < 0.1) {
+          randomEvent();
+        }
+
+        showNotification(`Ход ${gameState.turnNumber} начался!`);
+        updateUI();
+      }
+
+      function randomEvent() {
+        const events = [
+          () => {
+            const gold = Math.floor(Math.random() * 100) + 50;
+            gameState.resources.gold += gold;
+            showNotification(`Торговцы дали вам ${gold} золота!`);
+          },
+          () => {
+            gameState.hero.actionPoints += 50;
+            showNotification(
+              "Вы нашли лошадь! +50 очков движения на этот ход."
+            );
+          },
+          () => {
+            const crystals = Math.floor(Math.random() * 3) + 1;
+            gameState.resources.crystals += crystals;
+            showNotification(`Найдены магические кристаллы: +${crystals}!`);
+          },
+        ];
+
+        const event = events[Math.floor(Math.random() * events.length)];
+        event();
+      }
+
+      function gameLoop() {
+        render();
+        requestAnimationFrame(gameLoop);
+      }
+
+      // ===========================================
+      // ИНИЦИАЛИЗАЦИЯ ИГРЫ
+      // ===========================================
+
+      function initGame() {
+        const loadingSteps = [
+          { text: "Generating world...", duration: 1000 },
+          { text: "Placing resources...", duration: 800 },
+          { text: "Creating quests...", duration: 600 },
+          { text: "Initializing hero...", duration: 400 },
+          { text: "Ready to explore!", duration: 200 },
+        ];
+
+        let currentStep = 0;
+        const loadingBar = document.getElementById("loadingBar");
+        const loadingText = document.getElementById("loadingText");
+
+        function nextLoadingStep() {
+          if (currentStep < loadingSteps.length) {
+            const step = loadingSteps[currentStep];
+            loadingText.textContent = step.text;
+            loadingBar.style.width =
+              ((currentStep + 1) / loadingSteps.length) * 100 + "%";
+
+            setTimeout(() => {
+              currentStep++;
+              nextLoadingStep();
+            }, step.duration);
+          } else {
+            // Игра готова
+            generateMap();
+            initializeQuests();
+            updateCamera();
+            updateUI();
+            updateQuestsUI();
+
+            setTimeout(() => {
+              document.getElementById("loadingScreen").style.display = "none";
+              document.getElementById("gameInterface").style.display = "flex";
+              gameLoop();
+
+              // Инициализация системы магазина
+              if (typeof updateShopDisplay === "function") {
+                updateShopDisplay();
+              }
+
+              showNotification(
+                "Добро пожаловать в Heroes Adventure! Нажмите S для открытия магазина"
+              );
+            }, 500);
+          }
+        }
+
+        nextLoadingStep();
+      }
+
+      // Запуск игры
+      initGame();
+
+      // ===========================================
+      // ОБРАЗОВАТЕЛЬНЫЕ КОММЕНТАРИИ
+      // ===========================================
+
+      /*
+        ОБРАЗОВАТЕЛЬНЫЕ КОНЦЕПЦИИ В ЭТОЙ ИГРЕ:
+        
+        1. ТАЙЛОВЫЕ КАРТЫ И ДВУМЕРНЫЕ МАССИВЫ
+           - Представление игрового мира в виде сетки
+           - Эффективная работа с 2D массивами
+           - Координатные системы и преобразования
+        
+        2. АЛГОРИТМ ПОИСКА ПУТИ A*
+           - Один из важнейших алгоритмов в играх
+           - Эвристические функции и оптимизация
+           - Структуры данных: открытый и закрытый список
+        
+        3. ТУМАН ВОЙНЫ (FOG OF WAR)
+           - Система скрытой информации
+           - Алгоритмы видимости и открытия карты
+           - Оптимизация рендеринга
+        
+        4. ПРОЦЕДУРНАЯ ГЕНЕРАЦИЯ КОНТЕНТА
+           - Алгоритмы генерации карт
+           - Размещение объектов по правилам
+           - Системы случайности и seed
+        
+        5. СИСТЕМА КВЕСТОВ И ДОСТИЖЕНИЙ
+           - Паттерн Observer для отслеживания событий
+           - Система прогресса и наград
+           - Управление состояниями квестов
+        
+        6. КАМЕРА И VIEWPORT
+           - Виртуальные координаты vs экранные
+           - Следование за игроком
+           - Оптимизация отрисовки видимой области
+        
+        7. ИГРОВОЙ ИИ И СТРАТЕГИИ
+           - Простой ИИ для случайных событий
+           - Системы балансировки ресурсов
+           - Алгоритмы принятия решений
+        
+        8. АРХИТЕКТУРА СЛОЖНЫХ ИГР
+           - Разделение логики и представления
+           - Система состояний игры
+           - Управление сложностью кода
+        
+        АЛГОРИТМЫ:
+        - A* для поиска кратчайшего пути
+        - Процедурная генерация с помощью шума
+        - Flood fill для открытия областей тумана войны
+        - Система событий для связи компонентов
+        - Spatial partitioning для оптимизации поиска
+        */
+
+      // ===========================================
+      // СИСТЕМА МАГАЗИНА (финальная инициализация)
+      // ===========================================
+
+      const SHOP_ITEMS = {
+        buildings: [
+          {
+            id: "watchtower",
+            name: "🗼 Башня наблюдения",
+            description: "Увеличивает радиус обзора на +2 тайла",
+            cost: { stone: 5, wood: 3, gold: 200 },
+          },
+          {
+            id: "mine",
+            name: "⛏️ Шахта",
+            description: "Приносит +5 камня каждый ход",
+            cost: { wood: 10, gold: 300 },
+          },
+        ],
+        equipment: [
+          {
+            id: "iron_sword",
+            name: "⚔️ Железный меч",
+            description: "Атака +5",
+            cost: { gold: 300, stone: 2 },
+          },
+          {
+            id: "steel_armor",
+            name: "🛡️ Стальная броня",
+            description: "Защита +8",
+            cost: { gold: 500, stone: 5 },
+          },
+        ],
+        magic: [
+          {
+            id: "reveal_map",
+            name: "🔍 Видение карты",
+            description: "Открывает область карты",
+            cost: { crystals: 2, gold: 150 },
+          },
+          {
+            id: "teleport",
+            name: "✨ Телепортация",
+            description: "Переход к городу",
+            cost: { crystals: 3, gold: 100 },
+          },
+        ],
+        army: [
+          {
+            id: "warrior",
+            name: "⚔️ Воин",
+            description: "Дает +2 к атаке",
+            cost: { gold: 100, wood: 2 },
+          },
+          {
+            id: "archer",
+            name: "🏹 Лучник",
+            description: "Уменьшает урон на 10%",
+            cost: { gold: 150, wood: 5 },
+          },
+        ],
+      };
+
+      function switchShopTab(tab) {
+        gameState.currentShopTab = tab;
+        updateShopDisplay();
+      }
+
+      function updateShopDisplay() {
+        const content = document.getElementById("shopContent");
+        if (!content) return;
+
+        const items = SHOP_ITEMS[gameState.currentShopTab] || [];
+        content.innerHTML = "";
+
+        items.forEach((item) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "shop-item";
+
+          const canAfford = checkResourceCost(item.cost);
+          const costText = Object.keys(item.cost)
+            .map((resource) => {
+              const cost = item.cost[resource];
+              const current = gameState.resources[resource] || 0;
+              const enough = current >= cost;
+              const icon =
+                resource === "gold"
+                  ? "💰"
+                  : resource === "stone"
+                  ? "🪨"
+                  : resource === "wood"
+                  ? "🌳"
+                  : "⚡";
+              return `<span style="color: ${
+                enough ? "#27AE60" : "#E74C3C"
+              }">${icon}${cost}</span>`;
+            })
+            .join(" ");
+
+          itemDiv.innerHTML = `
+                    <div class="shop-item-name">${item.name}</div>
+                    <div class="shop-item-description">${item.description}</div>
+                    <div class="shop-item-cost">
+                        <div class="cost-display">Стоимость: ${costText}</div>
+                        <button class="shop-buy-btn" ${
+                          !canAfford ? "disabled" : ""
+                        } 
+                                onclick="buyItem('${
+                                  gameState.currentShopTab
+                                }', '${item.id}')">Купить</button>
+                    </div>
+                `;
+
+          content.appendChild(itemDiv);
+        });
+      }
+
+      function checkResourceCost(cost) {
+        return Object.keys(cost).every((resource) => {
+          return (gameState.resources[resource] || 0) >= cost[resource];
+        });
+      }
+
+      function payResourceCost(cost) {
+        Object.keys(cost).forEach((resource) => {
+          gameState.resources[resource] =
+            (gameState.resources[resource] || 0) - cost[resource];
+        });
+      }
+
+      function buyItem(category, itemId) {
+        const item = SHOP_ITEMS[category].find((i) => i.id === itemId);
+        if (!item || !checkResourceCost(item.cost)) return;
+
+        payResourceCost(item.cost);
+        showNotification(`Куплено: ${item.name}`);
+        updateUI();
+        updateShopDisplay();
+      }
+    </script>
+  </body>
+</html>

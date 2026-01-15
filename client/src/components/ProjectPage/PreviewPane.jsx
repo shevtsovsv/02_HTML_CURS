@@ -10,37 +10,71 @@ const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
   const documentContent = useMemo(() => {
     const safeJs = `
       document.addEventListener('DOMContentLoaded', function() {
-        // Перехватываем console методы для отправки сообщений в родительское окно
-        const originalConsole = {
-          log: console.log,
-          error: console.error,
-          warn: console.warn,
-          info: console.info
-        };
-        
-        ['log', 'error', 'warn', 'info'].forEach(method => {
-          console[method] = function(...args) {
-            originalConsole[method].apply(console, args);
-            window.parent.postMessage({
-              type: 'console',
-              method: method,
-              args: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
-            }, '*');
-          };
-        });
-
+        // Создаем изолированную среду для консоли
         try {
-          ${js || ""}
-        } catch (e) {
-          console.error('Ошибка выполнения кода в превью:', e.message || e);
+          // Перехватываем console методы для отправки сообщений в родительское окно
+          const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+          };
+          
+          ['log', 'error', 'warn', 'info'].forEach(method => {
+            console[method] = function(...args) {
+              try {
+                originalConsole[method].apply(console, args);
+                if (window.parent && window.parent !== window) {
+                  window.parent.postMessage({
+                    type: 'console',
+                    method: method,
+                    args: args.map(arg => {
+                      try {
+                        return typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+                      } catch (e) {
+                        return '[Объект не может быть преобразован]';
+                      }
+                    })
+                  }, '*');
+                }
+              } catch (postError) {
+                // Игнорируем ошибки отправки сообщений
+              }
+            };
+          });
+
+          // Защищаем от ошибок внешних скриптов
+          window.addEventListener('error', function(e) {
+            e.stopPropagation();
+            console.error('Ошибка в превью:', e.message);
+          });
+
+          // Выполняем пользовательский код в изолированной среде
+          (function() {
+            try {
+              ${js || ""}
+            } catch (e) {
+              console.error('Ошибка выполнения кода:', e.message || e);
+            }
+          })();
+        } catch (initError) {
+          // Игнорируем ошибки инициализации
         }
       });
     `;
+    
     return `
+      <!DOCTYPE html>
       <html>
-        <head><style>${css || ""}</style></head>
-        <body>${html || ""}</body>
-        <script>${safeJs}</script>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>${css || ""}</style>
+        </head>
+        <body>
+          ${html || ""}
+          <script>${safeJs}</script>
+        </body>
       </html>
     `;
   }, [html, css, js]);
@@ -50,10 +84,14 @@ const PreviewPane = ({ html, css, js, onConsoleMessage }) => {
       ref={iframeRef}
       srcDoc={documentContent}
       title="preview"
-      sandbox="allow-scripts"
+      sandbox="allow-scripts allow-popups allow-forms"
       width="100%"
       height="100%"
-      style={{ border: "none", backgroundColor: "#fff" }}
+      style={{ 
+        border: "none", 
+        backgroundColor: "#fff",
+        isolation: "isolate" 
+      }}
     />
   );
 };

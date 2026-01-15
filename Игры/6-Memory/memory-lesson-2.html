@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 2: CSS стилизация игры Memory</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f0f8ff;
+        padding: 20px;
+      }
+
+      .back-to-menu {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #4a6fa5;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-menu:hover {
+        background: #3a5a95;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 111, 165, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #4a6fa5 0%, #2e4a73 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .header .goal {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 20px;
+        border-radius: 25px;
+        display: inline-block;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+      }
+
+      .learning-goals, .what-we-build {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        border-left: 5px solid #4a6fa5;
+      }
+
+      h2 {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        border-left: 4px solid #4a6fa5;
+        padding-left: 15px;
+      }
+
+      h3 {
+        color: #34495e;
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        margin-top: 25px;
+      }
+
+      h4 {
+        color: #555;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        margin-top: 20px;
+      }
+
+      p {
+        margin-bottom: 15px;
+        font-size: 1.05rem;
+      }
+
+      ul,
+      ol {
+        margin-bottom: 20px;
+        padding-left: 30px;
+      }
+
+      li {
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+      }
+
+      .icon {
+        font-size: 1.5em;
+        margin-right: 10px;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        overflow-x: auto;
+        font-family: "Consolas", "Monaco", "Courier New", monospace;
+        border-left: 4px solid #4a6fa5;
+        white-space: pre-wrap;
+        line-height: 1.5;
+      }
+
+      .inline-code {
+        background: #f1f3f4;
+        color: #d73a49;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Consolas", "Monaco", "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .step {
+        background: #fff;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .step-number {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background: #4a6fa5;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .demo-container {
+        background: #f8f9fa;
+        border: 2px solid #4a6fa5;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .demo-container h4 {
+        color: #4a6fa5;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      /* Стили для демо игры */
+      .memory-demo {
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: center;
+        background: #f0f8ff;
+        padding: 20px;
+        border-radius: 16px;
+      }
+
+      .demo-title {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+      }
+
+      .demo-info {
+        margin-bottom: 15px;
+        font-size: 18px;
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        display: inline-block;
+      }
+
+      .demo-board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        max-width: 400px;
+        margin: 0 auto 20px;
+      }
+
+      .demo-card {
+        width: 80px;
+        height: 80px;
+        background-color: #4a6fa5;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.3s;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+      }
+
+      .demo-card:hover {
+        transform: scale(1.05);
+      }
+
+      .demo-card.flipped {
+        background-color: #ffcc00;
+        color: #333;
+      }
+
+      .demo-card.matched {
+        background-color: #a5d6a7;
+        border: 3px solid #4CAF50;
+        cursor: default;
+        opacity: 0.8;
+      }
+
+      .demo-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .demo-button:hover {
+        background-color: #45a049;
+      }
+
+      .css-section {
+        background: #f9f9f9;
+        border-left: 4px solid #ffcc00;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+
+      .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 1px solid #e5e5e5;
+        gap: 20px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #4a6fa5, #2e4a73);
+        color: white;
+        border: none;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
+      }
+
+      .btn-outline {
+        background: white;
+        color: #4a6fa5;
+        border: 2px solid #4a6fa5;
+      }
+
+      .btn-outline:hover {
+        background: #4a6fa5;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-menu"> ← Вернуться в меню </a>
+    <div class="container">
+      <div class="header">
+        <h1>
+          <span class="icon">🎨</span>
+          Урок 2: CSS стилизация игры Memory
+        </h1>
+        <div class="goal">
+          Создаем красивые стили для карточек, анимации и общий дизайн
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="learning-goals">
+          <h3><span class="icon">🎯</span> Цели урока</h3>
+          <ul>
+            <li>Настроить базовые стили для всех элементов</li>
+            <li>Создать Grid-сетку для игрового поля</li>
+            <li>Стилизовать карточки с эффектом переворота</li>
+            <li>Добавить анимации и переходы</li>
+            <li>Создать адаптивный дизайн</li>
+          </ul>
+        </div>
+
+        <div class="what-we-build">
+          <h3><span class="icon">🔨</span> Что мы создаем</h3>
+          <p>
+            Красивый интерфейс игры Memory в сине-голубых тонах с плавными анимациями,
+            эффектами наведения и адаптивной сеткой для карточек.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>1. Базовые стили и сброс</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 1</div>
+            <h4>Сброс стилей и общие настройки</h4>
+            <div class="code-block">* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f8ff;
+    padding: 20px;
+}</div>
+            <p>
+              <span class="inline-code">box-sizing: border-box</span> обеспечивает правильный расчет размеров элементов.
+              Фоновый цвет <span class="inline-code">#f0f8ff</span> создает приятный голубоватый оттенок.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="step-number">Шаг 2</div>
+            <h4>Стили заголовка</h4>
+            <div class="code-block">h1 {
+    color: #333;
+    margin-bottom: 20px;
+}</div>
+            <p>
+              Простые стили для заголовка с темным цветом и отступом снизу.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>2. Информационная панель</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 3</div>
+            <h4>Стилизация игровой информации</h4>
+            <div class="code-block">#game-info {
+    margin-bottom: 15px;
+    font-size: 18px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}</div>
+            <p>
+              Панель информации получает белый фон, скругленные углы и выглядит как карточка.
+              <span class="inline-code">display: inline-block</span> позволяет элементу подстраиваться под содержимое.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>3. CSS Grid для игрового поля</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 4</div>
+            <h4>Настройка сетки</h4>
+            <div class="code-block">#game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto 20px;
+}</div>
+            <p>
+              CSS Grid создает сетку 4x4 для карточек:
+            </p>
+            <ul>
+              <li><span class="inline-code">repeat(4, 1fr)</span> - 4 колонки равной ширины</li>
+              <li><span class="inline-code">gap: 10px</span> - промежутки между карточками</li>
+              <li><span class="inline-code">max-width: 500px</span> - ограничение ширины</li>
+              <li><span class="inline-code">margin: 0 auto</span> - центрирование</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>4. Стилизация карточек</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 5</div>
+            <h4>Основные стили карточки</h4>
+            <div class="code-block">.card {
+    width: 100px;
+    height: 100px;
+    background-color: #4a6fa5;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+}</div>
+            <p>
+              Карточка имеет фиксированный размер, синий цвет и плавную анимацию масштабирования.
+              <span class="inline-code">position: relative</span> нужен для позиционирования сторон карточки.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="step-number">Шаг 6</div>
+            <h4>Стили для сторон карточки</h4>
+            <div class="code-block">.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-front {
+    background-color: #ffcc00;
+    display: none; /* Изначально скрыта */
+}
+
+.card-back {
+    background-color: #4a6fa5;
+    color: white;
+    font-size: 24px;
+}</div>
+            <p>
+              Обе стороны занимают всю площадь карточки благодаря <span class="inline-code">position: absolute</span>.
+              Flexbox центрирует содержимое. Лицевая сторона изначально скрыта.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>5. Состояния карточек</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 7</div>
+            <h4>Перевернутая карточка</h4>
+            <div class="code-block">.card.flipped .card-front {
+    display: flex; /* Показываем картинку */
+}
+
+.card.flipped .card-back {
+    display: none; /* Скрываем рубашку */
+}</div>
+            <p>
+              Когда к карточке добавляется класс <span class="inline-code">flipped</span>,
+              показывается лицевая сторона, а рубашка скрывается.
+            </p>
+          </div>
+
+          <div class="step">
+            <div class="step-number">Шаг 8</div>
+            <h4>Найденная пара</h4>
+            <div class="code-block">.card.matched {
+    cursor: default;
+    opacity: 0.8;
+}
+
+.card.matched .card-front {
+    display: flex;
+    background-color: #a5d6a7; /* Зеленый фон */
+    border: 3px solid #4CAF50; /* Зеленая рамка */
+}
+
+.card.matched .card-back {
+    display: none;
+}</div>
+            <p>
+              Найденные пары получают зеленый цвет, рамку и слегка прозрачны.
+              Курсор меняется на <span class="inline-code">default</span>, показывая, что карточка неактивна.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>6. Стили для изображений</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 9</div>
+            <h4>Размеры и подгонка изображений</h4>
+            <div class="code-block">.card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}</div>
+            <p>
+              Изображения получают фиксированный размер 80x80px.
+              <span class="inline-code">object-fit: contain</span> сохраняет пропорции
+              и вписывает изображение в заданные размеры.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>7. Стили кнопки</h2>
+          
+          <div class="step">
+            <div class="step-number">Шаг 10</div>
+            <h4>Кнопка перезапуска</h4>
+            <div class="code-block">button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}</div>
+            <p>
+              Кнопка выполнена в зеленых тонах с эффектом наведения.
+              При наведении цвет становится темнее.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>8. Демонстрация стилей</h2>
+          <div class="demo-container">
+            <h4>Различные состояния карточек</h4>
+            <div class="memory-demo">
+              <h2 class="demo-title">🃏 Состояния карточек</h2>
+              
+              <div class="demo-info">
+                <p>Найдено пар: <span>2</span> из <span>8</span> | Попытки: <span>5</span></p>
+              </div>
+              
+              <div class="demo-board">
+                <!-- Обычная карточка -->
+                <div class="demo-card">?</div>
+                <!-- Перевернутая карточка -->
+                <div class="demo-card flipped">🐶</div>
+                <!-- Найденная пара -->
+                <div class="demo-card matched">🐱</div>
+                <div class="demo-card matched">🐱</div>
+                
+                <div class="demo-card">?</div>
+                <div class="demo-card flipped">🐰</div>
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+                
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+                
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+                <div class="demo-card">?</div>
+              </div>
+              
+              <button class="demo-button">Начать новую игру</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>9. Полный CSS код</h2>
+          <div class="css-section">
+            <h4>Итоговый файл styles.css</h4>
+            <div class="code-block">* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f8ff;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#game-info {
+    margin-bottom: 15px;
+    font-size: 18px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto 20px;
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    background-color: #4a6fa5;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-front {
+    background-color: #ffcc00;
+    display: none;
+}
+
+.card-back {
+    background-color: #4a6fa5;
+    color: white;
+    font-size: 24px;
+}
+
+.card.flipped .card-front {
+    display: flex;
+}
+
+.card.flipped .card-back {
+    display: none;
+}
+
+.card.matched {
+    cursor: default;
+    opacity: 0.8;
+}
+
+.card.matched .card-front {
+    display: flex;
+    background-color: #a5d6a7;
+    border: 3px solid #4CAF50;
+}
+
+.card.matched .card-back {
+    display: none;
+}
+
+.card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>10. Ключевые CSS концепции</h2>
+          
+          <h3>CSS Grid</h3>
+          <p>
+            Создает адаптивную сетку для размещения карточек.
+            Автоматически подстраивается под размер экрана.
+          </p>
+
+          <h3>Flexbox</h3>
+          <p>
+            Используется для центрирования содержимого в карточках.
+            Обеспечивает идеальное выравнивание изображений и текста.
+          </p>
+
+          <h3>Transitions</h3>
+          <p>
+            Плавные переходы создают профессиональный вид.
+            Анимация масштабирования при наведении улучшает UX.
+          </p>
+
+          <h3>Позиционирование</h3>
+          <p>
+            <span class="inline-code">position: relative</span> и <span class="inline-code">absolute</span>
+            позволяют размещать стороны карточки одну поверх другой.
+          </p>
+
+          <h3>Классы состояний</h3>
+          <p>
+            Классы <span class="inline-code">.flipped</span> и <span class="inline-code">.matched</span>
+            управляют визуальным состоянием карточек через JavaScript.
+          </p>
+        </div>
+
+        <div class="nav-buttons">
+          <a href="memory-lesson-1.html" class="btn btn-outline">
+            ← Урок 1: HTML структура
+          </a>
+          <a href="memory-lesson-3.html" class="btn btn-primary">
+            Урок 3: JavaScript основы →
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

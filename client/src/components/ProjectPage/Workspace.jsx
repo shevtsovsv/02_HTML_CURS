@@ -2,7 +2,13 @@
  * @file components/ProjectPage/Workspace.jsx
  * @description Правая панель с редакторами кода (вкладки) и окном превью.
  */
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../hooks/useStore";
 import Split from "react-split"; // <-- 1. Импортируем Split
@@ -14,50 +20,72 @@ const Workspace = observer(({ project, currentStep }) => {
 
   // Новое состояние для отслеживания активной вкладки
   const [activeTab, setActiveTab] = useState("html"); // По умолчанию открыт HTML
-  
+
   // Состояние для консоли
   const [consoleLogs, setConsoleLogs] = useState([]);
   const consoleRef = useRef(null);
+
+  // Ref для debounce автосохранения
+  const autoSaveTimeout = useRef(null);
 
   // Ваша логика вычисления initialCode
   const initialCode = useMemo(() => {
     if (!currentStep || !project.steps) return { html: "", css: "", js: "" };
 
+    // Функция для проверки, является ли код "содержательным"
+    const hasMeaningfulCode = (code) => {
+      return (
+        code &&
+        code.length > 0 &&
+        !code.includes("<!-- Начните с DOCTYPE html -->") &&
+        !code.includes("/* Добавьте CSS стили */") &&
+        !code.includes("// Добавьте JavaScript")
+      );
+    };
+
+    // Сначала проверим, есть ли содержательный сохраненный код для ТЕКУЩЕГО шага
     const userCodeForCurrentStep = project.userCodes?.find(
       (code) => code.step_id === currentStep.id
     );
+
     if (
       userCodeForCurrentStep &&
-      (userCodeForCurrentStep.html ||
-        userCodeForCurrentStep.css ||
-        userCodeForCurrentStep.js)
+      (hasMeaningfulCode(userCodeForCurrentStep.html) ||
+        hasMeaningfulCode(userCodeForCurrentStep.css) ||
+        hasMeaningfulCode(userCodeForCurrentStep.js))
     ) {
       return {
-        html: userCodeForCurrentStep.html,
-        css: userCodeForCurrentStep.css,
-        js: userCodeForCurrentStep.js,
+        html: userCodeForCurrentStep.html || "",
+        css: userCodeForCurrentStep.css || "",
+        js: userCodeForCurrentStep.js || "",
       };
     }
 
+    // Если нет содержательного кода для текущего шага, ищем предыдущие шаги
     const currentStepIndex = project.steps.findIndex(
       (step) => step.id === currentStep.id
     );
+
     if (currentStepIndex > 0) {
-      const prevStep = project.steps[currentStepIndex - 1];
-      const userCodeForPrevStep = project.userCodes?.find(
-        (code) => code.step_id === prevStep.id
-      );
-      if (
-        userCodeForPrevStep &&
-        (userCodeForPrevStep.html ||
-          userCodeForPrevStep.css ||
-          userCodeForPrevStep.js)
-      ) {
-        return {
-          html: userCodeForPrevStep.html,
-          css: userCodeForPrevStep.css,
-          js: userCodeForPrevStep.js,
-        };
+      // Проходим по всем предыдущим шагам от ближайшего к дальнему
+      for (let i = currentStepIndex - 1; i >= 0; i--) {
+        const prevStep = project.steps[i];
+        const userCodeForPrevStep = project.userCodes?.find(
+          (code) => code.step_id === prevStep.id
+        );
+
+        if (
+          userCodeForPrevStep &&
+          (hasMeaningfulCode(userCodeForPrevStep.html) ||
+            hasMeaningfulCode(userCodeForPrevStep.css) ||
+            hasMeaningfulCode(userCodeForPrevStep.js))
+        ) {
+          return {
+            html: userCodeForPrevStep.html || "",
+            css: userCodeForPrevStep.css || "",
+            js: userCodeForPrevStep.js || "",
+          };
+        }
       }
     }
 
@@ -66,17 +94,36 @@ const Workspace = observer(({ project, currentStep }) => {
       css: project.css_template ?? "",
       js: project.js_template ?? "",
     };
-  }, [project, currentStep]);
+  }, [
+    project.id,
+    currentStep?.id,
+    // Создаем хэш на основе времени последнего обновления userCodes для отслеживания изменений
+    project.userCodes
+      ? JSON.stringify(
+          project.userCodes.map((code) => ({
+            step_id: code.step_id,
+            htmlLength: code.html?.length || 0,
+            cssLength: code.css?.length || 0,
+            jsLength: code.js?.length || 0,
+          }))
+        )
+      : "",
+  ]);
 
   const [localHtml, setLocalHtml] = useState(initialCode.html);
   const [localCss, setLocalCss] = useState(initialCode.css);
   const [localJs, setLocalJs] = useState(initialCode.js);
+  const [isProgrammaticUpdate, setIsProgrammaticUpdate] = useState(false);
 
+  // Обновление локального состояния при смене initialCode
   useEffect(() => {
-    setLocalHtml(initialCode.html);
-    setLocalCss(initialCode.css);
-    setLocalJs(initialCode.js);
-  }, [initialCode]); // Зависимость от initialCode - это ключ к успеху!
+    setIsProgrammaticUpdate(true);
+    setLocalHtml(initialCode.html || "");
+    setLocalCss(initialCode.css || "");
+    setLocalJs(initialCode.js || "");
+    // Сбрасываем флаг после небольшой задержки
+    setTimeout(() => setIsProgrammaticUpdate(false), 100);
+  }, [initialCode]);
 
   // Карта для удобного сопоставления вкладок и данных
   const editorMapping = {
@@ -86,9 +133,9 @@ const Workspace = observer(({ project, currentStep }) => {
   };
 
   // Функция для добавления сообщения в консоль
-  const addConsoleMessage = (message, type = 'log') => {
+  const addConsoleMessage = (message, type = "log") => {
     const timestamp = new Date().toLocaleTimeString();
-    setConsoleLogs(prev => [...prev, { message, type, timestamp }]);
+    setConsoleLogs((prev) => [...prev, { message, type, timestamp }]);
   };
 
   // Функция для очистки консоли
@@ -96,23 +143,80 @@ const Workspace = observer(({ project, currentStep }) => {
     setConsoleLogs([]);
   };
 
+  // Принудительное сохранение перед размонтированием компонента
+  const forceSave = useCallback(() => {
+    if (!currentStep || !project?.id) return Promise.resolve();
+
+    const codeToSave = {
+      html: localHtml,
+      css: localCss,
+      js: localJs,
+    };
+
+    console.log(
+      "Принудительное сохранение кода при размонтировании:",
+      codeToSave
+    );
+    return projectStore.saveCode(project.id, currentStep.id, codeToSave);
+  }, [currentStep, project?.id, localHtml, localCss, localJs, projectStore]);
+
+  // Debounced автосохранение кода
+  const autoSaveCode = useCallback(() => {
+    if (!currentStep || !project?.id) {
+      return;
+    }
+
+    // Очищаем предыдущий таймер
+    if (autoSaveTimeout.current) {
+      clearTimeout(autoSaveTimeout.current);
+    }
+
+    // Устанавливаем новый таймер на 2 секунды
+    autoSaveTimeout.current = setTimeout(async () => {
+      const codeToSave = {
+        html: localHtml,
+        css: localCss,
+        js: localJs,
+      };
+
+      try {
+        // Сохраняем код в фоне, без блокировки интерфейса
+        await projectStore.saveCode(project.id, currentStep.id, codeToSave);
+      } catch (err) {
+        console.error("❌ Ошибка автосохранения:", err);
+      }
+    }, 2000); // Автосохранение через 2 секунды после последнего изменения
+  }, [localHtml, localCss, localJs, currentStep, project, projectStore]);
+
   useEffect(() => {
     projectStore.updateCode("html", localHtml);
     projectStore.updateCode("css", localCss);
     projectStore.updateCode("javascript", localJs);
-  }, [localHtml, localCss, localJs, projectStore]);
+
+    // Запускаем автосохранение только если изменение НЕ программное
+    if (!isProgrammaticUpdate) {
+      autoSaveCode();
+    }
+  }, [
+    localHtml,
+    localCss,
+    localJs,
+    projectStore,
+    autoSaveCode,
+    isProgrammaticUpdate,
+  ]);
 
   // Эффект для перехвата console сообщений из preview iframe
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.data && event.data.type === 'console') {
+      if (event.data && event.data.type === "console") {
         const { method, args } = event.data;
-        addConsoleMessage(args.join(' '), method);
+        addConsoleMessage(args.join(" "), method);
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   // Эффект для автоскролла консоли
@@ -173,6 +277,16 @@ const Workspace = observer(({ project, currentStep }) => {
     }
   };
 
+  // Cleanup эффект для таймера автосохранения
+  useEffect(() => {
+    return () => {
+      // При размонтировании компонента очищаем таймер автосохранения
+      if (autoSaveTimeout.current) {
+        clearTimeout(autoSaveTimeout.current);
+      }
+    };
+  }, []); // Пустые зависимости - выполняется только при размонтировании // Зависимость от ID текущего шага
+
   return (
     <Split
       className="right-panel"
@@ -221,14 +335,19 @@ const Workspace = observer(({ project, currentStep }) => {
               </div>
               <div className="console-content" ref={consoleRef}>
                 {consoleLogs.map((log, index) => (
-                  <div key={index} className={`console-message console-${log.type}`}>
+                  <div
+                    key={index}
+                    className={`console-message console-${log.type}`}
+                  >
                     <span className="console-timestamp">[{log.timestamp}]</span>
                     <span className="console-text">{log.message}</span>
                   </div>
                 ))}
                 {consoleLogs.length === 0 && (
                   <div className="console-message console-info">
-                    <span className="console-text">Console is empty. Run your code to see output.</span>
+                    <span className="console-text">
+                      Console is empty. Run your code to see output.
+                    </span>
                   </div>
                 )}
               </div>

@@ -12,6 +12,9 @@ export class ProjectStore {
   currentProject = null;
   isLoading = false; // Показывает, идет ли загрузка данных проекта
 
+  // --- НОВОЕ: Индекс последнего пройденного шага ---
+  lastCompletedStepIndex = -1;
+
   // Эти поля больше не нужны, так как код теперь живет в локальном состоянии компонента Workspace.
   // Но мы их оставим на случай, если они понадобятся для других целей, просто не будем их использовать для сохранения.
   htmlCode = "";
@@ -89,12 +92,16 @@ export class ProjectStore {
     this.isLoading = true;
     this.currentProject = null; // Сбрасываем старые данные
     this.validationResult = null; // Сбрасываем результат старой проверки
+    this.lastCompletedStepIndex = -1; // Сбрасываем индекс последнего пройденного шага
 
     try {
-      // Запрос на бэкенд, который вернет проект + шаги + массив userCodes
+      // Запрос на бэкенд, который вернет проект + шаги + массив userCodes + lastCompletedStepIndex
       const response = await api.get(`/projects/${id}`);
       runInAction(() => {
         this.currentProject = response.data;
+        // Сохраняем информацию о последнем пройденном шаге
+        this.lastCompletedStepIndex =
+          response.data.lastCompletedStepIndex ?? -1;
       });
     } catch (error) {
       console.error(`Не удалось загрузить проект ${id}:`, error);
@@ -169,8 +176,6 @@ export class ProjectStore {
         js: code.js,
       });
 
-      console.log(`Код для шага ${stepId} успешно сохранен на сервере.`);
-
       // --- 2. ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ: Обновляем состояние в памяти фронтенда ---
       runInAction(() => {
         if (!this.currentProject.userCodes) {
@@ -195,6 +200,32 @@ export class ProjectStore {
           // Если нет - добавляем новую
           this.currentProject.userCodes.push(newCodeEntry);
         }
+
+        // --- НОВАЯ ЛОГИКА: Удаляем старый код с последующих шагов ---
+        if (this.currentProject.steps) {
+          const currentStepIndex = this.currentProject.steps.findIndex(
+            (step) => step.id === stepId
+          );
+          if (currentStepIndex > -1) {
+            // Удаляем сохраненный код для всех последующих шагов
+            for (
+              let i = currentStepIndex + 1;
+              i < this.currentProject.steps.length;
+              i++
+            ) {
+              const nextStepId = this.currentProject.steps[i].id;
+              const nextStepCodeIndex = this.currentProject.userCodes.findIndex(
+                (c) => c.step_id === nextStepId
+              );
+              if (nextStepCodeIndex > -1) {
+                this.currentProject.userCodes.splice(nextStepCodeIndex, 1);
+              }
+            }
+          }
+        }
+
+        // Принудительно обновляем ссылку на массив для triggering reactivity
+        this.currentProject.userCodes = [...this.currentProject.userCodes];
       });
       // ----------------------------------------------------------------
     } catch (error) {
@@ -223,7 +254,10 @@ export class ProjectStore {
       );
       runInAction(() => {
         this.validationResult = response.data;
-        // TODO: Если success: true, сохранить прогресс в userProgress
+        // Если успешно, автоматически сохраняем прогресс
+        if (response.data.success) {
+          this.markStepAsCompleted(projectId, stepId);
+        }
       });
     } catch (error) {
       console.error("Ошибка проверки шага:", error);

@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок 5a: Анимационные эффекты</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .back-to-course {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #667eea;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-course:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .header::before {
+        content: "✨🎨🎪";
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .header h1 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .lesson-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 15px;
+        border-left: 5px solid #9b59b6;
+      }
+
+      .section h2 {
+        color: #9b59b6;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .code-example {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-title {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+        margin: 20px 0 0 0;
+      }
+
+      .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .highlight {
+        background: rgba(155, 89, 182, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #9b59b6;
+      }
+
+      .css-property {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      .css-value {
+        color: #2ecc71;
+      }
+
+      .css-selector {
+        color: #f39c12;
+        font-weight: 600;
+      }
+
+      .css-comment {
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .demo-container {
+        background: linear-gradient(135d, #e8d5ff, #d1b3ff);
+        border: 2px solid #9b59b6;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-container h3 {
+        color: #6b4c87;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+      }
+
+      .animation-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .animation-demo {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        border: 2px solid #9b59b6;
+      }
+
+      .animation-demo h4 {
+        color: #6b4c87;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+      }
+
+      /* Демонстрационные анимации */
+      .demo-shake {
+        animation: shake 0.5s infinite alternate;
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(-5px);
+        }
+        100% {
+          transform: translateX(5px);
+        }
+      }
+
+      .demo-bounce {
+        animation: bounce 1s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .demo-pulse {
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+      }
+
+      .demo-spin {
+        animation: spin 2s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .demo-glow {
+        animation: glow 2s infinite alternate;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+      }
+
+      @keyframes glow {
+        0% {
+          box-shadow: 0 0 10px #9b59b6;
+        }
+        100% {
+          box-shadow: 0 0 30px #9b59b6, 0 0 40px #9b59b6;
+        }
+      }
+
+      .demo-float {
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
+      }
+
+      .particle-container {
+        position: relative;
+        height: 200px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 20px 0;
+      }
+
+      .particle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+        animation: particles 4s linear infinite;
+        opacity: 0.8;
+      }
+
+      @keyframes particles {
+        0% {
+          transform: translateY(200px) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-20px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .particle:nth-child(1) {
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .particle:nth-child(2) {
+        left: 20%;
+        animation-delay: 0.5s;
+      }
+      .particle:nth-child(3) {
+        left: 30%;
+        animation-delay: 1s;
+      }
+      .particle:nth-child(4) {
+        left: 40%;
+        animation-delay: 1.5s;
+      }
+      .particle:nth-child(5) {
+        left: 50%;
+        animation-delay: 2s;
+      }
+      .particle:nth-child(6) {
+        left: 60%;
+        animation-delay: 2.5s;
+      }
+      .particle:nth-child(7) {
+        left: 70%;
+        animation-delay: 3s;
+      }
+      .particle:nth-child(8) {
+        left: 80%;
+        animation-delay: 3.5s;
+      }
+
+      .interactive-demo {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .demo-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .demo-choice {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 20px;
+        border-radius: 12px;
+        font-size: 2.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-choice:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .demo-choice.animate-win {
+        animation: winPulse 1s ease-out;
+      }
+
+      .demo-choice.animate-lose {
+        animation: loseFade 1s ease-out;
+      }
+
+      @keyframes winPulse {
+        0% {
+          transform: scale(1);
+          background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        50% {
+          transform: scale(1.2);
+          background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        100% {
+          transform: scale(1);
+          background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+      }
+
+      @keyframes loseFade {
+        0% {
+          transform: scale(1);
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(0.9);
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          opacity: 1;
+        }
+      }
+
+      .screen-shake {
+        animation: screenShake 0.5s ease-out;
+      }
+
+      @keyframes screenShake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      .confetti-burst {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #f39c12;
+        animation: confettiFall 3s linear forwards;
+      }
+
+      @keyframes confettiFall {
+        0% {
+          transform: translateY(-100vh) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .text-effects {
+        background: linear-gradient(135deg, #fff5e6, #ffe6cc);
+        border: 2px solid #f39c12;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+
+      .text-effects h3 {
+        color: #d68910;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+      }
+
+      .text-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .text-demo {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      .typing-effect {
+        border-right: 2px solid #f39c12;
+        animation: typing 3s steps(20, end), blink-caret 0.75s step-end infinite;
+        white-space: nowrap;
+        overflow: hidden;
+        font-family: monospace;
+      }
+
+      @keyframes typing {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+
+      @keyframes blink-caret {
+        from,
+        to {
+          border-color: transparent;
+        }
+        50% {
+          border-color: #f39c12;
+        }
+      }
+
+      .rainbow-text {
+        background: linear-gradient(
+          45deg,
+          #ff0000,
+          #ff7f00,
+          #ffff00,
+          #00ff00,
+          #0000ff,
+          #4b0082,
+          #9400d3
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 400% 400%;
+        animation: rainbowMove 3s ease-in-out infinite;
+        font-weight: bold;
+      }
+
+      @keyframes rainbowMove {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      .glitch-text {
+        position: relative;
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .glitch-text::before,
+      .glitch-text::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .glitch-text::before {
+        animation: glitch 0.3s infinite;
+        color: #ff0000;
+        z-index: -1;
+      }
+
+      .glitch-text::after {
+        animation: glitch 0.3s infinite reverse;
+        color: #00ff00;
+        z-index: -2;
+      }
+
+      @keyframes glitch {
+        0% {
+          transform: translate(0);
+        }
+        20% {
+          transform: translate(-2px, 2px);
+        }
+        40% {
+          transform: translate(-2px, -2px);
+        }
+        60% {
+          transform: translate(2px, 2px);
+        }
+        80% {
+          transform: translate(2px, -2px);
+        }
+        100% {
+          transform: translate(0);
+        }
+      }
+
+      .task-section {
+        background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+      }
+
+      .task-section h3 {
+        color: #004085;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .task-list li {
+        background: rgba(255, 255, 255, 0.8);
+        margin: 8px 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        font-weight: 500;
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .task-list li::before {
+        content: "✨";
+        position: absolute;
+        left: 15px;
+        font-size: 1rem;
+      }
+
+      .next-lesson {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+      }
+
+      .next-lesson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(155, 89, 182, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .back-to-course {
+          position: relative;
+          top: 0;
+          left: 0;
+          margin-bottom: 20px;
+          display: inline-flex;
+        }
+
+        .animation-showcase,
+        .text-showcase {
+          grid-template-columns: 1fr;
+        }
+
+        .demo-buttons {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-to-course"> ← Назад к курсу </a>
+
+    <div class="container">
+      <div class="header">
+        <h1>✨ Урок 5a: Анимационные эффекты</h1>
+        <p class="lesson-info">
+          Оживляем игру с помощью CSS анимаций и JavaScript эффектов
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>🎯 Цель урока</h2>
+          <p>
+            Превращаем нашу игру в визуальный праздник! Добавляем анимации,
+            эффекты частиц, интерактивные переходы и профессиональную полировку.
+          </p>
+          <p>
+            Ты научишься создавать современные анимации, которые делают
+            пользовательский интерфейс живым и увлекательным.
+          </p>
+        </div>
+
+        <div class="demo-container">
+          <h3>Демонстрация анимаций</h3>
+
+          <div class="animation-showcase">
+            <div class="animation-demo">
+              <h4>Дрожание при поражении</h4>
+              <div class="demo-shake" style="font-size: 2rem">😵</div>
+            </div>
+
+            <div class="animation-demo">
+              <h4>Прыжок при победе</h4>
+              <div class="demo-bounce" style="font-size: 2rem">🎉</div>
+            </div>
+
+            <div class="animation-demo">
+              <h4>Пульсация ожидания</h4>
+              <div class="demo-pulse" style="font-size: 2rem">⏳</div>
+            </div>
+
+            <div class="animation-demo">
+              <h4>Вращение загрузки</h4>
+              <div class="demo-spin" style="font-size: 2rem">⚙️</div>
+            </div>
+
+            <div class="animation-demo">
+              <h4>Свечение выбора</h4>
+              <div class="demo-glow">✊</div>
+            </div>
+
+            <div class="animation-demo">
+              <h4>Парение в воздухе</h4>
+              <div class="demo-float" style="font-size: 2rem">☁️</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎨 CSS Keyframes анимации</h2>
+          <p>
+            CSS @keyframes позволяют создавать сложные анимации. Определяем
+            ключевые точки и браузер плавно интерполирует между ними.
+          </p>
+
+          <div class="code-title">🎨 Базовые анимации</div>
+          <div class="code-example">
+            <pre><span class="css-comment">/* Дрожание при ошибке */</span>
+<span class="css-selector">@keyframes shake</span> {
+    <span class="css-property">0%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(-5px)</span>; }
+    <span class="css-property">25%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(5px)</span>; }
+    <span class="css-property">50%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(-5px)</span>; }
+    <span class="css-property">75%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(5px)</span>; }
+    <span class="css-property">100%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(0)</span>; }
+}
+
+<span class="css-comment">/* Пульсация при ожидании */</span>
+<span class="css-selector">@keyframes pulse</span> {
+    <span class="css-property">0%</span>, <span class="css-property">100%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+    }
+    <span class="css-property">50%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1.1)</span>; 
+        <span class="css-property">opacity</span>: <span class="css-value">0.7</span>; 
+    }
+}
+
+<span class="css-comment">/* Свечение для выделения */</span>
+<span class="css-selector">@keyframes glow</span> {
+    <span class="css-property">0%</span> { <span class="css-property">box-shadow</span>: <span class="css-value">0 0 10px #667eea</span>; }
+    <span class="css-property">100%</span> { <span class="css-property">box-shadow</span>: <span class="css-value">0 0 30px #667eea, 0 0 40px #667eea</span>; }
+}
+
+<span class="css-comment">/* Применение анимаций */</span>
+<span class="css-selector">.choice-button.shake</span> {
+    <span class="css-property">animation</span>: <span class="css-value">shake 0.5s ease-out</span>;
+}
+
+<span class="css-selector">.choice-button.waiting</span> {
+    <span class="css-property">animation</span>: <span class="css-value">pulse 1.5s infinite</span>;
+}
+
+<span class="css-selector">.choice-button.selected</span> {
+    <span class="css-property">animation</span>: <span class="css-value">glow 2s infinite alternate</span>;
+}</pre>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎪 Эффекты для результатов игры</h2>
+          <p>
+            Создадим специальные анимации для разных исходов: победа, поражение,
+            ничья. Каждый результат получит уникальный визуальный фидбек.
+          </p>
+
+          <div class="code-title">🎪 Анимации результатов</div>
+          <div class="code-example">
+            <pre><span class="css-comment">/* Анимация победы - увеличение и зелёный цвет */</span>
+<span class="css-selector">@keyframes winPulse</span> {
+    <span class="css-property">0%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; 
+        <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #667eea, #764ba2)</span>; 
+    }
+    <span class="css-property">50%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1.2)</span>; 
+        <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #2ecc71, #27ae60)</span>; 
+    }
+    <span class="css-property">100%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; 
+        <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #667eea, #764ba2)</span>; 
+    }
+}
+
+<span class="css-comment">/* Анимация поражения - уменьшение и красный цвет */</span>
+<span class="css-selector">@keyframes loseFade</span> {
+    <span class="css-property">0%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; 
+        <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #667eea, #764ba2)</span>; 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+    }
+    <span class="css-property">50%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(0.9)</span>; 
+        <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #e74c3c, #c0392b)</span>; 
+        <span class="css-property">opacity</span>: <span class="css-value">0.7</span>; 
+    }
+    <span class="css-property">100%</span> { 
+        <span class="css-property">transform</span>: <span class="css-value">scale(1)</span>; 
+        <span class="css-property">background</span>: <span class="css-value">linear-gradient(135deg, #667eea, #764ba2)</span>; 
+        <span class="css-property">opacity</span>: <span class="css-value">1</span>; 
+    }
+}
+
+<span class="css-comment">/* Встряхивание всего экрана при критическом поражении */</span>
+<span class="css-selector">@keyframes screenShake</span> {
+    <span class="css-property">0%</span>, <span class="css-property">100%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(0)</span>; }
+    <span class="css-property">10%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(-10px)</span>; }
+    <span class="css-property">20%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(10px)</span>; }
+    <span class="css-property">30%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(-10px)</span>; }
+    <span class="css-property">40%</span> { <span class="css-property">transform</span>: <span class="css-value">translateX(10px)</span>; }
+}</pre>
+          </div>
+        </div>
+
+        <div class="particle-container">
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+        </div>
+
+        <div class="section">
+          <h2>⭐ JavaScript анимации и эффекты</h2>
+          <p>
+            Используем JavaScript для создания динамических эффектов: частиц,
+            конфетти, плавных переходов и интерактивных анимаций.
+          </p>
+
+          <div class="code-title">⭐ Система анимаций</div>
+          <div class="code-example">
+            <pre><span class="css-comment">// Система управления анимациями</span>
+<span class="css-selector">const AnimationSystem</span> = {
+    <span class="css-comment">// Применить анимацию к элементу</span>
+    <span class="css-property">applyAnimation</span>(element, animationClass, duration = 1000) {
+        element.classList.add(animationClass);
+        
+        setTimeout(() => {
+            element.classList.remove(animationClass);
+        }, duration);
+    },
+    
+    <span class="css-comment">// Эффект победы для кнопки</span>
+    <span class="css-property">winEffect</span>(buttonElement) {
+        this.applyAnimation(buttonElement, 'animate-win', 1000);
+        this.createConfetti(buttonElement);
+    },
+    
+    <span class="css-comment">// Эффект поражения</span>
+    <span class="css-property">loseEffect</span>(buttonElement) {
+        this.applyAnimation(buttonElement, 'animate-lose', 1000);
+        this.shakeScreen();
+    },
+    
+    <span class="css-comment">// Встряхивание экрана</span>
+    <span class="css-property">shakeScreen</span>() {
+        const gameContainer = document.querySelector('.game-container');
+        this.applyAnimation(gameContainer, 'screen-shake', 500);
+    },
+    
+    <span class="css-comment">// Создание конфетти</span>
+    <span class="css-property">createConfetti</span>(centerElement) {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        const container = document.body;
+        
+        for (let i = 0; i < 20; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            
+            container.appendChild(confetti);
+            
+            <span class="css-comment">// Удаляем элемент после анимации</span>
+            setTimeout(() => {
+                container.removeChild(confetti);
+            }, 3000);
+        }
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="interactive-demo">
+          <h3>Интерактивная демонстрация</h3>
+          <p>Нажми на кнопки, чтобы увидеть анимации в действии:</p>
+
+          <div class="demo-buttons">
+            <button class="demo-choice" onclick="demoWinAnimation(this)">
+              ✊
+            </button>
+            <button class="demo-choice" onclick="demoLoseAnimation(this)">
+              ✋
+            </button>
+            <button class="demo-choice" onclick="demoDrawAnimation(this)">
+              ✌️
+            </button>
+          </div>
+
+          <p style="font-size: 0.9rem; color: #666; margin-top: 15px">
+            Левая кнопка - победа, средняя - поражение, правая - ничья
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>🌟 Эффекты частиц</h2>
+          <p>
+            Частицы добавляют профессионализм игре. Создадим систему для
+            генерации искр, дыма, звёзд и других визуальных эффектов.
+          </p>
+
+          <div class="code-title">🌟 Система частиц</div>
+          <div class="code-example">
+            <pre><span class="css-comment">// Система частиц</span>
+<span class="css-selector">const ParticleSystem</span> = {
+    particles: [],
+    
+    <span class="css-comment">// Создать частицу</span>
+    <span class="css-property">createParticle</span>(x, y, type = 'spark') {
+        const particle = {
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 10, <span class="css-comment">// Скорость по X</span>
+            vy: (Math.random() - 0.5) * 10, <span class="css-comment">// Скорость по Y</span>
+            life: 1.0,                      <span class="css-comment">// Жизнь частицы (0-1)</span>
+            decay: Math.random() * 0.02 + 0.01, <span class="css-comment">// Скорость затухания</span>
+            type: type,
+            size: Math.random() * 5 + 2,    <span class="css-comment">// Размер</span>
+            color: this.getParticleColor(type)
+        };
+        
+        this.particles.push(particle);
+    },
+    
+    <span class="css-comment">// Цвета для разных типов частиц</span>
+    <span class="css-property">getParticleColor</span>(type) {
+        const colors = {
+            spark: '#ffd700',    <span class="css-comment">// Золотые искры</span>
+            smoke: '#888888',    <span class="css-comment">// Серый дым</span>
+            magic: '#9b59b6',    <span class="css-comment">// Фиолетовая магия</span>
+            fire: '#ff4500'      <span class="css-comment">// Оранжевый огонь</span>
+        };
+        return colors[type] || colors.spark;
+    },
+    
+    <span class="css-comment">// Обновление всех частиц</span>
+    <span class="css-property">update</span>() {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            
+            <span class="css-comment">// Обновляем позицию</span>
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            <span class="css-comment">// Гравитация</span>
+            p.vy += 0.3;
+            
+            <span class="css-comment">// Затухание</span>
+            p.life -= p.decay;
+            
+            <span class="css-comment">// Удаляем "мёртвые" частицы</span>
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+            }
+        }
+    },
+    
+    <span class="css-comment">// Эффект взрыва искр</span>
+    <span class="css-property">sparkExplosion</span>(x, y, count = 15) {
+        for (let i = 0; i < count; i++) {
+            this.createParticle(x, y, 'spark');
+        }
+    }
+};</pre>
+          </div>
+        </div>
+
+        <div class="text-effects">
+          <h3>📝 Текстовые эффекты</h3>
+          <p>Анимированный текст делает интерфейс более живым:</p>
+
+          <div class="text-showcase">
+            <div class="text-demo">
+              <h4>Печатающийся текст</h4>
+              <div class="typing-effect" style="width: 100%">Твоя очередь!</div>
+            </div>
+
+            <div class="text-demo">
+              <h4>Радужный текст</h4>
+              <div class="rainbow-text">ПОБЕДА!</div>
+            </div>
+
+            <div class="text-demo">
+              <h4>Глитч эффект</h4>
+              <div class="glitch-text" data-text="ERROR">ERROR</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>🎭 Интеграция анимаций в игру</h2>
+          <p>
+            Теперь подключим все анимации к основной логике игры. Каждое
+            действие игрока будет сопровождаться визуальным фидбеком.
+          </p>
+
+          <div class="code-title">🎭 Интеграция в игровую логику</div>
+          <div class="code-example">
+            <pre><span class="css-comment">// Обновлённая функция игры с анимациями</span>
+<span class="css-selector">function makeChoiceAnimated</span>(playerChoice) {
+    const playerButton = document.querySelector(`[data-choice="${playerChoice}"]`);
+    const resultElement = document.getElementById('gameResult');
+    
+    <span class="css-comment">// 1. Анимация выбора игрока</span>
+    AnimationSystem.applyAnimation(playerButton, 'selected', 500);
+    
+    <span class="css-comment">// 2. Показываем индикатор загрузки</span>
+    resultElement.textContent = 'Компьютер думает...';
+    AnimationSystem.applyAnimation(resultElement, 'pulse', 1500);
+    
+    <span class="css-comment">// 3. Задержка для драматизма</span>
+    setTimeout(() => {
+        const computerChoice = AISystem.getChoice();
+        const result = determineWinner(playerChoice, computerChoice);
+        
+        <span class="css-comment">// 4. Показываем результат с анимацией</span>
+        displayResult(result, playerChoice, computerChoice);
+        
+        <span class="css-comment">// 5. Применяем соответствующую анимацию</span>
+        switch (result) {
+            case 'win':
+                AnimationSystem.winEffect(playerButton);
+                ParticleSystem.sparkExplosion(
+                    playerButton.offsetLeft + playerButton.offsetWidth / 2,
+                    playerButton.offsetTop + playerButton.offsetHeight / 2
+                );
+                break;
+                
+            case 'lose':
+                AnimationSystem.loseEffect(playerButton);
+                break;
+                
+            case 'draw':
+                AnimationSystem.applyAnimation(playerButton, 'pulse', 1000);
+                break;
+        }
+        
+        <span class="css-comment">// 6. Обновляем статистику с анимацией</span>
+        updateStatsAnimated(result);
+        
+    }, 1000);
+}
+
+<span class="css-comment">// Анимированное обновление статистики</span>
+<span class="css-selector">function updateStatsAnimated</span>(result) {
+    updateStats(result); <span class="css-comment">// Обычное обновление</span>
+    
+    <span class="css-comment">// Анимация изменившихся счётчиков</span>
+    const statElements = {
+        wins: document.getElementById('wins'),
+        losses: document.getElementById('losses'),
+        draws: document.getElementById('draws'),
+        streak: document.getElementById('streak')
+    };
+    
+    switch (result) {
+        case 'win':
+            AnimationSystem.applyAnimation(statElements.wins, 'bounce', 600);
+            AnimationSystem.applyAnimation(statElements.streak, 'glow', 1000);
+            break;
+        case 'lose':
+            AnimationSystem.applyAnimation(statElements.losses, 'shake', 500);
+            break;
+        case 'draw':
+            AnimationSystem.applyAnimation(statElements.draws, 'pulse', 800);
+            break;
+    }
+}</pre>
+          </div>
+        </div>
+
+        <div class="task-section">
+          <h3>✨ Твоё задание</h3>
+          <p>Добавь анимационные эффекты в свою игру:</p>
+
+          <ol class="task-list">
+            <li>
+              Создай CSS @keyframes для основных анимаций (shake, pulse, glow,
+              bounce)
+            </li>
+            <li>Реализуй систему управления анимациями через JavaScript</li>
+            <li>
+              Добавь анимации для каждого результата игры (победа, поражение,
+              ничья)
+            </li>
+            <li>Создай эффект частиц для особых моментов</li>
+            <li>Интегрируй анимации в основную логику игры</li>
+            <li>Добавь анимированное обновление статистики</li>
+            <li>Создай текстовые эффекты для результатов</li>
+            <li>Протестируй все анимации на разных устройствах</li>
+          </ol>
+
+          <p style="margin-top: 20px; font-style: italic; color: #004085">
+            💡 Не переборщи с анимациями - они должны улучшать, а не отвлекать!
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px">
+          <a href="rps-lesson-5b.html" class="next-lesson">
+            Следующий урок: Силы-апы и полировка →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Демо функции для интерактивных элементов
+      function demoWinAnimation(button) {
+        button.classList.add("animate-win");
+        createDemoConfetti();
+        setTimeout(() => {
+          button.classList.remove("animate-win");
+        }, 1000);
+      }
+
+      function demoLoseAnimation(button) {
+        button.classList.add("animate-lose");
+        document.querySelector(".container").classList.add("screen-shake");
+        setTimeout(() => {
+          button.classList.remove("animate-lose");
+          document.querySelector(".container").classList.remove("screen-shake");
+        }, 1000);
+      }
+
+      function demoDrawAnimation(button) {
+        button.classList.add("demo-pulse");
+        setTimeout(() => {
+          button.classList.remove("demo-pulse");
+        }, 1500);
+      }
+
+      function createDemoConfetti() {
+        const colors = [
+          "#ff0000",
+          "#00ff00",
+          "#0000ff",
+          "#ffff00",
+          "#ff00ff",
+          "#00ffff",
+        ];
+
+        for (let i = 0; i < 15; i++) {
+          const confetti = document.createElement("div");
+          confetti.style.position = "fixed";
+          confetti.style.width = "8px";
+          confetti.style.height = "8px";
+          confetti.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.left = Math.random() * 100 + "vw";
+          confetti.style.top = "-10px";
+          confetti.style.borderRadius = "50%";
+          confetti.style.pointerEvents = "none";
+          confetti.style.zIndex = "9999";
+          confetti.style.animation = "confettiFall 3s linear forwards";
+
+          document.body.appendChild(confetti);
+
+          setTimeout(() => {
+            if (document.body.contains(confetti)) {
+              document.body.removeChild(confetti);
+            }
+          }, 3000);
+        }
+      }
+
+      // Инициализация анимаций при загрузке
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(
+          ".section, .demo-container, .text-effects, .task-section"
+        );
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        sections.forEach((section) => {
+          section.style.opacity = "0";
+          section.style.transform = "translateY(20px)";
+          section.style.transition = "all 0.6s ease";
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>

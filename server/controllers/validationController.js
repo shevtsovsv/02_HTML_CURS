@@ -27,9 +27,26 @@ const checkProjectStep = asyncHandler(async (req, res) => {
   const rules = step.validationRules;
 
   // Создаем виртуальный DOM
-  const dom = new JSDOM(
-    `<html><head><style>${css || ""}</style></head><body>${html || ""}</body></html>`,
-    {
+  // Если HTML содержит DOCTYPE и полную HTML структуру, используем его как есть
+  // Иначе, оборачиваем в стандартную структуру
+  let fullHTML;
+  
+  if (html && html.trim().toLowerCase().startsWith('<!doctype')) {
+    // HTML уже содержит полную структуру документа
+    fullHTML = html;
+    // Добавляем стили в head, если есть
+    if (css) {
+      fullHTML = fullHTML.replace(
+        /<\/head>/i, 
+        `<style>${css}</style></head>`
+      );
+    }
+  } else {
+    // HTML содержит только фрагмент, оборачиваем в полную структуру
+    fullHTML = `<html><head><style>${css || ""}</style></head><body>${html || ""}</body></html>`;
+  }
+
+  const dom = new JSDOM(fullHTML, {
       url: "http://localhost",
       referrer: "http://localhost",
       contentType: "text/html",

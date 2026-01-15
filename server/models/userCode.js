@@ -6,35 +6,48 @@
  */
 
 module.exports = (sequelize, DataTypes) => {
-  const userCode = sequelize.define("userCode", {
-    /**
-     * @property {string} html
-     * @description HTML-код, введенный пользователем.
-     */
-    html: {
-      type: DataTypes.TEXT,
-      // defaultValue "" позволяет создавать запись, даже если пользователь еще ничего не ввел.
-      defaultValue: "",
-    },
+  const userCode = sequelize.define(
+    "userCode",
+    {
+      /**
+       * @property {string} html
+       * @description HTML-код, введенный пользователем.
+       */
+      html: {
+        type: DataTypes.TEXT,
+        // defaultValue "" позволяет создавать запись, даже если пользователь еще ничего не ввел.
+        defaultValue: "",
+      },
 
-    /**
-     * @property {string} css
-     * @description CSS-код, введенный пользователем.
-     */
-    css: {
-      type: DataTypes.TEXT,
-      defaultValue: "",
-    },
+      /**
+       * @property {string} css
+       * @description CSS-код, введенный пользователем.
+       */
+      css: {
+        type: DataTypes.TEXT,
+        defaultValue: "",
+      },
 
-    /**
-     * @property {string} js
-     * @description JavaScript-код, введенный пользователем.
-     */
-    js: {
-      type: DataTypes.TEXT,
-      defaultValue: "",
+      /**
+       * @property {string} js
+       * @description JavaScript-код, введенный пользователем.
+       */
+      js: {
+        type: DataTypes.TEXT,
+        defaultValue: "",
+      },
     },
-  });
+    {
+      // Добавляем составной уникальный индекс для предотвращения дубликатов
+      indexes: [
+        {
+          unique: true,
+          fields: ["user_id", "project_id", "step_id"],
+          name: "unique_user_project_step",
+        },
+      ],
+    }
+  );
 
   /**
    * @description Определение связей (ассоциаций) модели userCode с другими моделями.
@@ -57,10 +70,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       as: "project",
     });
-	userCode.belongsTo(models.projectStep, {
-    foreignKey: "step_id",
-    as: "step",
-  });
+    userCode.belongsTo(models.projectStep, {
+      foreignKey: "step_id",
+      as: "step",
+    });
   };
 
   return userCode;

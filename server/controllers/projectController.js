@@ -85,9 +85,64 @@ const getProjectById = async (req, res) => {
     });
 
     if (projectData) {
-      // --- ИЗМЕНЕНИЕ: Мы больше не вычисляем current_step.
-      // Просто возвращаем все данные как есть. Фронтенд разберется.
-      res.json(projectData);
+      // Логирование для отладки
+      console.log(
+        "Project Controller: Проект загружен:",
+        projectData.id,
+        projectData.title
+      );
+      console.log(
+        "Project Controller: Количество шагов:",
+        projectData.steps?.length
+      );
+      console.log(
+        "Project Controller: Количество userCodes:",
+        projectData.userCodes?.length
+      );
+      if (projectData.userCodes?.length > 0) {
+        console.log(
+          "Project Controller: userCodes step_ids:",
+          projectData.userCodes.map((code) => code.step_id)
+        );
+      }
+
+      // --- НОВАЯ ЛОГИКА: Вычисляем последний пройденный шаг ---
+      let lastCompletedStepIndex = -1;
+
+      if (userId && projectData.userProgresses && projectData.steps) {
+        // Получаем отсортированные шаги по порядку
+        const sortedSteps = projectData.steps.sort(
+          (a, b) => a.step_number - b.step_number
+        );
+
+        // Находим последний выполненный шаг
+        for (let i = 0; i < sortedSteps.length; i++) {
+          const step = sortedSteps[i];
+          const isCompleted = projectData.userProgresses.some(
+            (progress) => progress.step_id === step.id && progress.completed
+          );
+
+          if (isCompleted) {
+            lastCompletedStepIndex = i;
+          } else {
+            // Если шаг не выполнен, останавливаемся (шаги должны идти последовательно)
+            break;
+          }
+        }
+
+        console.log(
+          "Project Controller: Последний пройденный шаг индекс:",
+          lastCompletedStepIndex
+        );
+      }
+
+      // Добавляем информацию о последнем пройденном шаге к ответу
+      const responseData = {
+        ...projectData.toJSON(),
+        lastCompletedStepIndex: lastCompletedStepIndex,
+      };
+
+      res.json(responseData);
     } else {
       res.status(404).json({ error: "Проект не найден" });
     }

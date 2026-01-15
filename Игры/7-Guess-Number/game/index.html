@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Угадай число - Математический детектив!</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #f093fb 100%
+        );
+        margin: 0;
+        padding: 10px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+      }
+
+      .back-to-games {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-to-games:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      .game-container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        padding: 20px;
+        border: 3px solid rgba(102, 126, 234, 0.8);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        max-width: 700px;
+        backdrop-filter: blur(10px);
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 5px;
+        color: #5a67d8;
+        text-shadow: 0 2px 4px rgba(90, 103, 216, 0.3);
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        margin-bottom: 15px;
+        color: #555;
+      }
+
+      .game-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        padding: 12px;
+        border-radius: 15px;
+        color: #d63384;
+        font-weight: bold;
+        border: 2px solid #ff6b9d;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+      }
+
+      .difficulty-selector {
+        margin-bottom: 20px;
+      }
+
+      .difficulty-btn {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        border-radius: 20px;
+        cursor: pointer;
+        margin: 5px;
+        transition: all 0.3s ease;
+        font-weight: bold;
+      }
+
+      .difficulty-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .difficulty-btn.active {
+        background: linear-gradient(135deg, #00b894, #00a085);
+        box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+      }
+
+      .game-area {
+        background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        border-radius: 25px;
+        padding: 25px;
+        margin: 20px 0;
+        border: 3px solid #e17055;
+        position: relative;
+      }
+
+      .mystery-number {
+        font-size: 4rem;
+        margin: 15px 0;
+        color: #2d3436;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .range-display {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        border: 2px solid #ddd;
+      }
+
+      .range-text {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        font-weight: bold;
+      }
+
+      .attempts-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .attempts-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 15px;
+        border: 2px solid #3498db;
+      }
+
+      .attempts-number {
+        font-size: 2rem;
+        color: #e74c3c;
+        font-weight: bold;
+        display: block;
+      }
+
+      .attempts-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+      }
+
+      .input-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 3px solid #9b59b6;
+      }
+
+      .guess-input {
+        font-size: 2rem;
+        padding: 15px 20px;
+        border: 3px solid #74b9ff;
+        border-radius: 15px;
+        text-align: center;
+        width: 200px;
+        margin: 10px;
+      }
+
+      .guess-input:focus {
+        outline: none;
+        border-color: #0984e3;
+        box-shadow: 0 0 20px rgba(116, 185, 255, 0.5);
+      }
+
+      .guess-btn {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border-radius: 15px;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        font-weight: bold;
+      }
+
+      .guess-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+      }
+
+      .guess-btn:disabled {
+        background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .feedback-area {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        color: white;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .feedback-text {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .hint-text {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .guess-history {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        border: 2px solid #f39c12;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .guess-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 8px 12px;
+        margin: 5px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 4px solid #3498db;
+      }
+
+      .guess-item.too-high {
+        border-left-color: #e74c3c;
+      }
+
+      .guess-item.too-low {
+        border-left-color: #f39c12;
+      }
+
+      .guess-item.correct {
+        border-left-color: #27ae60;
+        background: #d5f4e6;
+      }
+
+      .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      .action-btn {
+        background: linear-gradient(135deg, #a8e6cf, #88d8a3);
+        color: #2d3436;
+        border: none;
+        padding: 12px 15px;
+        font-size: 0.9rem;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+      }
+
+      .action-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .hint-btn {
+        background: linear-gradient(135deg, #fdcb6e, #e17055);
+      }
+      .newgame-btn {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        color: white;
+      }
+      .stats-btn {
+        background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+      }
+
+      .achievements-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 15px;
+        margin: 15px 0;
+        border: 3px solid #e67e22;
+      }
+
+      .achievement {
+        background: #e67e22;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        margin: 5px;
+        display: inline-block;
+        font-size: 0.85rem;
+        font-weight: bold;
+      }
+
+      .special-modes {
+        margin: 20px 0;
+      }
+
+      .special-btn {
+        background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        border-radius: 15px;
+        cursor: pointer;
+        margin: 5px;
+        transition: all 0.3s ease;
+        font-weight: bold;
+      }
+
+      .special-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .progress-bar {
+        background: #ecf0f1;
+        border-radius: 15px;
+        height: 20px;
+        margin: 10px 0;
+        overflow: hidden;
+        border: 2px solid #bdc3c7;
+      }
+
+      .progress-fill {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        height: 100%;
+        border-radius: 13px;
+        transition: width 0.5s ease;
+      }
+
+      .celebration {
+        position: fixed;
+        font-size: 3rem;
+        animation: celebrate 2s ease-out forwards;
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      @keyframes celebrate {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-200px) scale(2) rotate(360deg);
+        }
+      }
+
+      .temperature-gauge {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        color: white;
+        display: none;
+      }
+
+      .temperature-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .smart-hints {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        border: 2px solid #8e44ad;
+      }
+
+      .hint-indicator {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin: 5px 0;
+      }
+
+      .binary-search-mode {
+        background: linear-gradient(135deg, #2d3436, #636e72);
+        color: white;
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        display: none;
+      }
+
+      .optimal-path {
+        color: #00b894;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../../index.html" class="back-to-games">← Вернуться к играм</a>
+    <div class="game-container">
+      <h1>🕵️‍♂️ Математический детектив! 🕵️‍♂️</h1>
+      <p class="subtitle">
+        Найди загаданное число с помощью логики и дедукции!
+      </p>
+
+      <div class="game-stats">
+        <div class="stat-card">
+          <span class="stat-number" id="gamesPlayed">0</span>
+          <span class="stat-label">Игр</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="gamesWon">0</span>
+          <span class="stat-label">Побед</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="bestScore">0</span>
+          <span class="stat-label">Лучший</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="avgAttempts">0</span>
+          <span class="stat-label">Среднее</span>
+        </div>
+      </div>
+
+      <div class="difficulty-selector">
+        <p><strong>🎯 Выбери сложность:</strong></p>
+        <button
+          class="difficulty-btn active"
+          onclick="setDifficulty('easy')"
+          id="easy"
+        >
+          😊 Лёгкий (1-50)
+        </button>
+        <button
+          class="difficulty-btn"
+          onclick="setDifficulty('medium')"
+          id="medium"
+        >
+          😎 Средний (1-100)
+        </button>
+        <button
+          class="difficulty-btn"
+          onclick="setDifficulty('hard')"
+          id="hard"
+        >
+          🤯 Сложный (1-500)
+        </button>
+        <button
+          class="difficulty-btn"
+          onclick="setDifficulty('extreme')"
+          id="extreme"
+        >
+          🔥 Экстрим (1-1000)
+        </button>
+      </div>
+
+      <div class="game-area">
+        <div class="mystery-number">❓❓❓</div>
+
+        <div class="range-display">
+          <div class="range-text" id="rangeText">
+            Я загадал число от 1 до 50
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+        </div>
+
+        <div class="attempts-info">
+          <div class="attempts-card">
+            <span class="attempts-number" id="currentAttempts">0</span>
+            <span class="attempts-label">Попытки</span>
+          </div>
+          <div class="attempts-card">
+            <span class="attempts-number" id="maxAttempts">7</span>
+            <span class="attempts-label">Лимит</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-section">
+        <h3 style="margin-top: 0; color: #8e44ad">🎯 Твоя догадка:</h3>
+        <input
+          type="number"
+          class="guess-input"
+          id="guessInput"
+          placeholder="?"
+          onkeypress="handleKeyPress(event)"
+        />
+        <br />
+        <button class="guess-btn" onclick="makeGuess()" id="guessButton">
+          🎯 Проверить!
+        </button>
+      </div>
+
+      <div class="temperature-gauge" id="temperatureGauge">
+        <div class="temperature-text" id="temperatureText">
+          🌡️ Температура: Холодно
+        </div>
+      </div>
+
+      <div class="feedback-area">
+        <div class="feedback-text" id="feedbackText">
+          Сделай свою первую попытку!
+        </div>
+        <div class="hint-text" id="hintText">Используй логику и анализ 🧠</div>
+      </div>
+
+      <div class="smart-hints">
+        <h4 style="margin-top: 0; color: #8e44ad">💡 Умные подсказки:</h4>
+        <div class="hint-indicator" id="rangeHint">
+          Полный диапазон доступен
+        </div>
+        <div class="hint-indicator" id="strategyHint">
+          Попробуй метод деления пополам
+        </div>
+        <div class="hint-indicator" id="proximityHint">
+          Подсказки о близости появятся после попытки
+        </div>
+      </div>
+
+      <div class="binary-search-mode" id="binarySearchMode">
+        <h4 style="margin-top: 0">🤖 Режим оптимального поиска:</h4>
+        <p>
+          Следующий оптимальный ход:
+          <span class="optimal-path" id="optimalGuess">25</span>
+        </p>
+        <p>
+          Максимум шагов до победы:
+          <span class="optimal-path" id="maxSteps">6</span>
+        </p>
+      </div>
+
+      <div class="guess-history">
+        <h4 style="margin-top: 0; color: #f39c12">📝 История попыток:</h4>
+        <div id="historyList">Попытки появятся здесь...</div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="action-btn hint-btn" onclick="getHint()">
+          💡 Подсказка
+        </button>
+        <button class="action-btn newgame-btn" onclick="newGame()">
+          🎲 Новая игра
+        </button>
+        <button class="action-btn stats-btn" onclick="toggleMode()">
+          📊 Режим
+        </button>
+      </div>
+
+      <div class="special-modes">
+        <button class="special-btn" onclick="toggleTemperature()">
+          🌡️ Термометр
+        </button>
+        <button class="special-btn" onclick="toggleBinarySearch()">
+          🤖 ИИ помощь
+        </button>
+        <button class="special-btn" onclick="showStrategies()">
+          📚 Стратегии
+        </button>
+        <button class="special-btn" onclick="resetStats()">🔄 Сброс</button>
+      </div>
+
+      <div class="achievements-section">
+        <h4 style="margin-top: 0; color: #d35400">🏆 Достижения:</h4>
+        <div id="achievementsList">Играй, чтобы получить достижения!</div>
+      </div>
+    </div>
+
+    <script>
+      // Игровое состояние
+      let gameState = {
+        secretNumber: 0,
+        minRange: 1,
+        maxRange: 50,
+        attempts: 0,
+        maxAttempts: 7,
+        guessHistory: [],
+        difficulty: "easy",
+        gameActive: true,
+        hintsUsed: 0,
+        showTemperature: false,
+        showBinarySearch: false,
+      };
+
+      // Статистика
+      let stats = {
+        gamesPlayed: 0,
+        gamesWon: 0,
+        totalAttempts: 0,
+        bestScore: 0,
+        achievements: [],
+      };
+
+      // Настройки сложности
+      const difficultySettings = {
+        easy: { min: 1, max: 50, attempts: 7 },
+        medium: { min: 1, max: 100, attempts: 8 },
+        hard: { min: 1, max: 500, attempts: 10 },
+        extreme: { min: 1, max: 1000, attempts: 12 },
+      };
+
+      // Достижения
+      const achievements = [
+        {
+          id: "first_win",
+          name: "🌟 Первая победа",
+          condition: () => stats.gamesWon >= 1,
+        },
+        {
+          id: "lucky_guess",
+          name: "🍀 Везучий",
+          condition: () => gameState.attempts === 1 && !gameState.gameActive,
+        },
+        {
+          id: "efficient",
+          name: "🎯 Эффективный",
+          condition: () => stats.bestScore <= 3,
+        },
+        {
+          id: "persistent",
+          name: "💪 Упорный",
+          condition: () => stats.gamesPlayed >= 10,
+        },
+        {
+          id: "master",
+          name: "👑 Мастер дедукции",
+          condition: () => stats.gamesWon >= 20,
+        },
+        {
+          id: "perfectionist",
+          name: "💫 Перфекционист",
+          condition: () =>
+            stats.gamesWon >= 5 && stats.gamesWon === stats.gamesPlayed,
+        },
+      ];
+
+      // Установка сложности
+      function setDifficulty(level) {
+        gameState.difficulty = level;
+        const settings = difficultySettings[level];
+
+        gameState.minRange = settings.min;
+        gameState.maxRange = settings.max;
+        gameState.maxAttempts = settings.attempts;
+
+        // Переключение активной кнопки
+        document
+          .querySelectorAll(".difficulty-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.getElementById(level).classList.add("active");
+
+        // Обновление отображения и новая игра
+        updateRangeDisplay();
+        document.getElementById("maxAttempts").textContent =
+          gameState.maxAttempts;
+        newGame();
+      }
+
+      // Новая игра
+      function newGame() {
+        gameState.secretNumber =
+          Math.floor(
+            Math.random() * (gameState.maxRange - gameState.minRange + 1)
+          ) + gameState.minRange;
+        gameState.attempts = 0;
+        gameState.guessHistory = [];
+        gameState.gameActive = true;
+        gameState.hintsUsed = 0;
+
+        // Сброс интерфейса
+        document.getElementById("currentAttempts").textContent = "0";
+        document.getElementById("guessInput").value = "";
+        document.getElementById("guessInput").disabled = false;
+        document.getElementById("guessButton").disabled = false;
+        document.getElementById("historyList").innerHTML =
+          "Попытки появятся здесь...";
+        document.getElementById("feedbackText").textContent =
+          "Сделай свою первую попытку!";
+        document.getElementById("hintText").textContent =
+          "Используй логику и анализ 🧠";
+        document.querySelector(".mystery-number").textContent = "❓❓❓";
+        document.getElementById("progressFill").style.width = "0%";
+
+        updateRangeDisplay();
+        updateSmartHints();
+        updateBinarySearch();
+
+        console.log("Загадано число:", gameState.secretNumber); // Для отладки
+      }
+
+      // Основная функция угадывания
+      function makeGuess() {
+        const guessInput = document.getElementById("guessInput");
+        const guess = parseInt(guessInput.value);
+
+        // Валидация ввода
+        if (isNaN(guess)) {
+          showFeedback("❌ Введи число!", "Попробуй ещё раз");
+          return;
+        }
+
+        if (guess < gameState.minRange || guess > gameState.maxRange) {
+          showFeedback(
+            "❌ Число вне диапазона!",
+            `Введи число от ${gameState.minRange} до ${gameState.maxRange}`
+          );
+          return;
+        }
+
+        if (!gameState.gameActive) {
+          showFeedback("🎲 Игра окончена!", "Начни новую игру");
+          return;
+        }
+
+        gameState.attempts++;
+        document.getElementById("currentAttempts").textContent =
+          gameState.attempts;
+
+        // Определение результата
+        let result, feedback, hint;
+        const difference = Math.abs(guess - gameState.secretNumber);
+
+        if (guess === gameState.secretNumber) {
+          result = "correct";
+          feedback = "🎉 ПОЗДРАВЛЯЮ! Ты угадал!";
+          hint = `Число было ${gameState.secretNumber}! За ${gameState.attempts} попыток!`;
+          winGame();
+        } else if (guess < gameState.secretNumber) {
+          result = "too-low";
+          feedback = "📈 Моё число БОЛЬШЕ!";
+          hint = getSmartHint(guess, "higher", difference);
+        } else {
+          result = "too-high";
+          feedback = "📉 Моё число МЕНЬШЕ!";
+          hint = getSmartHint(guess, "lower", difference);
+        }
+
+        // Добавление в историю
+        addToHistory(guess, result);
+
+        // Показ обратной связи
+        showFeedback(feedback, hint);
+
+        // Обновление термометра
+        if (gameState.showTemperature && result !== "correct") {
+          updateTemperature(difference);
+        }
+
+        // Проверка лимита попыток
+        if (
+          gameState.attempts >= gameState.maxAttempts &&
+          result !== "correct"
+        ) {
+          loseGame();
+        }
+
+        // Обновление интерфейса
+        updateProgress();
+        updateSmartHints();
+        updateBinarySearch();
+
+        guessInput.value = "";
+      }
+
+      // Умная подсказка
+      function getSmartHint(guess, direction, difference) {
+        if (difference <= 5) {
+          return "🔥 Очень близко! Ты почти у цели!";
+        } else if (difference <= 15) {
+          return "🌡️ Тепло! Ты на правильном пути!";
+        } else if (difference <= 30) {
+          return "❄️ Прохладно! Нужно ещё подумать";
+        } else {
+          return "🧊 Холодно! Попробуй кардинально другое число";
+        }
+      }
+
+      // Победа
+      function winGame() {
+        gameState.gameActive = false;
+        document.getElementById("guessInput").disabled = true;
+        document.getElementById("guessButton").disabled = true;
+        document.querySelector(".mystery-number").textContent =
+          gameState.secretNumber;
+
+        // Обновление статистики
+        stats.gamesPlayed++;
+        stats.gamesWon++;
+        stats.totalAttempts += gameState.attempts;
+
+        if (stats.bestScore === 0 || gameState.attempts < stats.bestScore) {
+          stats.bestScore = gameState.attempts;
+        }
+
+        updateStats();
+        checkAchievements();
+        createCelebration();
+      }
+
+      // Поражение
+      function loseGame() {
+        gameState.gameActive = false;
+        document.getElementById("guessInput").disabled = true;
+        document.getElementById("guessButton").disabled = true;
+
+        showFeedback(
+          "😔 Попытки закончились!",
+          `Число было ${gameState.secretNumber}. Попробуй ещё раз!`
+        );
+        document.querySelector(".mystery-number").textContent =
+          gameState.secretNumber;
+
+        stats.gamesPlayed++;
+        stats.totalAttempts += gameState.attempts;
+        updateStats();
+      }
+
+      // Показ обратной связи
+      function showFeedback(main, hint) {
+        document.getElementById("feedbackText").textContent = main;
+        document.getElementById("hintText").textContent = hint;
+      }
+
+      // Добавление в историю
+      function addToHistory(guess, result) {
+        gameState.guessHistory.push({ guess, result });
+
+        const historyList = document.getElementById("historyList");
+        const item = document.createElement("div");
+        item.className = `guess-item ${result}`;
+
+        let resultText = "";
+        switch (result) {
+          case "too-high":
+            resultText = "Слишком много";
+            break;
+          case "too-low":
+            resultText = "Слишком мало";
+            break;
+          case "correct":
+            resultText = "🎯 ВЕРНО!";
+            break;
+        }
+
+        item.innerHTML = `
+                <span>Попытка ${gameState.attempts}: ${guess}</span>
+                <span>${resultText}</span>
+            `;
+
+        if (historyList.textContent === "Попытки появятся здесь...") {
+          historyList.innerHTML = "";
+        }
+
+        historyList.appendChild(item);
+        historyList.scrollTop = historyList.scrollHeight;
+      }
+
+      // Обновление прогресса
+      function updateProgress() {
+        const progress = (gameState.attempts / gameState.maxAttempts) * 100;
+        document.getElementById("progressFill").style.width = progress + "%";
+
+        // Изменение цвета прогресса
+        const fill = document.getElementById("progressFill");
+        if (progress < 50) {
+          fill.style.background = "linear-gradient(135deg, #2ecc71, #27ae60)";
+        } else if (progress < 80) {
+          fill.style.background = "linear-gradient(135deg, #f39c12, #e67e22)";
+        } else {
+          fill.style.background = "linear-gradient(135deg, #e74c3c, #c0392b)";
+        }
+      }
+
+      // Обновление отображения диапазона
+      function updateRangeDisplay() {
+        document.getElementById(
+          "rangeText"
+        ).textContent = `Я загадал число от ${gameState.minRange} до ${gameState.maxRange}`;
+      }
+
+      // Подсказка
+      function getHint() {
+        if (gameState.hintsUsed >= 3) {
+          alert("❌ Больше подсказок нет! Используй логику!");
+          return;
+        }
+
+        if (!gameState.gameActive) {
+          alert("🎲 Начни новую игру для подсказок!");
+          return;
+        }
+
+        gameState.hintsUsed++;
+
+        const hints = [
+          `🎯 Число ${
+            gameState.secretNumber % 2 === 0 ? "ЧЁТНОЕ" : "НЕЧЁТНОЕ"
+          }`,
+          `🔢 Число ${
+            gameState.secretNumber <
+            (gameState.minRange + gameState.maxRange) / 2
+              ? "в ПЕРВОЙ половине"
+              : "во ВТОРОЙ половине"
+          } диапазона`,
+          `💫 Сумма цифр числа: ${gameState.secretNumber
+            .toString()
+            .split("")
+            .reduce((a, b) => a + parseInt(b), 0)}`,
+        ];
+
+        alert(
+          `💡 Подсказка ${gameState.hintsUsed}/3:\n${
+            hints[gameState.hintsUsed - 1]
+          }`
+        );
+      }
+
+      // Термометр
+      function toggleTemperature() {
+        gameState.showTemperature = !gameState.showTemperature;
+        const gauge = document.getElementById("temperatureGauge");
+        gauge.style.display = gameState.showTemperature ? "block" : "none";
+      }
+
+      function updateTemperature(difference) {
+        const range = gameState.maxRange - gameState.minRange;
+        const percentage = difference / range;
+
+        let temp, color;
+        if (percentage < 0.05) {
+          temp = "🔥 Очень горячо!";
+          color = "#e74c3c";
+        } else if (percentage < 0.15) {
+          temp = "🌡️ Горячо!";
+          color = "#e67e22";
+        } else if (percentage < 0.3) {
+          temp = "😊 Тепло";
+          color = "#f39c12";
+        } else if (percentage < 0.5) {
+          temp = "❄️ Прохладно";
+          color = "#3498db";
+        } else {
+          temp = "🧊 Холодно";
+          color = "#74b9ff";
+        }
+
+        const gauge = document.getElementById("temperatureGauge");
+        gauge.style.background = `linear-gradient(135deg, ${color}, ${color}dd)`;
+        document.getElementById(
+          "temperatureText"
+        ).textContent = `🌡️ Температура: ${temp}`;
+      }
+
+      // Бинарный поиск
+      function toggleBinarySearch() {
+        gameState.showBinarySearch = !gameState.showBinarySearch;
+        const mode = document.getElementById("binarySearchMode");
+        mode.style.display = gameState.showBinarySearch ? "block" : "none";
+        updateBinarySearch();
+      }
+
+      function updateBinarySearch() {
+        if (!gameState.showBinarySearch) return;
+
+        let min = gameState.minRange;
+        let max = gameState.maxRange;
+
+        // Учитываем историю попыток
+        gameState.guessHistory.forEach((item) => {
+          if (item.result === "too-high") {
+            max = Math.min(max, item.guess - 1);
+          } else if (item.result === "too-low") {
+            min = Math.max(min, item.guess + 1);
+          }
+        });
+
+        const optimal = Math.floor((min + max) / 2);
+        const maxSteps = Math.ceil(Math.log2(max - min + 1));
+
+        document.getElementById("optimalGuess").textContent = optimal;
+        document.getElementById("maxSteps").textContent = maxSteps;
+      }
+
+      // Умные подсказки
+      function updateSmartHints() {
+        let min = gameState.minRange;
+        let max = gameState.maxRange;
+
+        gameState.guessHistory.forEach((item) => {
+          if (item.result === "too-high") {
+            max = Math.min(max, item.guess - 1);
+          } else if (item.result === "too-low") {
+            min = Math.max(min, item.guess + 1);
+          }
+        });
+
+        document.getElementById(
+          "rangeHint"
+        ).textContent = `Возможный диапазон: ${min} - ${max} (${
+          max - min + 1
+        } вариантов)`;
+
+        if (gameState.attempts === 0) {
+          document.getElementById("strategyHint").textContent =
+            "Попробуй метод деления пополам";
+        } else {
+          const optimal = Math.floor((min + max) / 2);
+          document.getElementById(
+            "strategyHint"
+          ).textContent = `Оптимальный следующий ход: ${optimal}`;
+        }
+
+        if (gameState.attempts > 0) {
+          const lastGuess =
+            gameState.guessHistory[gameState.guessHistory.length - 1];
+          const difference = Math.abs(lastGuess.guess - gameState.secretNumber);
+          document.getElementById(
+            "proximityHint"
+          ).textContent = `Последняя попытка была в ${difference} числах от цели`;
+        }
+      }
+
+      // Стратегии
+      function showStrategies() {
+        alert(`🎓 СТРАТЕГИИ ПОИСКА:
+
+1. 🎯 Деление пополам
+   Всегда выбирай середину диапазона
+
+2. 🧠 Логический анализ  
+   Используй подсказки о чётности/нечётности
+
+3. 🌡️ Термометр
+   Ориентируйся на "температуру" 
+
+4. 📊 Анализ истории
+   Изучай свои предыдущие попытки
+
+5. 🤖 ИИ помощь
+   Включи режим оптимального поиска`);
+      }
+
+      // Обновление статистики
+      function updateStats() {
+        document.getElementById("gamesPlayed").textContent = stats.gamesPlayed;
+        document.getElementById("gamesWon").textContent = stats.gamesWon;
+        document.getElementById("bestScore").textContent =
+          stats.bestScore || "-";
+
+        const avg =
+          stats.gamesPlayed > 0
+            ? (stats.totalAttempts / stats.gamesPlayed).toFixed(1)
+            : 0;
+        document.getElementById("avgAttempts").textContent = avg;
+      }
+
+      // Проверка достижений
+      function checkAchievements() {
+        achievements.forEach((achievement) => {
+          if (
+            !stats.achievements.includes(achievement.id) &&
+            achievement.condition()
+          ) {
+            stats.achievements.push(achievement.id);
+            alert(`🏆 Достижение разблокировано: ${achievement.name}!`);
+            updateAchievements();
+          }
+        });
+      }
+
+      // Обновление достижений
+      function updateAchievements() {
+        const list = document.getElementById("achievementsList");
+
+        if (stats.achievements.length === 0) {
+          list.innerHTML = "Играй, чтобы получить достижения!";
+          return;
+        }
+
+        list.innerHTML = achievements
+          .filter((a) => stats.achievements.includes(a.id))
+          .map((a) => `<span class="achievement">${a.name}</span>`)
+          .join("");
+      }
+
+      // Анимация празднования
+      function createCelebration() {
+        const emojis = ["🎉", "🎊", "🌟", "💫", "🏆", "👑"];
+
+        for (let i = 0; i < 10; i++) {
+          setTimeout(() => {
+            const celebration = document.createElement("div");
+            celebration.className = "celebration";
+            celebration.textContent =
+              emojis[Math.floor(Math.random() * emojis.length)];
+            celebration.style.left = Math.random() * window.innerWidth + "px";
+            celebration.style.top = window.innerHeight + "px";
+
+            document.body.appendChild(celebration);
+            setTimeout(() => celebration.remove(), 2000);
+          }, i * 200);
+        }
+      }
+
+      // Переключение режимов
+      function toggleMode() {
+        const modes = ["classic", "temperature", "binary"];
+        // Логика переключения режимов
+        alert("🔄 Режимы: классический, с термометром, с ИИ помощью!");
+      }
+
+      // Сброс статистики
+      function resetStats() {
+        if (confirm("🔄 Сбросить всю статистику?")) {
+          stats = {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            totalAttempts: 0,
+            bestScore: 0,
+            achievements: [],
+          };
+          updateStats();
+          updateAchievements();
+        }
+      }
+
+      // Обработка Enter
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          makeGuess();
+        }
+      }
+
+      // Инициализация
+      document.addEventListener("DOMContentLoaded", function () {
+        newGame();
+        updateStats();
+        updateAchievements();
+      });
+    </script>
+  </body>
+</html>
