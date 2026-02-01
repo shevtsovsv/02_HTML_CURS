@@ -48,6 +48,45 @@ const PreviewPane = ({
   }, [html, css, js, forceUpdate]);
 
   const documentContent = useMemo(() => {
+    // Функция для обертывания JS кода, чтобы функции были доступны глобально для onclick
+    const wrapJavaScript = (jsCode) => {
+      if (!jsCode) return "";
+      
+      // Находим все function declarations в коде
+      const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
+      const functionNames = [];
+      let match;
+      
+      while ((match = functionRegex.exec(jsCode)) !== null) {
+        functionNames.push(match[1]);
+      }
+      
+      // Отладочный вывод
+      if (functionNames.length > 0) {
+        console.log('[PreviewPane] Найдены функции для wrapper:', functionNames);
+      }
+      
+      // Создаем код, который делает функции глобальными
+      let globalAssignments = '';
+      if (functionNames.length > 0) {
+        globalAssignments = '\n// Делаем функции доступными для onclick\n';
+        functionNames.forEach(name => {
+          globalAssignments += `if (typeof ${name} !== 'undefined') window.${name} = ${name};\n`;
+        });
+      }
+      
+      const result = jsCode + globalAssignments;
+      
+      // Выводим обернутый код для отладки
+      if (globalAssignments) {
+        console.log('[PreviewPane] Код с wrapper:\n', result);
+      }
+      
+      return result;
+    };
+
+    const wrappedJs = wrapJavaScript(debouncedJs);
+
     const safeJs = `
       document.addEventListener('DOMContentLoaded', function() {
         // Создаем изолированную среду для консоли
@@ -88,19 +127,18 @@ const PreviewPane = ({
             e.stopPropagation();
             console.error('Ошибка в превью:', e.message);
           });
-
-          // Выполняем пользовательский код в изолированной среде
-          (function() {
-            try {
-              ${debouncedJs || ""}
-            } catch (e) {
-              console.error('Ошибка выполнения кода:', e.message || e);
-            }
-          })();
         } catch (initError) {
           // Игнорируем ошибки инициализации
         }
       });
+
+      // Выполняем пользовательский код в ГЛОБАЛЬНОМ контексте (вне IIFE)
+      // Это необходимо для работы onclick с function declarations
+      try {
+        ${wrappedJs || ""}
+      } catch (e) {
+        console.error('Ошибка выполнения кода:', e.message || e);
+      }
     `;
 
     return `
@@ -119,12 +157,19 @@ const PreviewPane = ({
     `;
   }, [debouncedHtml, debouncedCss, debouncedJs]);
 
+  // Отладочный вывод финального HTML
+  useEffect(() => {
+    console.log('[PreviewPane] Final HTML length:', documentContent.length);
+    // Можно раскомментировать для полного просмотра HTML
+    // console.log('[PreviewPane] Full HTML:', documentContent);
+  }, [documentContent]);
+
   return (
     <iframe
       ref={iframeRef}
       srcDoc={documentContent}
       title="preview"
-      sandbox="allow-scripts allow-popups allow-forms"
+      sandbox="allow-scripts allow-modals allow-popups allow-forms"
       width="100%"
       height="100%"
       style={{

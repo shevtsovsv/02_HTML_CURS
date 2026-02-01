@@ -1,26 +1,50 @@
 // Дополнительные (кастомные) правила валидации для Magic Button
 // Подключать через require и расширять основной класс ValidationRules
 
-const ValidationRules = require('./validationRules');
+const ValidationRules = require("./validationRules");
 
 class ValidationRulesCustom extends ValidationRules {
   // Проверка наличия глобальной переменной (аналог variableExists)
   variableExists(rule) {
     this.executeJavaScript();
-    if (!(rule.name in this.window)) {
-      return `Глобальная переменная '${rule.name}' не определена.`;
+
+    // Сначала проверяем в window (для var и window.переменная)
+    if (rule.name in this.window) {
+      return null;
     }
-    return null;
+
+    // Если не найдена в window, пробуем через eval (для let/const в глобальном scope)
+    try {
+      const result = this.window.eval(`typeof ${rule.name} !== 'undefined'`);
+      if (result) {
+        return null;
+      }
+    } catch (e) {
+      // Переменная не доступна
+    }
+
+    return `Глобальная переменная '${rule.name}' не определена.`;
   }
 
   // Проверка значения глобальной переменной (аналог variableValueCheck)
   variableValueCheck(rule) {
     this.executeJavaScript();
-    if (!(rule.name in this.window)) {
-      return `Глобальная переменная '${rule.name}' не определена.`;
+
+    let value;
+    // Сначала проверяем в window
+    if (rule.name in this.window) {
+      value = this.window[rule.name];
+    } else {
+      // Пробуем получить через eval (для let/const)
+      try {
+        value = this.window.eval(rule.name);
+      } catch (e) {
+        return `Глобальная переменная '${rule.name}' не определена.`;
+      }
     }
-    if (this.window[rule.name] !== rule.expected) {
-      return `Переменная '${rule.name}' имеет значение '${this.window[rule.name]}', ожидалось '${rule.expected}'.`;
+
+    if (value !== rule.expected) {
+      return `Переменная '${rule.name}' имеет значение '${value}', ожидалось '${rule.expected}'.`;
     }
     return null;
   }
@@ -28,17 +52,30 @@ class ValidationRulesCustom extends ValidationRules {
   // Проверка наличия функции (аналог functionExists)
   functionExists(rule) {
     this.executeJavaScript();
-    if (typeof this.window[rule.name] !== 'function') {
-      return `Функция '${rule.name}' не найдена.`;
+
+    // Проверяем в window
+    if (typeof this.window[rule.name] === "function") {
+      return null;
     }
-    return null;
+
+    // Пробуем через eval (для function в глобальном scope, объявленных через let/const)
+    try {
+      const fn = this.window.eval(rule.name);
+      if (typeof fn === "function") {
+        return null;
+      }
+    } catch (e) {
+      // Функция не доступна
+    }
+
+    return `Функция '${rule.name}' не найдена.`;
   }
 
   // Проверка вызова функции (очень базово, только если функция есть)
   functionCallCheck(rule) {
     // Для простоты: проверяем, что функция определена (реальный call-tracking требует прокси)
     this.executeJavaScript();
-    if (typeof this.window[rule.function] !== 'function') {
+    if (typeof this.window[rule.function] !== "function") {
       return `Функция '${rule.function}' не найдена для вызова.`;
     }
     // Можно расширить: логировать вызовы через Proxy или monkey-patch
@@ -48,10 +85,21 @@ class ValidationRulesCustom extends ValidationRules {
   // Проверка наличия кода в теле функции (очень базово, eval+toString)
   functionBodyIncludes(rule) {
     this.executeJavaScript();
-    const fn = this.window[rule.function];
-    if (typeof fn !== 'function') {
+
+    let fn = this.window[rule.function];
+    // Если не найдена в window, пробуем через eval
+    if (typeof fn !== "function") {
+      try {
+        fn = this.window.eval(rule.function);
+      } catch (e) {
+        return `Функция '${rule.function}' не найдена.`;
+      }
+    }
+
+    if (typeof fn !== "function") {
       return `Функция '${rule.function}' не найдена.`;
     }
+
     const body = fn.toString();
     if (!body.includes(rule.expected)) {
       return `В теле функции '${rule.function}' не найдено '${rule.expected}'.`;
@@ -71,14 +119,25 @@ class ValidationRulesCustom extends ValidationRules {
   // Проверка длины массива (arrayLengthCheck)
   arrayLengthCheck(rule) {
     this.executeJavaScript();
-    if (!(rule.array in this.window)) {
-      return `Массив '${rule.array}' не найден.`;
+
+    let arr;
+    // Проверяем в window
+    if (rule.array in this.window) {
+      arr = this.window[rule.array];
+    } else {
+      // Пробуем через eval (для let/const)
+      try {
+        arr = this.window.eval(rule.array);
+      } catch (e) {
+        return `Массив '${rule.array}' не найден.`;
+      }
     }
-    if (!Array.isArray(this.window[rule.array])) {
+
+    if (!Array.isArray(arr)) {
       return `'${rule.array}' не является массивом.`;
     }
-    if (this.window[rule.array].length < rule.expected) {
-      return `Массив '${rule.array}' содержит ${this.window[rule.array].length} элементов, ожидалось минимум ${rule.expected}.`;
+    if (arr.length < rule.expected) {
+      return `Массив '${rule.array}' содержит ${arr.length} элементов, ожидалось минимум ${rule.expected}.`;
     }
     return null;
   }
@@ -171,7 +230,9 @@ class ValidationRulesCustom extends ValidationRules {
   // Проверка наличия сообщения в консоли (consoleLogCheck)
   consoleLogCheck(rule) {
     this.executeJavaScript();
-    const found = this.consoleMessages.some((msg) => msg.message.includes(rule.expected));
+    const found = this.consoleMessages.some((msg) =>
+      msg.message.includes(rule.expected),
+    );
     if (!found) {
       return `В консоли не найдено сообщение '${rule.expected}'.`;
     }

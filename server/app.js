@@ -7,8 +7,18 @@ const db = require("./models");
 const app = express();
 
 // Security and middleware
+// Разрешаем CORS для любого localhost порта (для разработки)
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  origin: function (origin, callback) {
+    // Разрешаем запросы без origin (например, Postman) или с localhost
+    if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+      callback(null, true);
+    } else if (process.env.CORS_ORIGIN && origin === process.env.CORS_ORIGIN) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 

@@ -15,6 +15,7 @@ class ValidationRules {
     this.consoleMessages = [];
     this.eventListeners = new Map();
     this.functionCallHistory = new Map(); // Для отслеживания вызовов функций
+    this.jsExecuted = false; // Флаг для предотвращения повторного выполнения JS
     this.setupInterception();
   }
 
@@ -67,21 +68,17 @@ class ValidationRules {
 
   /**
    * Execute JavaScript code safely
+   * JavaScript уже встроен в DOM через <script> тег в validationController
+   * Эта функция больше не должна добавлять скрипты повторно
    */
   executeJavaScript() {
-    if (!this.js) return;
-
-    try {
-      const script = this.document.createElement("script");
-      script.textContent = this.js;
-      this.document.head.appendChild(script);
-    } catch (error) {
-      this.consoleMessages.push({
-        type: "error",
-        message: `JavaScript execution error: ${error.message}`,
-        timestamp: Date.now(),
-      });
-    }
+    // JavaScript уже выполнен через встроенный <script> тег
+    // Не нужно выполнять повторно, это вызывает ошибки "already declared"
+    if (this.jsExecuted || !this.js) return;
+    
+    this.jsExecuted = true;
+    // Скрипт уже встроен в DOM при создании fullHTML в validationController
+    // Ничего делать не нужно
   }
 
   /**

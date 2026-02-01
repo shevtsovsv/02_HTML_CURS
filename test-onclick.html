@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тест onclick с wrapper</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      color: #333;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 500px;
+    }
+    .magic-button {
+      background: linear-gradient(135deg, #ff6b6b, #ffa500);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 50px;
+      border: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 20px;
+      box-shadow: 0 10px 25px rgba(255,107,107,0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .magic-button:hover {
+      transform: scale(1.1) rotate(2deg);
+      box-shadow: 0 15px 35px rgba(255,107,107,0.6);
+    }
+    .magic-button:active {
+      transform: scale(0.95);
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: left;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Тест onclick</h1>
+    <p>Этот файл показывает, как должен работать wrapper</p>
+    
+    <button class="magic-button" onclick="showMagic()">✨ Магия! ✨</button>
+    
+    <h3>Код JavaScript с wrapper:</h3>
+    <pre>let clickCount = 0;
+const magicMessages = [
+  "✨ Магия случилась!",
+  "🎉 Вау! Это невероятно!",
+  "🌟 Волшебство работает!",
+  "🎊 Удивительно!"
+];
+
+function showMagic() {
+  const randomIndex = Math.floor(Math.random() * magicMessages.length);
+  const randomMessage = magicMessages[randomIndex];
+  alert(randomMessage);
+}
+
+// Делаем функции доступными для onclick
+if (typeof showMagic !== 'undefined') window.showMagic = showMagic;</pre>
+    
+    <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+      Откройте консоль (F12) и проверьте: <code>typeof window.showMagic</code>
+    </p>
+  </div>
+
+  <script>
+    let clickCount = 0;
+    const magicMessages = [
+      "✨ Магия случилась!",
+      "🎉 Вау! Это невероятно!",
+      "🌟 Волшебство работает!",
+      "🎊 Удивительно!"
+    ];
+
+    function showMagic() {
+      const randomIndex = Math.floor(Math.random() * magicMessages.length);
+      const randomMessage = magicMessages[randomIndex];
+      alert(randomMessage);
+    }
+
+    // Делаем функции доступными для onclick
+    if (typeof showMagic !== 'undefined') window.showMagic = showMagic;
+
+    // Проверка в консоли
+    console.log('✅ typeof window.showMagic:', typeof window.showMagic);
+    console.log('✅ window.showMagic:', window.showMagic);
+  </script>
+</body>
+</html>
