@@ -1,4 +1,3 @@
-
 /**
  * @file lib/validationRules.js
  * @description Enhanced validation rules for HTML, CSS, and JavaScript validation
@@ -75,7 +74,7 @@ class ValidationRules {
     // JavaScript уже выполнен через встроенный <script> тег
     // Не нужно выполнять повторно, это вызывает ошибки "already declared"
     if (this.jsExecuted || !this.js) return;
-    
+
     this.jsExecuted = true;
     // Скрипт уже встроен в DOM при создании fullHTML в validationController
     // Ничего делать не нужно
@@ -225,25 +224,25 @@ class ValidationRules {
   /**
    * CSS Validation Rules
    */
-//   cssPropertyCheck(rule) {
-//     // (Твой текущий код cssPropertyCheck сохраняется без изменений)
-//   }
+  //   cssPropertyCheck(rule) {
+  //     // (Твой текущий код cssPropertyCheck сохраняется без изменений)
+  //   }
 
-//   styleRuleExists(rule) {
-//     // (Твой текущий код styleRuleExists сохраняется без изменений)
-//   }
+  //   styleRuleExists(rule) {
+  //     // (Твой текущий код styleRuleExists сохраняется без изменений)
+  //   }
 
-//   styleRuleProperty(rule) {
-//     // (Твой текущий код styleRuleProperty сохраняется без изменений)
-//   }
+  //   styleRuleProperty(rule) {
+  //     // (Твой текущий код styleRuleProperty сохраняется без изменений)
+  //   }
 
-//   computedStyle(rule) {
-//     // (Твой текущий код computedStyle сохраняется без изменений)
-//   }
+  //   computedStyle(rule) {
+  //     // (Твой текущий код computedStyle сохраняется без изменений)
+  //   }
 
-//   cssPropertyExists(rule) {
-//     // (Твой текущий код cssPropertyExists сохраняется без изменений)
-//   }
+  //   cssPropertyExists(rule) {
+  //     // (Твой текущий код cssPropertyExists сохраняется без изменений)
+  //   }
 
   computedStyle(rule) {
     const element = this.document.querySelector(rule.selector);
@@ -732,7 +731,6 @@ class ValidationRules {
 }
 
 module.exports = ValidationRules;
-
 
 // // ------------------------------------------------------------------------
 // /**

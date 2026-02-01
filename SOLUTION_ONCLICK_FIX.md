@@ -3,6 +3,7 @@
 ## Проблема
 
 При использовании `onclick="showMagic()"` в HTML возникала ошибка:
+
 ```
 Uncaught ReferenceError: showMagic is not defined
     at HTMLButtonElement.onclick
@@ -17,6 +18,7 @@ Uncaught ReferenceError: showMagic is not defined
 2. **Повторные выполнения**: Метод `executeJavaScript()` вызывался при каждой проверке валидации, добавляя новые `<script>` теги в head
 
 Это приводило к:
+
 - Ошибкам "Identifier 'clickCount' has already been declared" (для `let`/`const`)
 - Потере доступа к функциям для `onclick`
 - Переопределению переменных
@@ -41,7 +43,7 @@ class ValidationRules {
     // JavaScript уже выполнен через встроенный <script> тег
     // Не нужно выполнять повторно
     if (this.jsExecuted || !this.js) return;
-    
+
     this.jsExecuted = true;
     // Скрипт уже встроен в DOM при создании fullHTML
   }
@@ -76,12 +78,12 @@ if (html && html.trim().toLowerCase().startsWith("<!doctype")) {
 ```javascript
 variableExists(rule) {
   this.executeJavaScript();
-  
+
   // Проверка в window (для var и window.переменная)
   if (rule.name in this.window) {
     return null;
   }
-  
+
   // Проверка через eval (для let/const)
   try {
     const result = this.window.eval(`typeof ${rule.name} !== 'undefined'`);
@@ -89,7 +91,7 @@ variableExists(rule) {
       return null;
     }
   } catch (e) {}
-  
+
   return `Глобальная переменная '${rule.name}' не определена.`;
 }
 ```
@@ -104,7 +106,7 @@ const magicMessages = [
   "✨ Магия случилась!",
   "🎉 Вау! Это невероятно!",
   "🌟 Волшебство работает!",
-  "🎊 Удивительно!"
+  "🎊 Удивительно!",
 ];
 
 function showMagic() {
@@ -119,18 +121,18 @@ function showMagic() {
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Волшебная кнопка</title>
-</head>
-<body>
-  <div>
-    <h1>Волшебная кнопка</h1>
-    <p>Нажми на кнопку и увидишь магию!</p>
-    <button class="magic-button" onclick="showMagic()">✨ Магия! ✨</button>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Волшебная кнопка</title>
+  </head>
+  <body>
+    <div>
+      <h1>Волшебная кнопка</h1>
+      <p>Нажми на кнопку и увидишь магию!</p>
+      <button class="magic-button" onclick="showMagic()">✨ Магия! ✨</button>
+    </div>
+  </body>
 </html>
 ```
 
@@ -184,6 +186,7 @@ node test/test-onclick-fix.js
 ```
 
 Ожидаемый результат:
+
 ```
 ✅ Функция showMagic доступна глобально через window
 ✅ onclick должен работать
@@ -191,11 +194,11 @@ node test/test-onclick-fix.js
 
 ## Резюме изменений
 
-| Файл | Изменение | Цель |
-|------|-----------|------|
-| [validationRules.js](../server/lib/validationRules.js#L17) | Добавлен флаг `jsExecuted` | Предотвращение повторного выполнения JS |
-| [validationRules.js](../server/lib/validationRules.js#L71-L78) | Переработан `executeJavaScript()` | JS не добавляется повторно в DOM |
-| [validationController.js](../server/controllers/validationController.js#L44) | JS встраивается в `<script>` тег | Одноразовое выполнение при загрузке DOM |
-| [validationRulesCustom.js](../server/lib/validationRulesCustom.js) | Проверка через eval для let/const | Поддержка современного синтаксиса |
+| Файл                                                                         | Изменение                         | Цель                                    |
+| ---------------------------------------------------------------------------- | --------------------------------- | --------------------------------------- |
+| [validationRules.js](../server/lib/validationRules.js#L17)                   | Добавлен флаг `jsExecuted`        | Предотвращение повторного выполнения JS |
+| [validationRules.js](../server/lib/validationRules.js#L71-L78)               | Переработан `executeJavaScript()` | JS не добавляется повторно в DOM        |
+| [validationController.js](../server/controllers/validationController.js#L44) | JS встраивается в `<script>` тег  | Одноразовое выполнение при загрузке DOM |
+| [validationRulesCustom.js](../server/lib/validationRulesCustom.js)           | Проверка через eval для let/const | Поддержка современного синтаксиса       |
 
 Теперь `onclick` работает корректно! 🎉

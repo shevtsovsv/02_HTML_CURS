@@ -1,6 +1,7 @@
 # ✅ РЕШЕНИЕ: showMagic is not defined при onclick
 
 ## Проблема
+
 ```
 Uncaught ReferenceError: showMagic is not defined
     at HTMLButtonElement.onclick
@@ -21,31 +22,32 @@ Uncaught ReferenceError: showMagic is not defined
 **Файл**: [validationController.js](../server/controllers/validationController.js)
 
 Добавлена функция `wrapJavaScript`, которая:
+
 1. Находит все function declarations в коде (через RegExp)
 2. Автоматически добавляет их в `window`
 
 ```javascript
 const wrapJavaScript = (jsCode) => {
   if (!jsCode) return "";
-  
+
   // Находим все function declarations в коде
   const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
   const functionNames = [];
   let match;
-  
+
   while ((match = functionRegex.exec(jsCode)) !== null) {
     functionNames.push(match[1]);
   }
-  
+
   // Создаем код, который делает функции глобальными
-  let globalAssignments = '';
+  let globalAssignments = "";
   if (functionNames.length > 0) {
-    globalAssignments = '\n// Делаем функции доступными для onclick\n';
-    functionNames.forEach(name => {
+    globalAssignments = "\n// Делаем функции доступными для onclick\n";
+    functionNames.forEach((name) => {
       globalAssignments += `if (typeof ${name} !== 'undefined') window.${name} = ${name};\n`;
     });
   }
-  
+
   return jsCode + globalAssignments;
 };
 ```
@@ -53,6 +55,7 @@ const wrapJavaScript = (jsCode) => {
 ### Пример работы
 
 **Исходный код в редакторе JS:**
+
 ```javascript
 let clickCount = 0;
 const magicMessages = ["✨ Магия случилась!", "🎉 Вау!"];
@@ -65,12 +68,14 @@ function showMagic() {
 ```
 
 **Что добавляется автоматически:**
+
 ```javascript
 // Делаем функции доступными для onclick
-if (typeof showMagic !== 'undefined') window.showMagic = showMagic;
+if (typeof showMagic !== "undefined") window.showMagic = showMagic;
 ```
 
 **Итоговый код в DOM:**
+
 ```javascript
 let clickCount = 0;
 const magicMessages = ["✨ Магия случилась!", "🎉 Вау!"];
@@ -82,7 +87,7 @@ function showMagic() {
 }
 
 // Делаем функции доступными для onclick
-if (typeof showMagic !== 'undefined') window.showMagic = showMagic;
+if (typeof showMagic !== "undefined") window.showMagic = showMagic;
 ```
 
 ## Результат
@@ -101,12 +106,14 @@ if (typeof showMagic !== 'undefined') window.showMagic = showMagic;
 ## Важно
 
 ### ✅ Работает с onclick:
+
 ```javascript
 function myFunction() { ... }
 // Автоматически добавится в window
 ```
 
 ### ⚠️ НЕ работает автоматически (нужно вручную добавить в window):
+
 ```javascript
 const myFunction = () => { ... }
 // Arrow functions не ловятся RegExp'ом для function declarations
@@ -116,6 +123,7 @@ const myFunction = () => { ... }
 ### 💡 Рекомендация
 
 Для функций, используемых с `onclick`, используйте **обычные function declarations**:
+
 ```javascript
 // ✅ Хорошо - работает с onclick автоматически
 function handleClick() { ... }
@@ -136,6 +144,7 @@ node test/test-magic-button-validation.js
 ```
 
 Ожидаемый результат:
+
 ```
 ✅ Функция showMagic доступна глобально через window
 ✅ onclick должен работать

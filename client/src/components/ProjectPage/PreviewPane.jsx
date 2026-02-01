@@ -51,37 +51,40 @@ const PreviewPane = ({
     // Функция для обертывания JS кода, чтобы функции были доступны глобально для onclick
     const wrapJavaScript = (jsCode) => {
       if (!jsCode) return "";
-      
+
       // Находим все function declarations в коде
       const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
       const functionNames = [];
       let match;
-      
+
       while ((match = functionRegex.exec(jsCode)) !== null) {
         functionNames.push(match[1]);
       }
-      
+
       // Отладочный вывод
       if (functionNames.length > 0) {
-        console.log('[PreviewPane] Найдены функции для wrapper:', functionNames);
+        console.log(
+          "[PreviewPane] Найдены функции для wrapper:",
+          functionNames,
+        );
       }
-      
+
       // Создаем код, который делает функции глобальными
-      let globalAssignments = '';
+      let globalAssignments = "";
       if (functionNames.length > 0) {
-        globalAssignments = '\n// Делаем функции доступными для onclick\n';
-        functionNames.forEach(name => {
+        globalAssignments = "\n// Делаем функции доступными для onclick\n";
+        functionNames.forEach((name) => {
           globalAssignments += `if (typeof ${name} !== 'undefined') window.${name} = ${name};\n`;
         });
       }
-      
+
       const result = jsCode + globalAssignments;
-      
+
       // Выводим обернутый код для отладки
       if (globalAssignments) {
-        console.log('[PreviewPane] Код с wrapper:\n', result);
+        console.log("[PreviewPane] Код с wrapper:\n", result);
       }
-      
+
       return result;
     };
 
@@ -159,7 +162,7 @@ const PreviewPane = ({
 
   // Отладочный вывод финального HTML
   useEffect(() => {
-    console.log('[PreviewPane] Final HTML length:', documentContent.length);
+    console.log("[PreviewPane] Final HTML length:", documentContent.length);
     // Можно раскомментировать для полного просмотра HTML
     // console.log('[PreviewPane] Full HTML:', documentContent);
   }, [documentContent]);

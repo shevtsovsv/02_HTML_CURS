@@ -50,27 +50,27 @@ const { JSDOM } = require(path.join(__dirname, "../server/node_modules/jsdom"));
 // Копируем функцию wrapJavaScript из validationController
 const wrapJavaScript = (jsCode) => {
   if (!jsCode) return "";
-  
+
   // Находим все function declarations в коде
   const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
   const functionNames = [];
   let match;
-  
+
   while ((match = functionRegex.exec(jsCode)) !== null) {
     functionNames.push(match[1]);
   }
-  
+
   console.log("🔍 Найденные функции:", functionNames);
-  
+
   // Создаем код, который делает функции глобальными
-  let globalAssignments = '';
+  let globalAssignments = "";
   if (functionNames.length > 0) {
-    globalAssignments = '\n// Делаем функции доступными для onclick\n';
-    functionNames.forEach(name => {
+    globalAssignments = "\n// Делаем функции доступными для onclick\n";
+    functionNames.forEach((name) => {
       globalAssignments += `if (typeof ${name} !== 'undefined') window.${name} = ${name};\n`;
     });
   }
-  
+
   return jsCode + globalAssignments;
 };
 
@@ -88,8 +88,11 @@ if (html && html.trim().toLowerCase().startsWith("<!doctype")) {
     console.log("─".repeat(60));
     console.log(wrappedJS);
     console.log("─".repeat(60) + "\n");
-    
-    fullHTML = fullHTML.replace(/<\/body>/i, `<script>${wrappedJS}</script></body>`);
+
+    fullHTML = fullHTML.replace(
+      /<\/body>/i,
+      `<script>${wrappedJS}</script></body>`,
+    );
   }
 }
 
@@ -113,7 +116,7 @@ console.log(`   typeof window.showMagic = "${typeof dom.window.showMagic}"`);
 
 if (typeof dom.window.showMagic === "function") {
   console.log("   ✅ showMagic доступна в window!");
-  
+
   // Пробуем кликнуть
   const button = document.querySelector(".magic-button");
   if (button) {
@@ -128,7 +131,7 @@ if (typeof dom.window.showMagic === "function") {
 } else {
   console.log("   ❌ showMagic НЕ доступна в window!");
   console.log("\n💡 Смотрим, что есть в window:");
-  
+
   // Ищем функцию через eval
   try {
     const fn = dom.window.eval("showMagic");

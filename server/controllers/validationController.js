@@ -34,30 +34,32 @@ const checkProjectStep = asyncHandler(async (req, res) => {
   // Функция для обертывания JS кода, чтобы функции были доступны глобально для onclick
   const wrapJavaScript = (jsCode) => {
     if (!jsCode) return "";
-    
+
     // Находим все function declarations в коде
     const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
     const functionNames = [];
     let match;
-    
+
     while ((match = functionRegex.exec(jsCode)) !== null) {
       functionNames.push(match[1]);
     }
-    
+
     // Логирование для отладки
     if (functionNames.length > 0) {
-      logger.debug(`[WRAPPER] Найдено функций для добавления в window: ${functionNames.join(', ')}`);
+      logger.debug(
+        `[WRAPPER] Найдено функций для добавления в window: ${functionNames.join(", ")}`,
+      );
     }
-    
+
     // Создаем код, который делает функции глобальными
-    let globalAssignments = '';
+    let globalAssignments = "";
     if (functionNames.length > 0) {
-      globalAssignments = '\n// Делаем функции доступными для onclick\n';
-      functionNames.forEach(name => {
+      globalAssignments = "\n// Делаем функции доступными для onclick\n";
+      functionNames.forEach((name) => {
         globalAssignments += `if (typeof ${name} !== 'undefined') window.${name} = ${name};\n`;
       });
     }
-    
+
     return jsCode + globalAssignments;
   };
 
@@ -71,7 +73,10 @@ const checkProjectStep = asyncHandler(async (req, res) => {
     // Добавляем JavaScript в конец body, если есть
     if (js) {
       const wrappedJS = wrapJavaScript(js);
-      fullHTML = fullHTML.replace(/<\/body>/i, `<script>${wrappedJS}</script></body>`);
+      fullHTML = fullHTML.replace(
+        /<\/body>/i,
+        `<script>${wrappedJS}</script></body>`,
+      );
     }
   } else {
     // HTML содержит только фрагмент, оборачиваем в полную структуру

@@ -3,7 +3,9 @@
  */
 const path = require("path");
 const { JSDOM } = require(path.join(__dirname, "../server/node_modules/jsdom"));
-const ValidationRulesCustom = require(path.join(__dirname, "../server/lib/validationRulesCustom"));
+const ValidationRulesCustom = require(
+  path.join(__dirname, "../server/lib/validationRulesCustom"),
+);
 
 console.log("🧪 Тестирование onclick для волшебной кнопки\n");
 
@@ -49,25 +51,25 @@ function showMagic() {
 // Функция обертывания из validationController
 const wrapJavaScript = (jsCode) => {
   if (!jsCode) return "";
-  
+
   // Находим все function declarations в коде
   const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
   const functionNames = [];
   let match;
-  
+
   while ((match = functionRegex.exec(jsCode)) !== null) {
     functionNames.push(match[1]);
   }
-  
+
   // Создаем код, который делает функции глобальными
-  let globalAssignments = '';
+  let globalAssignments = "";
   if (functionNames.length > 0) {
-    globalAssignments = '\n// Делаем функции доступными для onclick\n';
-    functionNames.forEach(name => {
+    globalAssignments = "\n// Делаем функции доступными для onclick\n";
+    functionNames.forEach((name) => {
       globalAssignments += `if (typeof ${name} !== 'undefined') window.${name} = ${name};\n`;
     });
   }
-  
+
   return jsCode + globalAssignments;
 };
 
@@ -76,7 +78,10 @@ const wrappedJS = wrapJavaScript(js);
 // Создаем полный HTML так же, как в validationController
 let fullHTML = html;
 fullHTML = fullHTML.replace(/<\/head>/i, `<style>${css}</style></head>`);
-fullHTML = fullHTML.replace(/<\/body>/i, `<script>${wrappedJS}</script></body>`);
+fullHTML = fullHTML.replace(
+  /<\/body>/i,
+  `<script>${wrappedJS}</script></body>`,
+);
 
 console.log("📄 HTML для проверки:");
 console.log(fullHTML);
@@ -95,7 +100,7 @@ const { document } = dom.window;
 
 // Подключаем console.log
 let lastConsoleLog = null;
-dom.window.console.log = function(...args) {
+dom.window.console.log = function (...args) {
   lastConsoleLog = args.join(" ");
   console.log("📢 Console.log из JSDOM:", ...args);
 };
@@ -107,13 +112,15 @@ if (typeof dom.window.showMagic === "function") {
   console.log("   ✅ Функция showMagic найдена в window!");
 } else {
   console.log("   ❌ Функция showMagic НЕ найдена в window");
-  
+
   // Пробуем через eval
   try {
     const fn = dom.window.eval("showMagic");
     console.log(`   🔄 Через eval: typeof showMagic = "${typeof fn}"`);
     if (typeof fn === "function") {
-      console.log("   ⚠️  Функция есть в scope, но НЕ в window - onclick не сработает!");
+      console.log(
+        "   ⚠️  Функция есть в scope, но НЕ в window - onclick не сработает!",
+      );
     }
   } catch (e) {
     console.log("   ❌ Функция недоступна даже через eval:", e.message);
@@ -121,7 +128,9 @@ if (typeof dom.window.showMagic === "function") {
 }
 
 console.log("\n🔍 Проверка 2: Переменная magicMessages доступна?");
-console.log(`   typeof window.magicMessages = "${typeof dom.window.magicMessages}"`);
+console.log(
+  `   typeof window.magicMessages = "${typeof dom.window.magicMessages}"`,
+);
 
 console.log("\n🔍 Проверка 3: Найдём кнопку и попробуем кликнуть");
 const button = document.querySelector(".magic-button");
@@ -129,11 +138,11 @@ const button = document.querySelector(".magic-button");
 if (button) {
   console.log("   ✅ Кнопка найдена");
   console.log(`   onclick атрибут: "${button.getAttribute("onclick")}"`);
-  
+
   try {
     console.log("\n🖱️  Эмулируем клик на кнопку...");
     button.click();
-    
+
     if (lastConsoleLog && lastConsoleLog.includes("Alert вызван с:")) {
       console.log("   ✅ УСПЕХ! Функция showMagic вызвалась при клике!");
     } else {
