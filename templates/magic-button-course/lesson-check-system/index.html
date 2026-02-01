@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Волшебная кнопка - Система проверки</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <h1>Волшебная кнопка</h1>
+      <p class="subtitle">Выполните задания и нажмите "Проверить"</p>
+
+      <!-- Задание для ученика -->
+      <div class="task-container">
+        <h2>Задание:</h2>
+        <p>
+          Создайте переменную <code>clickCount</code> и функцию обработчика
+          клика
+        </p>
+
+        <!-- Редактор кода (симуляция) -->
+        <textarea
+          id="codeInput"
+          placeholder="Напишите ваш код здесь...
+// Пример:
+// let clickCount = 0;
+// const magicButton = document.querySelector('.magic-button');
+// ..."
+        ></textarea>
+      </div>
+
+      <!-- Основная магическая кнопка -->
+      <button class="magic-button">✨ Магия! ✨</button>
+
+      <!-- Кнопка проверки -->
+      <button class="check-button" onclick="checkCode()">
+        🔍 Проверить код
+      </button>
+
+      <!-- Контейнер для результатов проверки -->
+      <div id="checkResults" class="check-results"></div>
+
+      <!-- Контейнер для подсказок -->
+      <div id="hintsContainer" class="hints-container"></div>
+
+      <!-- Модальное окно для рекламы -->
+      <div id="adModal" class="ad-modal">
+        <div class="ad-content">
+          <span class="close-ad" onclick="closeAd()">&times;</span>
+          <h3>📢 Реклама</h3>
+          <div class="ad-body">
+            <p>🎯 Изучите веб-разработку с нашими курсами!</p>
+            <p>💻 HTML, CSS, JavaScript - от основ до профи!</p>
+            <div class="ad-timer">
+              Реклама закроется через <span id="adTimer">5</span> секунд
+            </div>
+          </div>
+          <button id="skipAdBtn" onclick="skipAd()" disabled>
+            Пропустить рекламу
+          </button>
+        </div>
+      </div>
+
+      <!-- Модальное окно для подсказок -->
+      <div id="hintModal" class="hint-modal">
+        <div class="hint-content">
+          <span class="close-hint" onclick="closeHint()">&times;</span>
+          <h3 id="hintTitle">💡 Подсказка</h3>
+          <div id="hintText" class="hint-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="ad-platform-adapter.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

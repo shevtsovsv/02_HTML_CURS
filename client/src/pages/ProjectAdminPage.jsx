@@ -78,7 +78,7 @@ const ProjectAdminPage = observer(() => {
 
   const completedStepIds = new Set(
     project.userProgresses?.filter((p) => p.completed).map((p) => p.step_id) ||
-      []
+      [],
   );
 
   return (
@@ -258,9 +258,7 @@ const ProjectAdminPage = observer(() => {
                 {/* Кнопка "Вставить шаг после" */}
                 <div style={{ textAlign: "center", marginBottom: "1rem" }}>
                   <button
-                    onClick={() =>
-                      projectStore.openStepCreateModal(step.order + 1)
-                    }
+                    onClick={() => projectStore.openStepCreateModal(step.order)}
                     className="btn-outline"
                     style={{
                       padding: "0.25rem 1rem",

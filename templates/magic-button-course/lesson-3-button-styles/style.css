@@ -66,7 +66,6 @@ h1 {
   font-size: 1.5rem;
   font-weight: bold;
   border-radius: 50px;
-  cursor: pointer;
   margin: 20px;
   box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
   transition: all 0.3s ease;
@@ -86,6 +85,7 @@ h1 {
   transform: scale(1.1) rotate(2deg);
   box-shadow: 0 15px 35px rgba(255, 107, 107, 0.6);
   background: linear-gradient(135deg, #ff5252, #ff8f00);
+  cursor: pointer;
 }
 
 /* 

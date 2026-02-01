@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Практикум: Волшебная кнопка</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        margin: 0;
+      }
+      .workshop-container {
+        max-width: 1100px;
+        width: 95%;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        margin: 40px 0;
+      }
+      .header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        color: white;
+        text-align: center;
+        padding: 40px 20px 25px 20px;
+      }
+      .header h1 {
+        font-size: 2.7rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .header .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.93;
+      }
+      .tabs {
+        display: flex;
+        border-bottom: 2px solid #eee;
+        background: #f8f9fa;
+        flex-wrap: wrap;
+      }
+      .tab {
+        padding: 18px 32px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #666;
+        background: none;
+        border: none;
+        outline: none;
+        transition:
+          background 0.2s,
+          color 0.2s;
+        font-size: 1.1rem;
+      }
+      .tab.active {
+        color: #ff6b6b;
+        background: #fff;
+        border-bottom: 3px solid #ff6b6b;
+      }
+      .tab-content {
+        display: none;
+        padding: 40px 30px 30px 30px;
+        background: #fff;
+        min-height: 350px;
+        animation: fadeIn 0.5s;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .task-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+      .task-desc {
+        font-size: 1.13rem;
+        margin-bottom: 18px;
+        color: #444;
+      }
+      .hints-block,
+      .answer-block {
+        margin: 18px 0 0 0;
+        padding: 18px 22px;
+        background: #f8f9fa;
+        border-left: 4px solid #ffa500;
+        border-radius: 10px;
+        color: #7a5c00;
+        font-size: 1.08rem;
+        display: none;
+        animation: fadeIn 0.4s;
+      }
+      .answer-block {
+        border-left: 4px solid #28a745;
+        color: #155724;
+        background: #e8f5e9;
+      }
+      .show-btn {
+        margin-right: 10px;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 22px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s,
+          opacity 0.2s;
+        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.13);
+      }
+      .show-btn:hover {
+        background: linear-gradient(135deg, #ff5252, #ff8f00);
+        transform: translateY(-2px);
+      }
+      .show-btn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+        opacity: 0.6;
+      }
+      .show-btn:disabled:hover {
+        background: #cccccc;
+        transform: none;
+      }
+      .timer-text {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 10px;
+        font-style: italic;
+        display: none;
+      }
+      .timer-active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (max-width: 800px) {
+        .workshop-container {
+          margin: 10px 0;
+        }
+        .tab-content {
+          padding: 20px 5px;
+        }
+        .tabs {
+          flex-wrap: wrap;
+        }
+        .tab {
+          padding: 12px 10px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="workshop-container">
+      <div class="header">
+        <h1>Практикум: Волшебная кнопка</h1>
+        <div class="subtitle">Пошаговые задания с подсказками и ответами</div>
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div id="tab-contents"></div>
+    </div>
+    <script>
+      // Все 38 шагов из steps.md
+      const steps = [
+  {
+    title: "Шаг 1. Базовая HTML-структура",
+    desc: "Добавьте базовую HTML структуру: DOCTYPE, html, head, body.",
+    hints: [
+      "Начинайте с &lt;!DOCTYPE html&gt;.",
+      "Теги &lt;html&gt;, &lt;head&gt;, &lt;body&gt; обязательны.",
+      "Проверьте правильность вложенности тегов.",
+      "В head пока ничего не добавляйте.",
+    ],
+    answer: `&lt;!DOCTYPE html&gt;<br>   &lt;html lang=&quot;ru&quot;&gt;<br>  &lt;head&gt;<br>  &lt;/head&gt;<br>  &lt;body&gt;<br>  &lt;/body&gt;<br>&lt;/html&gt;`,
+  },
+  {
+    title: "Шаг 2. Мета и заголовок",
+    desc: "Добавьте в head: meta charset UTF-8, viewport и title 'Волшебная кнопка'",
+    hints: [
+      '&lt;meta charset="UTF-8"&gt; — для кодировки.',
+      '&lt;meta name="viewport"&gt; — для адаптивности.',
+      "&lt;title&gt;Волшебная кнопка&lt;/title&gt; — для вкладки браузера.",
+      "Все эти теги должны быть внутри &lt;head&gt;!",
+    ],
+    answer: `&lt;head&gt;<br>  &lt;meta charset=&quot;UTF-8&quot;&gt;<br>  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;<br>  &lt;title&gt;Волшебная кнопка&lt;/title&gt;<br>&lt;/head&gt;`,
+  },
+  {
+    title: "Шаг 3. Контент: div, h1, p, button",
+    desc: "Создайте в body: div, h1 'Волшебная кнопка', p 'Нажми на кнопку и увидишь магию!', button '✨ Магия! ✨'",
+    hints: [
+      "Всё содержимое — внутри одного &lt;div&gt;.",
+      "Заголовок — &lt;h1&gt;.",
+      "Описание — &lt;p&gt;.",
+      "Кнопка — &lt;button&gt;.",
+      "Проверьте текст!",
+    ],
+    answer: `&lt;body&gt;<br>  &lt;div&gt;<br>    &lt;h1&gt;Волшебная кнопка&lt;/h1&gt;<br>    &lt;p&gt;Нажми на кнопку и увидишь магию!&lt;/p&gt;<br>    &lt;button&gt;✨ Магия! ✨&lt;/button&gt;<br>  &lt;/div&gt;<br>&lt;/body&gt;`,
+  },
+  {
+    title: "Шаг 4. Стилизация body",
+    desc: "Добавьте style тег и CSS для body: font-family, градиентный фон, margin 0, padding 0",
+    hints: [
+      "Тег &lt;style&gt; — внутри &lt;head&gt;.",
+      "Используйте background: linear-gradient(...).",
+      "font-family: Arial, sans-serif; или похожий.",
+      "margin и padding — 0.",
+    ],
+    answer: `&lt;style&gt;<br>body {<br>  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;<br>  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);<br>  margin: 0;<br>  padding: 0;<br>  color: white;<br>}<br>&lt;/style&gt;`,
+  },
+  {
+    title: "Шаг 5. Стилизация body: flex и цвет",
+    desc: "Добавьте к body: min-height 100vh, display flex, align-items center, justify-content center, color white",
+    hints: [
+      "min-height: 100vh — чтобы занять всю высоту.",
+      "display: flex — для центрирования.",
+      "align-items и justify-content — оба center.",
+      "color: white — для белого текста.",
+    ],
+    answer: `body {<br>  min-height: 100vh;<br>  display: flex;<br>  align-items: center;<br>  justify-content: center;<br>  color: white;<br>}`,
+  },
+  {
+    title: "Шаг 6. Класс game-container",
+    desc: "Добавьте класс game-container к div и CSS: text-align center",
+    hints: [
+      'Добавьте class="game-container" к div.',
+      "В CSS: .game-container { text-align: center; }",
+      "Это поможет выровнять содержимое по центру.",
+      "Проверьте, что класс применён.",
+    ],
+    answer: `&lt;div class=&quot;game-container&quot;&gt;...&lt;/div&gt;<br>.game-container { text-align: center; }`,
+  },
+  {
+    title: "Шаг 7. Стилизация h1",
+    desc: "Стилизуйте h1: font-size 2.5rem, margin-bottom 10px",
+    hints: [
+      "font-size: 2.5rem — крупный заголовок.",
+      "margin-bottom: 10px — отступ снизу.",
+      "Добавьте правило для h1 в CSS.",
+      "Проверьте визуально!",
+    ],
+    answer: `h1 {<br>  font-size: 2.5rem;<br>  margin-bottom: 10px;<br>}`,
+  },
+  {
+    title: "Шаг 8. Класс subtitle для p",
+    desc: "Добавьте класс subtitle к p и CSS: font-size 1.2rem, opacity 0.9",
+    hints: [
+      'Добавьте class="subtitle" к p.',
+      "В CSS: .subtitle { font-size: 1.2rem; opacity: 0.9; }",
+      "Это для описания под заголовком.",
+      "Проверьте, что класс применён.",
+    ],
+    answer: `&lt;p class=&quot;subtitle&quot;&gt;...&lt;/p&gt;<br>.subtitle { font-size: 1.2rem; opacity: 0.9; }`,
+  },
+  {
+    title: "Шаг 9. Класс magic-button для button",
+    desc: "Добавьте класс magic-button к button",
+    hints: [
+      'Добавьте class="magic-button" к кнопке.',
+      "Это нужно для дальнейшей стилизации.",
+      "Проверьте, что класс применён.",
+      "Класс пишется через пробел, если их несколько.",
+    ],
+    answer: `&lt;button class=&quot;magic-button&quot;&gt;...&lt;/button&gt;`,
+  },
+  {
+    title: "Шаг 10. Стилизация кнопки: градиент, отступы, радиус",
+    desc: "Стилизуйте кнопку: градиент, белый текст, padding 20px 40px, border-radius 50px, жирный шрифт 1.5rem",
+    hints: [
+      "background: linear-gradient(135deg, #ff6b6b, #ffa500)",
+      "color: white",
+      "padding: 20px 40px",
+      "border-radius: 50px",
+      "font-weight: bold, font-size: 1.5rem",
+    ],
+    answer: `.magic-button {<br>  background: linear-gradient(135deg, #ff6b6b, #ffa500);<br>  color: white;<br>  padding: 20px 40px;<br>  border-radius: 50px;<br>  font-weight: bold;<br>  font-size: 1.5rem;<br>}`,
+  },
+  {
+    title: "Шаг 11. Дополнительные стили для кнопки",
+    desc: "Добавьте дополнительные стили: margin 20px, box-shadow, transition, text-transform, letter-spacing",
+    hints: [
+      "margin: 20px — отступы.",
+      "box-shadow: 0 10px 25px rgba(255,107,107,0.4)",
+      "transition: all 0.3s ease",
+      "text-transform: uppercase",
+      "letter-spacing: 1px",
+    ],
+    answer: `.magic-button {<br>  margin: 20px;<br>  box-shadow: 0 10px 25px rgba(255,107,107,0.4);<br>  transition: all 0.3s ease;<br>  text-transform: uppercase;<br>  letter-spacing: 1px;<br>}`,
+  },
+  {
+    title: "Шаг 12. Эффект наведения на кнопку",
+    desc: "Добавьте эффект при наведении: cursor pointer, transform, box-shadow, background",
+    hints: [
+      "cursor: pointer",
+      "transform: scale(1.1) rotate(2deg)",
+      "box-shadow: 0 15px 35px rgba(255,107,107,0.6)",
+      "background: linear-gradient(135deg, #ff5252, #ff8f00)",
+    ],
+    answer: `.magic-button:hover {<br>  cursor: pointer;<br>  transform: scale(1.1) rotate(2deg);<br>  box-shadow: 0 15px 35px rgba(255,107,107,0.6);<br>  background: linear-gradient(135deg, #ff5252, #ff8f00);<br>}`,
+  },
+  {
+    title: "Шаг 13. Эффект нажатия на кнопку",
+    desc: "Добавьте эффект при нажатии: transform: scale(0.95) rotate(-1deg)",
+    hints: [
+      "Используйте :active для кнопки.",
+      "transform: scale(0.95) rotate(-1deg)",
+      "Проверьте визуально!",
+      "Можно добавить плавность через transition.",
+    ],
+    answer: `.magic-button:active {<br>  transform: scale(0.95) rotate(-1deg);<br>}`,
+  },
+  {
+    title: "Шаг 14. Переменная clickCount",
+    desc: "Создайте переменную clickCount со значением 0",
+    hints: [
+      "let clickCount = 0; в &lt;script&gt;.",
+      "Переменная нужна для счёта кликов.",
+      "Объявите до функций.",
+      "Проверьте, что она инициализирована.",
+    ],
+    answer: `&lt;script&gt;<br>let clickCount = 0;<br>&lt;/script&gt;`,
+  },
+  {
+    title: "Шаг 15. Тег &lt;script&gt; в конце body",
+    desc: "Добавьте тег &lt;script&gt; в конец body",
+    hints: [
+      "&lt;script&gt; размещается перед &lt;/body&gt;.",
+      "Внутри будет JS-код.",
+      "Проверьте, что тег открыт и закрыт.",
+      "Можно добавить комментарий для ясности.",
+    ],
+    answer: `&lt;body&gt;...&lt;script&gt;...&lt;/script&gt;&lt;/body&gt;`,
+  },
+  {
+    title: "Шаг 16. Добавление onclick к кнопке",
+    desc: "Добавьте к кнопке атрибут onclick='showMagic()' для вызова функции при клике",
+    hints: [
+      "Добавьте атрибут onclick к тегу button",
+      "Внутри кавычек напишите showMagic()",
+      "Этот код будет выполнять функцию при каждом клике",
+      "Не забудьте про одинарные или двойные кавычки",
+    ],
+    answer: `&lt;button class=&quot;magic-button&quot; onclick=&quot;showMagic()&quot;&gt;✨ Магия! ✨&lt;/button&gt;`,
+  },
+  {
+    title: "Шаг 17. Добавление alert в функцию",
+    desc: "Внутри функции showMagic добавьте alert с сообщением о магии",
+    hints: [
+      "Внутри фигурных скобок функции добавьте alert()",
+      "В скобках укажите текст сообщения",
+      "Можно добавить эмодзи для красоты",
+      "Не забудьте точку с запятой в конце",
+    ],
+    answer: `function showMagic() {<br>  alert(&quot;🎉 Вау! Это действительно магия! 🎉&quot;);<br>}`,
+  },
+  {
+    title: "Шаг 18. Массив магических сообщений",
+    desc: "Создайте массив magicMessages с разными магическими фразами",
+    hints: [
+      "Используйте ключевое слово const",
+      "Назовите массив magicMessages",
+      "Добавьте несколько строк с разными фразами и эмодзи",
+      "Не забудьте запятые между элементами массива",
+    ],
+    answer: `const magicMessages = [<br>  &quot;🎉 Вау! Это действительно магия! 🎉&quot;,<br>  &quot;✨ Звёзды танцуют в небе! ✨&quot;,<br>  &quot;🌟 Ты призвал магическую силу! 🌟&quot;<br>];`,
+  },
+  {
+    title: "Шаг 19. Функция выбора случайного сообщения",
+    desc: "Измените функцию showMagic, чтобы она выбирала случайное сообщение из массива",
+    hints: [
+      "Используйте Math.random() для получения случайного числа",
+      "Math.floor() округляет число вниз до целого",
+      "Умножьте на magicMessages.length для получения индекса",
+      "Используйте полученный индекс для выбора сообщения",
+    ],
+    answer: `function showMagic() {<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  alert(randomMessage);<br>}`,
+  },
+  {
+    title: "Шаг 20. Расширение массива сообщений",
+    desc: "Добавьте в массив magicMessages несколько дополнительных магических фраз",
+    hints: [
+      "Добавьте ещё 3-4 сообщения в массив",
+      "Используйте разные эмодзи для каждого сообщения",
+      "Не забудьте запятые между элементами",
+      "Проверьте, что массив закрывается правильно",
+    ],
+    answer: `const magicMessages = [<br>  &quot;🎉 Вау! Это действительно магия! 🎉&quot;,<br>  &quot;✨ Звёзды танцуют в небе! ✨&quot;,<br>  &quot;🌟 Ты призвал магическую силу! 🌟&quot;,<br>  &quot;🎨 Радуга появилась из ниоткуда! 🎨&quot;,<br>  &quot;🦄 Единорог мелькнул где-то рядом! 🦄&quot;,<br>  &quot;🎪 Магический цирк открыт! 🎪&quot;<br>];`,
+  },
+  {
+    title: "Шаг 21. Элемент для отображения счётчика",
+    desc: "Добавьте div с id='clickCounter' для отображения количества кликов",
+    hints: [
+      "Добавьте div внутри game-container",
+      "Установите id='clickCounter'",
+      "Добавьте начальный текст 'Кликов: 0'",
+      "Разместите его после заголовка",
+    ],
+    answer: `&lt;div id=&quot;clickCounter&quot; class=&quot;click-counter&quot;&gt;Кликов: 0&lt;/div&gt;`,
+  },
+  {
+    title: "Шаг 22. Стилизация счётчика",
+    desc: "Добавьте CSS стили для элемента счётчика кликов",
+    hints: [
+      "Создайте CSS правило .click-counter",
+      "Установите font-size: 1.8rem",
+      "Добавьте font-weight: bold",
+      "Установите margin и text-shadow",
+    ],
+    answer: `.click-counter {<br>  font-size: 1.8rem;<br>  font-weight: bold;<br>  margin: 20px 0;<br>  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);<br>}`,
+  },
+  {
+    title: "Шаг 23. Элемент для магических сообщений",
+    desc: "Добавьте div с id='magicMessage' для отображения магических сообщений на странице",
+    hints: [
+      "Добавьте div внутри game-container",
+      "Установите id='magicMessage'",
+      "Оставьте его пустым - будет заполняться JavaScript",
+      "Разместите его после кнопки",
+    ],
+    answer: `&lt;div id=&quot;magicMessage&quot;&gt;&lt;/div&gt;`,
+  },
+  {
+    title: "Шаг 24. Изменение функции showMagic - увеличение счётчика",
+    desc: "Добавьте увеличение переменной clickCount при каждом вызове функции",
+    hints: [
+      "Используйте оператор ++ для увеличения clickCount",
+      "Поместите это в начало функции",
+      "Переменная должна быть объявлена глобально",
+    ],
+    answer: `function showMagic() {<br>  clickCount++;<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  alert(randomMessage);<br>}`,
+  },
+  {
+    title: "Шаг 25. Обновление отображения счётчика",
+    desc: "Добавьте код для обновления текста в элементе clickCounter",
+    hints: [
+      "Используйте document.getElementById('clickCounter')",
+      "Измените свойство innerHTML",
+      "Добавьте текст 'Кликов: ' и значение clickCount",
+      "Поместите это после увеличения счётчика",
+    ],
+    answer: `function showMagic() {<br>  clickCount++;<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: ' + clickCount;<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  alert(randomMessage);<br>}`,
+  },
+  {
+    title: "Шаг 26. Замена alert на отображение в magicMessage",
+    desc: "Вместо alert выводите сообщение в элемент magicMessage",
+    hints: [
+      "Удалите вызов alert()",
+      "Используйте document.getElementById('magicMessage')",
+      "Установите innerHTML для отображения сообщения",
+      "Добавьте HTML-разметку для красивого отображения",
+    ],
+    answer: `function showMagic() {<br>  clickCount++;<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: ' + clickCount;<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  document.getElementById('magicMessage').innerHTML = '&lt;p style=&quot;margin-top: 20px; font-size: 1.2rem;&quot;&gt;' + randomMessage + '&lt;/p&gt;';<br>}`,
+  },
+  {
+    title: "Шаг 27. CSS класс для анимации кнопки",
+    desc: "Добавьте CSS класс .magic-button.clicked для анимации нажатия кнопки",
+    hints: [
+      "Добавьте правило .magic-button.clicked",
+      "Используйте transform для увеличения кнопки",
+      "Добавьте увеличенную тень для эффекта",
+      "Не забудьте translateY(-5px) для поднятия кнопки",
+    ],
+    answer: `.magic-button.clicked {<br>  transform: scale(1.1) translateY(-5px);<br>  box-shadow: 0 20px 40px rgba(255, 107, 107, 0.6);<br>}`,
+  },
+  {
+    title: "Шаг 28. Добавление анимации кнопки в JavaScript",
+    desc: "Добавьте код для добавления класса clicked при клике на кнопку",
+    hints: [
+      "Используйте document.querySelector('.magic-button')",
+      "Добавьте класс с помощью classList.add('clicked')",
+      "Поместите это в начало функции showMagic",
+      "Убедитесь, что класс добавляется при каждом клике",
+    ],
+    answer: `function showMagic() {<br>  const button = document.querySelector('.magic-button');<br>  button.classList.add('clicked');<br>  clickCount++;<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: ' + clickCount;<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  document.getElementById('magicMessage').innerHTML = '&lt;p style=&quot;margin-top: 20px; font-size: 1.2rem;&quot;&gt;' + randomMessage + '&lt;/p&gt;';<br>}`,
+  },
+  {
+    title: "Шаг 29. Удаление анимации через setTimeout",
+    desc: "Добавьте setTimeout для удаления класса clicked через 200 миллисекунд",
+    hints: [
+      "Используйте setTimeout(function() { ... }, 200)",
+      "Внутри функции удалите класс clicked",
+      "Используйте button.classList.remove('clicked')",
+      "Не забудьте обратиться к той же переменной button",
+    ],
+    answer: `function showMagic() {<br>  const button = document.querySelector('.magic-button');<br>  button.classList.add('clicked');<br>  <br>  setTimeout(function() {<br>    button.classList.remove('clicked');<br>  }, 200);<br>  <br>  clickCount++;<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: ' + clickCount;<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  const messageElement = document.getElementById('magicMessage');<br>  messageElement.innerHTML = '&lt;p style=&quot;margin-top: 20px; font-size: 1.2rem;&quot;&gt;' + randomMessage + '&lt;/p&gt;';<br>}`,
+  },
+  {
+    title: "Шаг 30. Автоматическое скрытие сообщения",
+    desc: "Добавьте setTimeout для очистки сообщения через 3 секунды",
+    hints: [
+      "Используйте setTimeout(function() { ... }, 3000)",
+      "Внутри функции очистите содержимое magicMessage",
+      "Используйте document.getElementById('magicMessage').innerHTML = ''",
+      "Поместите этот код после отображения сообщения",
+    ],
+    answer: `function showMagic() {<br>  const button = document.querySelector('.magic-button');<br>  button.classList.add('clicked');<br>  <br>  setTimeout(function() {<br>    button.classList.remove('clicked');<br>  }, 200);<br>  <br>  clickCount++;<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: ' + clickCount;<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  const messageElement = document.getElementById('magicMessage');<br>  messageElement.innerHTML = '&lt;p style=&quot;margin-top: 20px; font-size: 1.2rem;&quot;&gt;' + randomMessage + '&lt;/p&gt;';<br>  <br>  setTimeout(function() {<br>    messageElement.innerHTML = '';<br>  }, 3000);<br>}`,
+  },
+  // Шаги 31-38 из урока 5
+  {
+    title: "Шаг 31. Добавление контейнера для частиц",
+    desc: "Добавьте на страницу div с id='particles' для отображения визуальных эффектов",
+    hints: [
+      "Добавьте &lt;div id='particles'&gt;&lt;/div&gt; внутри game-container",
+      "Разместите его в начале контейнера, чтобы частицы появлялись поверх всего",
+      "Добавьте CSS для контейнера частиц",
+      "Используйте position: absolute и pointer-events: none"
+    ],
+    answer: `&lt;div id=&quot;particles&quot;&gt;&lt;/div&gt;<br><br>/* В CSS */<br>#particles {<br>  position: absolute;<br>  top: 0;<br>  left: 0;<br>  width: 100%;<br>  height: 100%;<br>  pointer-events: none;<br>  z-index: 1;<br>}`,
+  },
+  {
+    title: "Шаг 32. Функция createParticles",
+    desc: "Создайте функцию createParticles, которая добавляет анимированные частицы с эмодзи",
+    hints: [
+      "Создайте массив с эмодзи для частиц",
+      "Используйте document.createElement('div') для создания частицы",
+      "Установите случайную позицию с помощью Math.random()",
+      "Добавьте CSS анимацию через класс 'particle'",
+      "Удаляйте частицу через 2.5 секунды"
+    ],
+    answer: `const particleEmojis = [&quot;✨&quot;, &quot;🌟&quot;, &quot;💫&quot;, &quot;⭐&quot;, &quot;🎆&quot;, &quot;🎇&quot;, &quot;💥&quot;, &quot;🔮&quot;];<br><br>function createParticles() {<br>  const particleContainer = document.getElementById('particles');<br>  const particleCount = 5 + Math.floor(Math.random() * 4);<br>  <br>  for (let i = 0; i &lt; particleCount; i++) {<br>    const particle = document.createElement('div');<br>    particle.className = 'particle';<br>    particle.innerHTML = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];<br>    <br>    particle.style.left = Math.random() * 100 + '%';<br>    particle.style.top = Math.random() * 100 + '%';<br>    particle.style.animationDelay = Math.random() * 0.5 + 's';<br>    <br>    particleContainer.appendChild(particle);<br>    <br>    setTimeout(() =&gt; {<br>      if (particle.parentNode) {<br>        particle.parentNode.removeChild(particle);<br>      }<br>    }, 2500);<br>  }<br>}`,
+  },
+  {
+    title: "Шаг 33. CSS анимация для частиц",
+    desc: "Добавьте CSS анимацию для частиц с помощью @keyframes",
+    hints: [
+      "Создайте класс .particle в CSS",
+      "Добавьте анимацию particleFloat через @keyframes",
+      "Используйте transform: translateY() для движения вверх",
+      "Добавьте изменение scale и opacity для эффекта исчезновения",
+      "Установите pointer-events: none для частиц"
+    ],
+    answer: `.particle {<br>  position: absolute;<br>  font-size: 1.5rem;<br>  animation: particleFloat 2s ease-out forwards;<br>  pointer-events: none;<br>}<br><br>@keyframes particleFloat {<br>  0% {<br>    opacity: 1;<br>    transform: translateY(0) scale(1) rotate(0deg);<br>  }<br>  100% {<br>    opacity: 0;<br>    transform: translateY(-100px) scale(0.5) rotate(360deg);<br>  }<br>}`,
+  },
+  {
+    title: "Шаг 34. Функция checkAchievements",
+    desc: "Создайте функцию checkAchievements для показа достижений при определённом количестве кликов",
+    hints: [
+      "Создайте функцию checkAchievements()",
+      "Используйте switch или if/else для проверки clickCount",
+      "Возвращайте специальное сообщение для достижений",
+      "Добавьте контейнер для отображения достижений"
+    ],
+    answer: `&lt;div id=&quot;achievements&quot;&gt;&lt;/div&gt;<br><br>function checkAchievements() {<br>  const achievementContainer = document.getElementById('achievements');<br>  let achievement = '';<br>  <br>  switch(clickCount) {<br>    case 5:<br>      achievement = '🏆 Первые шаги в магии!';<br>      break;<br>    case 10:<br>      achievement = '🌟 Юный волшебник!';<br>      break;<br>    case 25:<br>      achievement = '🔮 Опытный маг!';<br>      break;<br>    case 50:<br>      achievement = '🧙‍♂️ Мастер магии!';<br>      break;<br>    case 100:<br>      achievement = '👑 ЛЕГЕНДА МАГИИ!';<br>      break;<br>  }<br>  <br>  if (achievement) {<br>    achievementContainer.innerHTML = '&lt;div class=&quot;achievement&quot;&gt;' + achievement + '&lt;/div&gt;';<br>    setTimeout(() =&gt; {<br>      achievementContainer.innerHTML = '';<br>    }, 5000);<br>  }<br>}`,
+  },
+  {
+    title: "Шаг 35. CSS стили для достижений",
+    desc: "Добавьте CSS стили для отображения достижений",
+    hints: [
+      "Создайте класс .achievement",
+      "Используйте градиентный фон для выделения",
+      "Добавьте анимацию для плавного появления",
+      "Используйте box-shadow для объёмного эффекта"
+    ],
+    answer: `.achievement {<br>  background: linear-gradient(135deg, #ffd700, #ffed4e);<br>  color: #8b4513;<br>  padding: 15px;<br>  border-radius: 15px;<br>  margin-top: 20px;<br>  font-weight: bold;<br>  border: 2px solid #ffc107;<br>  animation: achievementPulse 0.5s ease-in-out;<br>}<br><br>@keyframes achievementPulse {<br>  0%, 100% { transform: scale(1); }<br>  50% { transform: scale(1.05); }<br>}`,
+  },
+  {
+    title: "Шаг 36. Добавление кнопки сброса",
+    desc: "Добавьте кнопку сброса и функцию resetGame для обнуления игры",
+    hints: [
+      "Добавьте &lt;button class='reset-button' onclick='resetGame()'&gt;🔄 Начать сначала&lt;/button&gt;",
+      "Создайте функцию resetGame()",
+      "Сбросьте clickCount и все отображаемые элементы",
+      "Покажите сообщение о сбросе игры"
+    ],
+    answer: `&lt;button class=&quot;reset-button&quot; onclick=&quot;resetGame()&quot;&gt;🔄 Начать сначала&lt;/button&gt;<br><br>function resetGame() {<br>  clickCount = 0;<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: 0';<br>  document.getElementById('magicMessage').innerHTML = '';<br>  document.getElementById('achievements').innerHTML = '';<br>  <br>  // Очищаем частицы<br>  const particleContainer = document.getElementById('particles');<br>  particleContainer.innerHTML = '';<br>  <br>  // Показываем сообщение о сбросе<br>  const messageElement = document.getElementById('magicMessage');<br>  messageElement.innerHTML = '&lt;p style=&quot;margin-top: 20px; font-size: 1.2rem; color: #ffd700;&quot;&gt;🔄 Игра сброшена! Начинаем заново! 🔄&lt;/p&gt;';<br>  <br>  setTimeout(() =&gt; {<br>    messageElement.innerHTML = '';<br>  }, 2000);<br>}`,
+  },
+  {
+    title: "Шаг 37. Функция playClickSound",
+    desc: "Добавьте функцию playClickSound для воспроизведения звука при клике",
+    hints: [
+      "Создайте функцию playClickSound()",
+      "Используйте Web Audio API для простого звукового эффекта",
+      "Обработайте ошибки с помощью try/catch",
+      "Вызывайте функцию при каждом клике"
+    ],
+    answer: `function playClickSound() {<br>  try {<br>    const audioContext = new (window.AudioContext || window.webkitAudioContext)();<br>    const oscillator = audioContext.createOscillator();<br>    const gainNode = audioContext.createGain();<br>    <br>    oscillator.connect(gainNode);<br>    gainNode.connect(audioContext.destination);<br>    <br>    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);<br>    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);<br>    <br>    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);<br>    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);<br>    <br>    oscillator.start(audioContext.currentTime);<br>    oscillator.stop(audioContext.currentTime + 0.1);<br>  } catch (e) {<br>    // Звук не поддерживается - ничего страшного<br>  }<br>}`,
+  },
+  {
+    title: "Шаг 38. Финальная версия функции showMagic",
+    desc: "Объедините все функции в showMagic: частицы, достижения, звуки, анимации",
+    hints: [
+      "Вызывайте все созданные функции в правильном порядке",
+      "Увеличивайте clickCount и обновляйте счётчик",
+      "Вызывайте createParticles, checkAchievements, playClickSound",
+      "Показывайте случайное сообщение и анимируйте кнопку"
+    ],
+    answer: `function showMagic() {<br>  clickCount++;<br>  <br>  // Обновляем счётчик<br>  document.getElementById('clickCounter').innerHTML = 'Кликов: ' + clickCount;<br>  <br>  // Создаём частицы<br>  createParticles();<br>  <br>  // Проверяем достижения<br>  checkAchievements();<br>  <br>  // Показываем случайное сообщение<br>  const randomIndex = Math.floor(Math.random() * magicMessages.length);<br>  const randomMessage = magicMessages[randomIndex];<br>  const messageElement = document.getElementById('magicMessage');<br>  messageElement.innerHTML = '&lt;p style=&quot;margin-top: 20px; font-size: 1.2rem;&quot;&gt;' + randomMessage + '&lt;/p&gt;';<br>  <br>  // Анимация кнопки<br>  const button = document.querySelector('.magic-button');<br>  button.classList.add('clicked');<br>  setTimeout(() =&gt; {<br>    button.classList.remove('clicked');<br>  }, 200);<br>  <br>  // Звуковой эффект<br>  playClickSound();<br>  <br>  // Очищаем сообщение через 3 секунды<br>  setTimeout(() =&gt; {<br>    messageElement.innerHTML = '';<br>  }, 3000);<br>}`,
+  }
+];
+
+      // Объект для хранения таймеров и их состояния
+      const answerTimers = {};
+      const timerElements = {};
+
+      // Генерация вкладок и контента
+      const tabsDiv = document.getElementById("tabs");
+      const tabContentsDiv = document.getElementById("tab-contents");
+      
+      steps.forEach((step, idx) => {
+        // Вкладка
+        const tab = document.createElement("button");
+        tab.className = "tab" + (idx === 0 ? " active" : "");
+        tab.textContent = `${idx + 1}`;
+        tab.dataset.idx = idx;
+        tabsDiv.appendChild(tab);
+        
+        // Контент
+        const content = document.createElement("div");
+        content.className = "tab-content" + (idx === 0 ? " active" : "");
+        content.id = `tab-content-${idx}`;
+        content.innerHTML = `
+          <div class="task-title">${step.title}</div>
+          <div class="task-desc">${step.desc}</div>
+          <button class="show-btn" onclick="toggleHints(${idx})" id="hints-btn-${idx}">Показать подсказки</button>
+          <button class="show-btn" onclick="toggleAnswer(${idx})" id="answer-btn-${idx}" disabled>Показать ответ</button>
+          <div class="timer-text" id="timer-${idx}"></div>
+          <div class="hints-block" id="hints-${idx}">${step.hints.map((h) => `<div>• ${h}</div>`).join("")}</div>
+          <div class="answer-block" id="answer-${idx}">${step.answer}</div>
+        `;
+        tabContentsDiv.appendChild(content);
+        
+        // Сохраняем ссылку на элемент таймера
+        timerElements[idx] = document.getElementById(`timer-${idx}`);
+      });
+
+      // Переключение вкладок
+      tabsDiv.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("tab")) return;
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        e.target.classList.add("active");
+        document
+          .getElementById("tab-content-" + e.target.dataset.idx)
+          .classList.add("active");
+      });
+
+      // Функция для переключения показа/скрытия подсказок
+      window.toggleHints = (idx) => {
+        const hintsBlock = document.getElementById("hints-" + idx);
+        const hintsBtn = document.getElementById("hints-btn-" + idx);
+        const answerBtn = document.getElementById("answer-btn-" + idx);
+        const timerElement = timerElements[idx];
+        
+        if (hintsBlock.style.display === "block") {
+          // Если подсказки видны - скрываем их
+          hintsBlock.style.display = "none";
+          hintsBtn.textContent = "Показать подсказки";
+          timerElement.classList.remove("timer-active");
+          timerElement.textContent = "";
+          
+          // Деактивируем кнопку ответа
+          answerBtn.disabled = true;
+          answerBtn.textContent = "Показать ответ";
+          
+          // Очищаем таймер, если он был активен
+          if (answerTimers[idx]) {
+            clearInterval(answerTimers[idx].interval);
+            clearTimeout(answerTimers[idx].timeout);
+            delete answerTimers[idx];
+          }
+        } else {
+          // Если подсказки скрыты - показываем их
+          hintsBlock.style.display = "block";
+          hintsBtn.textContent = "Скрыть подсказки";
+          
+          // Скрываем ответ, если он был открыт
+          const answerBlock = document.getElementById("answer-" + idx);
+          answerBlock.style.display = "none";
+          
+          // Запускаем обратный отсчет 30 секунд
+          let timeLeft = 30;
+          timerElement.textContent = `Ответ будет доступен через: ${timeLeft} секунд`;
+          timerElement.classList.add("timer-active");
+          
+          // Обновляем счетчик каждую секунду
+          answerTimers[idx] = {
+            interval: setInterval(() => {
+              timeLeft--;
+              timerElement.textContent = `Ответ будет доступен через: ${timeLeft} секунд`;
+              
+              if (timeLeft <= 0) {
+                clearInterval(answerTimers[idx].interval);
+                timerElement.textContent = "Ответ теперь доступен!";
+                answerBtn.disabled = false;
+              }
+            }, 1000),
+            
+            timeout: setTimeout(() => {
+              clearInterval(answerTimers[idx].interval);
+              timerElement.textContent = "Ответ теперь доступен!";
+              answerBtn.disabled = false;
+            }, 1000)
+          };
+        }
+      };
+
+      // Функция для переключения показа/скрытия ответа
+      window.toggleAnswer = (idx) => {
+        const answerBlock = document.getElementById("answer-" + idx);
+        const answerBtn = document.getElementById("answer-btn-" + idx);
+        
+        if (answerBlock.style.display === "block") {
+          // Если ответ виден - скрываем его
+          answerBlock.style.display = "none";
+          answerBtn.textContent = "Показать ответ";
+        } else {
+          // Если ответ скрыт - показываем его
+          answerBlock.style.display = "block";
+          answerBtn.textContent = "Скрыть ответ";
+        }
+      };
+    </script>
+  </body>
+</html>

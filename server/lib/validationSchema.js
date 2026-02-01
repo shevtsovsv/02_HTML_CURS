@@ -1,3 +1,5 @@
+
+
 /**
  * @file lib/validationSchema.js
  * @description Schema definitions for validation rules to support the Rule Builder
@@ -669,6 +671,184 @@ const validationSchema = {
         { type: "elementExists", selector: "p" },
         { type: "elementExists", selector: "img" },
       ],
+    },
+  },
+  // Проверка, что элемент реагирует на клик и изменяет DOM
+  eventClickChangesDom: {
+    category: "JavaScript",
+    title: "Элемент на клик изменяет DOM",
+    description:
+      "Проверяет, что при клике на элемент DOM изменяется определенным образом",
+    parameters: {
+      selector: {
+        type: "string",
+        required: true,
+        title: "CSS селектор",
+        placeholder: "button, .clickable",
+      },
+      expectChange: {
+        type: "boolean",
+        required: false,
+        title: "Ожидается изменение DOM",
+        default: true,
+      },
+      condition: {
+        type: "text",
+        required: false,
+        title: "Условие проверки",
+        description:
+          "JavaScript выражение для проверки изменения DOM после клика",
+        placeholder:
+          "document.querySelector('.result').textContent === 'Success'",
+      },
+    },
+    example: {
+      type: "eventClickChangesDom",
+      selector: "#magic-button",
+      expectChange: true,
+      condition: "document.querySelector('#clickCounter').textContent === '1'",
+    },
+  },
+
+  // Проверка, что массив содержит определенные значения
+  arrayContains: {
+    category: "JavaScript",
+    title: "Массив содержит значения",
+    description:
+      "Проверяет, что массив содержит хотя бы одно указанное значение",
+    parameters: {
+      name: {
+        type: "string",
+        required: true,
+        title: "Имя массива",
+        placeholder: "magicMessages, items",
+      },
+      expected: {
+        type: "array",
+        required: true,
+        title: "Ожидаемые значения",
+        description: "Значения, которые должны быть в массиве",
+        placeholder: '["one", "two"]',
+      },
+    },
+    example: {
+      type: "arrayContains",
+      name: "magicMessages",
+      expected: ["✨", "💫"],
+    },
+  },
+
+  // Проверка создания элемента динамически
+  elementCreated: {
+    category: "HTML",
+    title: "Элемент создан динамически",
+    description: "Проверяет, что в DOM появился элемент с указанным селектором",
+    parameters: {
+      selector: {
+        type: "string",
+        required: true,
+        title: "CSS селектор",
+        placeholder: "div.particle, span.effect",
+      },
+    },
+    example: {
+      type: "elementCreated",
+      selector: ".particle",
+    },
+  },
+
+  // Проверка добавления CSS класса через JS
+  classAdded: {
+    category: "JavaScript",
+    title: "Класс добавлен элементу",
+    description:
+      "Проверяет, что JS добавил CSS класс элементу с указанным селектором",
+    parameters: {
+      selector: {
+        type: "string",
+        required: true,
+        title: "CSS селектор",
+        placeholder: "div, button",
+      },
+      className: {
+        type: "string",
+        required: true,
+        title: "CSS класс",
+        placeholder: "active, highlighted",
+      },
+    },
+    example: {
+      type: "classAdded",
+      selector: "div.game-container",
+      className: "active",
+    },
+  },
+
+  // Проверка inline стиля элемента
+  inlineStyleCheck: {
+    category: "CSS",
+    title: "Проверка inline стиля элемента",
+    description: "Проверяет наличие и значение inline CSS свойства у элемента",
+    parameters: {
+      selector: {
+        type: "string",
+        required: true,
+        title: "CSS селектор",
+        placeholder: "button, div.box",
+      },
+      property: {
+        type: "string",
+        required: true,
+        title: "CSS свойство",
+        placeholder: "transform, color",
+      },
+      expected: {
+        type: "string",
+        required: false,
+        title: "Ожидаемое значение",
+        placeholder: "scale(1.1), red",
+      },
+    },
+    example: {
+      type: "inlineStyleCheck",
+      selector: ".magic-button",
+      property: "transform",
+      expected: "scale(1.1) rotate(2deg)",
+    },
+  },
+
+  // Проверка количества элементов после действия
+  elementCountAfterAction: {
+    category: "Logic",
+    title: "Количество элементов после действия",
+    description:
+      "Проверяет, что после определенного действия в DOM есть нужное количество элементов",
+    parameters: {
+      action: {
+        type: "text",
+        required: true,
+        title: "Действие",
+        description: "JS код для выполнения действия (например, клик)",
+        placeholder: "document.querySelector('#magic-button').click()",
+      },
+      selector: {
+        type: "string",
+        required: true,
+        title: "CSS селектор",
+        placeholder: ".particle",
+      },
+      expected: {
+        type: "number",
+        required: true,
+        title: "Ожидаемое количество элементов",
+        placeholder: "10",
+      },
+    },
+    example: {
+      type: "elementCountAfterAction",
+      action: "document.querySelector('#magic-button').click()",
+      selector: ".particle",
+      expected: 10,
     },
   },
 };

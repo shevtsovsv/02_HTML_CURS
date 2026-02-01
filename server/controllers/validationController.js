@@ -4,7 +4,7 @@
  */
 const { projectStep } = require("../models");
 const { JSDOM } = require("jsdom");
-const ValidationRules = require("../lib/validationRules");
+const ValidationRules = require("../lib/validationRulesCustom");
 const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 const logger = require("../utils/logger");
