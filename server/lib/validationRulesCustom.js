@@ -101,9 +101,20 @@ class ValidationRulesCustom extends ValidationRules {
     }
 
     const body = fn.toString();
-    if (!body.includes(rule.expected)) {
-      return `В теле функции '${rule.function}' не найдено '${rule.expected}'.`;
+
+    // Поддержка массива альтернативных вариантов
+    if (Array.isArray(rule.expected)) {
+      const found = rule.expected.some((variant) => body.includes(variant));
+      if (!found) {
+        return `В теле функции '${rule.function}' не найден ни один из вариантов: ${rule.expected.join(" ИЛИ ")}.`;
+      }
+    } else {
+      // Одиночная проверка (обратная совместимость)
+      if (!body.includes(rule.expected)) {
+        return `В теле функции '${rule.function}' не найдено '${rule.expected}'.`;
+      }
     }
+
     return null;
   }
 
@@ -204,8 +215,14 @@ class ValidationRulesCustom extends ValidationRules {
 
   // Проверка наличия слушателя события (eventListenerExists)
   eventListenerExists(rule) {
-    this.executeJavaScript();
+    // JavaScript уже выполнен при создании DOM, не нужно вызывать executeJavaScript()
+    // this.executeJavaScript(); - УБРАНО
+
     const elements = this.document.querySelectorAll(rule.element);
+    if (elements.length === 0) {
+      return `Элемент '${rule.element}' не найден в DOM.`;
+    }
+
     let found = false;
     for (const elementKey of this.eventListeners.keys()) {
       const listeners = this.eventListeners.get(elementKey);
@@ -214,8 +231,11 @@ class ValidationRulesCustom extends ValidationRules {
         break;
       }
     }
+
     if (!found) {
-      return `Слушатель события '${rule.event}' не найден для '${rule.element}'.`;
+      // Дополнительная информация для отладки
+      const allListeners = Array.from(this.eventListeners.keys());
+      return `Слушатель события '${rule.event}' не найден для '${rule.element}'. Найденные слушатели: ${allListeners.length > 0 ? allListeners.join(", ") : "нет"}.`;
     }
     return null;
   }

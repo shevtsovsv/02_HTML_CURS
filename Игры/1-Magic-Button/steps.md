@@ -558,7 +558,22 @@
   {
     "type": "functionBodyIncludes",
     "function": "showMagic",
-    "expected": "document.getElementById('clickCounter').innerHTML =`Кликов: ${clickCount}`"
+    "expected": [
+      "document.getElementById('clickCounter').innerHTML",
+      "document.getElementById('clickCounter').innerText",
+      "document.getElementById('clickCounter').textContent",
+      "document.querySelector('#clickCounter').innerHTML",
+      "document.querySelector('#clickCounter').innerText",
+      "document.querySelector('#clickCounter').textContent",
+      "clickCounter.innerHTML",
+      "clickCounter.innerText",
+      "clickCounter.textContent"
+    ]
+  },
+  {
+    "type": "functionBodyIncludes",
+    "function": "showMagic",
+    "expected": "clickCount"
   }
 ]
 ```

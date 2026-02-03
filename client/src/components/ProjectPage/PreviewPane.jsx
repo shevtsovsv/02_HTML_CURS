@@ -91,6 +91,7 @@ const PreviewPane = ({
     const wrappedJs = wrapJavaScript(debouncedJs);
 
     const safeJs = `
+      // Выполняем пользовательский код ПОСЛЕ загрузки DOM
       document.addEventListener('DOMContentLoaded', function() {
         // Создаем изолированную среду для консоли
         try {
@@ -133,15 +134,14 @@ const PreviewPane = ({
         } catch (initError) {
           // Игнорируем ошибки инициализации
         }
+        
+        // Выполняем пользовательский код ПОСЛЕ настройки консоли и загрузки DOM
+        try {
+          ${wrappedJs || ""}
+        } catch (e) {
+          console.error('Ошибка выполнения кода:', e.message || e);
+        }
       });
-
-      // Выполняем пользовательский код в ГЛОБАЛЬНОМ контексте (вне IIFE)
-      // Это необходимо для работы onclick с function declarations
-      try {
-        ${wrappedJs || ""}
-      } catch (e) {
-        console.error('Ошибка выполнения кода:', e.message || e);
-      }
     `;
 
     return `

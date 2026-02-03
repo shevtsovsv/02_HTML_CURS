@@ -37,32 +37,39 @@ class ValidationRules {
       };
     });
 
-    // Intercept addEventListener
-    const originalAddEventListener =
-      this.window.EventTarget.prototype.addEventListener;
+    // Используем уже установленный Map из beforeParse или создаем новый
+    if (this.window.__eventListenersMap__) {
+      this.eventListeners = this.window.__eventListenersMap__;
+    } else {
+      // Fallback: устанавливаем перехват сейчас (может быть поздно для некоторых случаев)
+      const originalAddEventListener =
+        this.window.EventTarget.prototype.addEventListener;
 
-    this.window.EventTarget.prototype.addEventListener = function (
-      type,
-      listener,
-      options,
-    ) {
-      const element = this;
-      const elementKey =
-        (element.tagName || "Unknown") +
-        (element.id ? "#" + element.id : "") +
-        (element.className ? "." + element.className.split(" ").join(".") : "");
-
-      if (!self.eventListeners.has(elementKey)) {
-        self.eventListeners.set(elementKey, []);
-      }
-      self.eventListeners.get(elementKey).push({
+      this.window.EventTarget.prototype.addEventListener = function (
         type,
         listener,
         options,
-      });
+      ) {
+        const element = this;
+        const elementKey =
+          (element.tagName || "Unknown") +
+          (element.id ? "#" + element.id : "") +
+          (element.className
+            ? "." + element.className.split(" ").join(".")
+            : "");
 
-      return originalAddEventListener.call(this, type, listener, options);
-    };
+        if (!self.eventListeners.has(elementKey)) {
+          self.eventListeners.set(elementKey, []);
+        }
+        self.eventListeners.get(elementKey).push({
+          type,
+          listener,
+          options,
+        });
+
+        return originalAddEventListener.call(this, type, listener, options);
+      };
+    }
   }
 
   /**

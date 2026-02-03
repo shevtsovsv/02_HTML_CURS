@@ -60,7 +60,13 @@ const checkProjectStep = asyncHandler(async (req, res) => {
       });
     }
 
-    return jsCode + globalAssignments;
+    // Оборачиваем код в DOMContentLoaded, чтобы DOM был готов для querySelector и addEventListener
+    return `
+document.addEventListener('DOMContentLoaded', function() {
+  ${jsCode}
+  ${globalAssignments}
+});
+    `.trim();
   };
 
   if (html && html.trim().toLowerCase().startsWith("<!doctype")) {
@@ -93,8 +99,55 @@ const checkProjectStep = asyncHandler(async (req, res) => {
     includeNodeLocations: true,
     storageQuota: 10000000,
     runScripts: "dangerously",
+    beforeParse(window) {
+      // Устанавливаем перехват addEventListener ДО выполнения скриптов
+      const eventListenersMap = new Map();
+      const originalAddEventListener =
+        window.EventTarget.prototype.addEventListener;
+
+      window.EventTarget.prototype.addEventListener = function (
+        type,
+        listener,
+        options,
+      ) {
+        const element = this;
+        const elementKey =
+          (element.tagName || "Unknown") +
+          (element.id ? "#" + element.id : "") +
+          (element.className
+            ? "." + element.className.split(" ").join(".")
+            : "");
+
+        if (!eventListenersMap.has(elementKey)) {
+          eventListenersMap.set(elementKey, []);
+        }
+        eventListenersMap.get(elementKey).push({
+          type,
+          listener,
+          options,
+        });
+
+        return originalAddEventListener.call(this, type, listener, options);
+      };
+
+      // Сохраняем Map в window для доступа из ValidationRules
+      window.__eventListenersMap__ = eventListenersMap;
+    },
   });
   const { document } = dom.window;
+
+  // Ждем выполнения DOMContentLoaded, чтобы addEventListener успел зарегистрироваться
+  await new Promise((resolve) => {
+    if (dom.window.document.readyState === "complete") {
+      // Если документ уже загружен, ждем немного для выполнения скриптов
+      setTimeout(resolve, 100);
+    } else {
+      dom.window.document.addEventListener("DOMContentLoaded", () => {
+        // Даем еще немного времени после DOMContentLoaded для выполнения кода
+        setTimeout(resolve, 100);
+      });
+    }
+  });
 
   // Создаем экземпляр расширенной системы валидации
   const validator = new ValidationRules(dom, document, html, css, js);
