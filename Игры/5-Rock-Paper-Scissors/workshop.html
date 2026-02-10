@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Практикум: Камень-Ножницы-Бумага</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #6b73ff 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        margin: 0;
+      }
+      .back-to-games {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .back-to-games:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+      .workshop-container {
+        max-width: 1100px;
+        width: 95%;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        margin: 40px 0;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 40px 20px 25px 20px;
+      }
+      .header h1 {
+        font-size: 2.7rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .header .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.93;
+      }
+      .tabs {
+        display: flex;
+        border-bottom: 2px solid #eee;
+        background: #f8f9fa;
+        flex-wrap: wrap;
+        overflow-x: auto;
+      }
+      .tab {
+        padding: 18px 32px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #666;
+        background: none;
+        border: none;
+        outline: none;
+        transition:
+          background 0.2s,
+          color 0.2s;
+        font-size: 1.1rem;
+      }
+      .tab.active {
+        color: #667eea;
+        background: #fff;
+        border-bottom: 3px solid #667eea;
+      }
+      .tab-content {
+        display: none;
+        padding: 40px 30px 30px 30px;
+        background: #fff;
+        min-height: 350px;
+        animation: fadeIn 0.5s;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .task-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+      .task-desc {
+        font-size: 1.13rem;
+        margin-bottom: 18px;
+        color: #444;
+      }
+      .hints-block,
+      .answer-block {
+        margin: 18px 0 0 0;
+        padding: 18px 22px;
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        border-radius: 10px;
+        color: #004085;
+        font-size: 1.08rem;
+        display: none;
+        animation: fadeIn 0.4s;
+      }
+      .answer-block {
+        border-left: 4px solid #28a745;
+        color: #155724;
+        background: #d4edda;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+      }
+      .show-btn {
+        margin-right: 10px;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 22px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s,
+          opacity 0.2s;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.13);
+      }
+      .show-btn:hover {
+        background: linear-gradient(135deg, #5a67d8, #6b4c87);
+        transform: translateY(-2px);
+      }
+      .show-btn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+        opacity: 0.6;
+      }
+      .show-btn:disabled:hover {
+        background: #cccccc;
+        transform: none;
+      }
+      .timer-text {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 10px;
+        font-style: italic;
+        display: none;
+      }
+      .timer-active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (max-width: 800px) {
+        .workshop-container {
+          margin: 10px 0;
+        }
+        .tab-content {
+          padding: 20px 15px;
+        }
+        .tabs {
+          flex-wrap: wrap;
+        }
+        .tab {
+          padding: 12px 10px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../index.html" class="back-to-games">← Вернуться к играм</a>
+    <div class="workshop-container">
+      <div class="header">
+        <h1>Практикум: Камень-Ножницы-Бумага</h1>
+        <div class="subtitle">Пошаговые задания с подсказками и ответами</div>
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div id="tab-contents"></div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const steps = [
+          {
+            title: "Шаг 1. Базовая HTML-структура",
+            desc: "Создайте базовую HTML структуру с DOCTYPE, тегами html, head и body.",
+            hints: [
+              "Начинайте с &lt;!DOCTYPE html&gt;.",
+              "Добавьте тег &lt;html lang='ru'&gt;.",
+              "Внутри html создайте &lt;head&gt; и &lt;body&gt;.",
+              "Проверьте правильность вложенности тегов.",
+            ],
+            answer: `
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+  </head>
+  <body>
+  </body>
+</html>`,
+          },
+          {
+            title: "Шаг 2. Мета-теги и заголовок",
+            desc: "Добавьте в head: meta charset UTF-8, viewport для адаптивности и title 'Камень-Ножницы-Бумага'.",
+            hints: [
+              "&lt;meta charset='UTF-8'&gt; — для правильной кодировки.",
+              "&lt;meta name='viewport' content='width=device-width, initial-scale=1.0'&gt; — для адаптивности.",
+              "&lt;title&gt;Камень-Ножницы-Бумага&lt;/title&gt; — заголовок вкладки браузера.",
+              "Все мета-теги размещаются внутри &lt;head&gt;.",
+            ],
+            answer: `
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Камень-Ножницы-Бумага</title>
+</head>`,
+          },
+          {
+            title: "Шаг 3. Подключение внешних файлов",
+            desc: "Подключите файлы style.css и script.js через теги link и script.",
+            hints: [
+              "Для CSS используйте &lt;link rel='stylesheet' href='style.css'&gt;.",
+              "Для JavaScript используйте &lt;script src='script.js' defer&gt;.",
+              "Атрибут defer откладывает выполнение скрипта до загрузки HTML.",
+              "Тег link размещается в head, script можно в head или в конце body.",
+            ],
+            answer:
+              `
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Камень-Ножницы-Бумага</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <script src="script.js"><` +
+              `/script>
+</body>`,
+          },
+          {
+            title: "Шаг 4. Основной контейнер игры",
+            desc: "Создайте div с классом game-container — это главный контейнер всей игры.",
+            hints: [
+              "Создайте &lt;div class='game-container'&gt;&lt;/div&gt; внутри body.",
+              "Этот контейнер будет содержать все элементы игры.",
+              "Используйте семантически правильные имена классов.",
+            ],
+            answer:
+              `
+<body>
+  <div class="game-container">
+  </div>
+  <script src="script.js"><` +
+              `/script>
+</body>`,
+          },
+          {
+            title: "Шаг 5. Заголовок игры",
+            desc: "Внутри game-container создайте h1 с текстом '✊✋✌️ Камень-Ножницы-Бумага' и p с классом subtitle.",
+            hints: [
+              "Добавьте &lt;h1&gt;✊✋✌️ Камень-Ножницы-Бумага&lt;/h1&gt;.",
+              "Добавьте &lt;p class='subtitle'&gt;Сразись с компьютером!&lt;/p&gt;.",
+              "Эмодзи делают интерфейс более дружелюбным.",
+            ],
+            answer: `
+<div class="game-container">
+  <h1>✊✋✌️ Камень-Ножницы-Бумага</h1>
+  <p class="subtitle">Сразись с компьютером!</p>
+</div>`,
+          },
+          {
+            title: "Шаг 6. Контейнер статистики",
+            desc: "Создайте div с классом game-stats для отображения счёта.",
+            hints: [
+              "Создайте &lt;div class='game-stats'&gt;&lt;/div&gt;.",
+              "Внутри будут карточки со статистикой.",
+              "CSS Grid будет использоваться для размещения.",
+            ],
+            answer: `
+<div class="game-stats">
+</div>`,
+          },
+          {
+            title: 'Шаг 7. Карточка "Победы"',
+            desc: "В game-stats создайте карточку для отображения количества побед.",
+            hints: [
+              "Создайте &lt;div class='stat-card'&gt;.",
+              "Внутри добавьте &lt;span class='stat-number' id='wins'&gt;0&lt;/span&gt;.",
+              "И &lt;span class='stat-label'&gt;Победы&lt;/span&gt;.",
+              "ID нужен для обновления значения через JavaScript.",
+            ],
+            answer: `
+<div class="game-stats">
+  <div class="stat-card">
+    <span class="stat-number" id="wins">0</span>
+    <span class="stat-label">Победы</span>
+  </div>
+</div>`,
+          },
+          {
+            title: 'Шаг 8. Карточка "Поражения"',
+            desc: "Создайте карточку для отображения количества поражений.",
+            hints: [
+              "Аналогично предыдущему шагу.",
+              "id='losses', начальное значение: 0.",
+              "Название: 'Поражения'.",
+            ],
+            answer: `
+<div class="stat-card">
+  <span class="stat-number" id="losses">0</span>
+  <span class="stat-label">Поражения</span>
+</div>`,
+          },
+          {
+            title: 'Шаг 9. Карточка "Ничьих"',
+            desc: "Создайте карточку для отображения количества ничьих.",
+            hints: [
+              "id='draws'.",
+              "Начальное значение: 0.",
+              "Название: 'Ничьих'.",
+            ],
+            answer: `
+<div class="stat-card">
+  <span class="stat-number" id="draws">0</span>
+  <span class="stat-label">Ничьих</span>
+</div>`,
+          },
+          {
+            title: 'Шаг 10. Карточка "Серия"',
+            desc: "Создайте карточку для отображения текущей серии побед.",
+            hints: [
+              "id='streak'.",
+              "Начальное значение: 0.",
+              "Название: 'Серия'.",
+            ],
+            answer: `
+<div class="stat-card">
+  <span class="stat-number" id="streak">0</span>
+  <span class="stat-label">Серия</span>
+</div>`,
+          },
+          {
+            title: "Шаг 11. Игровое поле (контейнер)",
+            desc: "Создайте div с классом battle-arena для игрового поля.",
+            hints: [
+              "Создайте &lt;div class='battle-arena'&gt;&lt;/div&gt;.",
+              "Здесь будут отображаться выборы игрока и компьютера.",
+              "Это основная область взаимодействия.",
+            ],
+            answer: `
+<div class="battle-arena">
+</div>`,
+          },
+          {
+            title: "Шаг 12. Секция VS (контейнер)",
+            desc: "В battle-arena создайте div с классом vs-section для размещения выборов.",
+            hints: [
+              "Создайте &lt;div class='vs-section'&gt;&lt;/div&gt;.",
+              "CSS Grid разделит это на 3 колонки: игрок | VS | компьютер.",
+              "Здесь будет происходить 'бой'.",
+            ],
+            answer: `
+<div class="battle-arena">
+  <div class="vs-section">
+  </div>
+</div>`,
+          },
+          {
+            title: "Шаг 13. Сторона игрока",
+            desc: "В vs-section создайте div с классом player-side для отображения выбора игрока.",
+            hints: [
+              "Создайте &lt;div class='player-side'&gt;&lt;/div&gt;.",
+              "Добавьте заголовок &lt;h3&gt;Вы&lt;/h3&gt;.",
+              "Добавьте &lt;div class='player-choice' id='playerChoice'&gt;❓&lt;/div&gt; для отображения выбора.",
+              "Начальный символ: ❓ (вопросительный знак).",
+            ],
+            answer: `
+<div class="player-side">
+  <h3>Вы</h3>
+  <div class="player-choice" id="playerChoice">❓</div>
+</div>`,
+          },
+          {
+            title: "Шаг 14. Разделитель VS",
+            desc: "Создайте div с классом vs-divider для отображения 'VS' между игроком и компьютером.",
+            hints: [
+              "Создайте &lt;div class='vs-divider'&gt;VS&lt;/div&gt;.",
+              "Это будет в центральной колонке.",
+              "Визуально разделяет два выбора.",
+            ],
+            answer: `
+<div class="vs-divider">VS</div>`,
+          },
+          {
+            title: "Шаг 15. Сторона компьютера",
+            desc: "Создайте div с классом computer-side для отображения выбора компьютера.",
+            hints: [
+              "Аналогично стороне игрока.",
+              "Заголовок: 'Компьютер'.",
+              "id='computerChoice', начальный символ: ❓.",
+            ],
+            answer: `
+<div class="computer-side">
+  <h3>Компьютер</h3>
+  <div class="computer-choice" id="computerChoice">❓</div>
+</div>`,
+          },
+          {
+            title: "Шаг 16. Контейнер кнопок выбора",
+            desc: "Создайте div с классом choice-buttons для кнопок выбора.",
+            hints: [
+              "Создайте &lt;div class='choice-buttons'&gt;&lt;/div&gt;.",
+              "CSS Grid разместит 3 кнопки в ряд.",
+              "Кнопки будут добавлены в следующих шагах.",
+            ],
+            answer: `
+<div class="choice-buttons">
+</div>`,
+          },
+          {
+            title: 'Шаг 17. Кнопка "Камень"',
+            desc: "Создайте кнопку для выбора камня.",
+            hints: [
+              "Создайте &lt;button class='choice-btn' onclick='play(\"rock\")'&gt;.",
+              "Текст кнопки: ✊.",
+              "Добавьте &lt;span class='choice-label'&gt;Камень&lt;/span&gt; для подписи.",
+              "onclick вызывает функцию JavaScript с параметром 'rock'.",
+            ],
+            answer: `
+<button class="choice-btn" onclick="play('rock')">
+  ✊
+  <span class="choice-label">Камень</span>
+</button>`,
+          },
+          {
+            title: 'Шаг 18. Кнопка "Бумага"',
+            desc: "Создайте кнопку для выбора бумаги.",
+            hints: [
+              "onclick='play(\"paper\")'.",
+              "Эмодзи: ✋.",
+              "Подпись: Бумага.",
+            ],
+            answer: `
+<button class="choice-btn" onclick="play('paper')">
+  ✋
+  <span class="choice-label">Бумага</span>
+</button>`,
+          },
+          {
+            title: 'Шаг 19. Кнопка "Ножницы"',
+            desc: "Создайте кнопку для выбора ножниц.",
+            hints: [
+              "onclick='play(\"scissors\")'.",
+              "Эмодзи: ✌️.",
+              "Подпись: Ножницы.",
+            ],
+            answer: `
+<button class="choice-btn" onclick="play('scissors')">
+  ✌️
+  <span class="choice-label">Ножницы</span>
+</button>`,
+          },
+          {
+            title: "Шаг 20. Блок отображения результата",
+            desc: "Создайте div для отображения результата раунда.",
+            hints: [
+              "Создайте &lt;div class='result-display'&gt;.",
+              "Внутри добавьте &lt;div class='result-text' id='resultText'&gt;Сделайте свой выбор!&lt;/div&gt;.",
+              "JavaScript будет обновлять этот текст после каждого раунда.",
+            ],
+            answer: `
+<div class="result-display">
+  <div class="result-text" id="resultText">Сделайте свой выбор!</div>
+</div>`,
+          },
+          {
+            title: "Шаг 21. Объект переменных игры",
+            desc: "Создайте объект для хранения статистики игры.",
+            hints: [
+              "Используйте let для изменяемого объекта.",
+              "Поля: wins, losses, draws, streak.",
+              "Все счётчики начинаются с 0.",
+            ],
+            answer: `
+let gameStats = {
+  wins: 0,
+  losses: 0,
+  draws: 0,
+  streak: 0
+};`,
+          },
+          {
+            title: "Шаг 22. Объект соответствия выбора эмодзи",
+            desc: "Создайте объект для преобразования названия выбора в эмодзи.",
+            hints: [
+              "Константа choices с ключами: rock, paper, scissors.",
+              "Значения: соответствующие эмодзи (✊, ✋, ✌️).",
+              "Это упростит отображение выборов.",
+            ],
+            answer: `
+const choices = {
+  rock: '✊',
+  paper: '✋',
+  scissors: '✌️'
+};`,
+          },
+          {
+            title: "Шаг 23. Функция случайного выбора компьютера",
+            desc: "Создайте функцию getComputerChoice() для генерации случайного выбора компьютера.",
+            hints: [
+              "Создайте массив ['rock', 'paper', 'scissors'].",
+              "Используйте Math.random() для случайного числа.",
+              "Math.floor() округляет вниз.",
+              "Верните случайный элемент массива.",
+            ],
+            answer: `
+function getComputerChoice() {
+  const options = ['rock', 'paper', 'scissors'];
+  const randomIndex = Math.floor(Math.random() * 3);
+  return options[randomIndex];
+}`,
+          },
+          {
+            title: "Шаг 24. Функция определения победителя",
+            desc: "Создайте функцию determineWinner(player, computer) для определения результата.",
+            hints: [
+              "Если выборы равны — ничья.",
+              "Камень бьёт ножницы.",
+              "Ножницы бьют бумагу.",
+              "Бумага бьёт камень.",
+              "Верните 'win', 'lose' или 'draw'.",
+            ],
+            answer: `
+function determineWinner(player, computer) {
+  if (player === computer) {
+    return 'draw';
+  }
+  
+  if (
+    (player === 'rock' && computer === 'scissors') ||
+    (player === 'scissors' && computer === 'paper') ||
+    (player === 'paper' && computer === 'rock')
+  ) {
+    return 'win';
+  }
+  
+  return 'lose';
+}`,
+          },
+          {
+            title: "Шаг 25. Функция обновления статистики",
+            desc: "Создайте функцию updateStats() для обновления отображения счёта.",
+            hints: [
+              "Обновите textContent элементов с id: wins, losses, draws, streak.",
+              "Используйте getElementById.",
+              "Берите значения из объекта gameStats.",
+            ],
+            answer: `
+function updateStats() {
+  document.getElementById('wins').textContent = gameStats.wins;
+  document.getElementById('losses').textContent = gameStats.losses;
+  document.getElementById('draws').textContent = gameStats.draws;
+  document.getElementById('streak').textContent = gameStats.streak;
+}`,
+          },
+          {
+            title: "Шаг 26. Функция отображения результата",
+            desc: "Создайте функцию displayResult(result, playerChoice, computerChoice) для показа результата раунда.",
+            hints: [
+              "Обновите текст в элементе с id='resultText'.",
+              "Используйте разные сообщения для win, lose, draw.",
+              "Добавьте классы для цветового оформления (win, lose, draw).",
+            ],
+            answer: `
+function displayResult(result, playerChoice, computerChoice) {
+  const resultText = document.getElementById('resultText');
+  const playerEmoji = choices[playerChoice];
+  const computerEmoji = choices[computerChoice];
+  
+  resultText.className = 'result-text ' + result;
+  
+  if (result === 'win') {
+    resultText.textContent = \`Вы победили! \${playerEmoji} бьёт \${computerEmoji}\`;
+  } else if (result === 'lose') {
+    resultText.textContent = \`Вы проиграли! \${computerEmoji} бьёт \${playerEmoji}\`;
+  } else {
+    resultText.textContent = \`Ничья! Оба выбрали \${playerEmoji}\`;
+  }
+}`,
+          },
+          {
+            title: "Шаг 27. Функция обновления отображения выборов",
+            desc: "Создайте функцию updateChoiceDisplay(playerChoice, computerChoice) для показа эмодзи выборов.",
+            hints: [
+              "Обновите textContent элементов playerChoice и computerChoice.",
+              "Используйте объект choices для получения эмодзи.",
+              "Это визуально показывает, что выбрали игрок и компьютер.",
+            ],
+            answer: `
+function updateChoiceDisplay(playerChoice, computerChoice) {
+  document.getElementById('playerChoice').textContent = choices[playerChoice];
+  document.getElementById('computerChoice').textContent = choices[computerChoice];
+}`,
+          },
+          {
+            title: "Шаг 28. Основная функция игры play()",
+            desc: "Создайте функцию play(playerChoice) — главную функцию игры.",
+            hints: [
+              "Получите выбор компьютера через getComputerChoice().",
+              "Определите победителя через determineWinner().",
+              "Обновите статистику в зависимости от результата.",
+              "Обновите серию побед.",
+              "Вызовите функции обновления дисплея.",
+            ],
+            answer: `
+function play(playerChoice) {
+  const computerChoice = getComputerChoice();
+  const result = determineWinner(playerChoice, computerChoice);
+  
+  if (result === 'win') {
+    gameStats.wins++;
+    gameStats.streak++;
+  } else if (result === 'lose') {
+    gameStats.losses++;
+    gameStats.streak = 0;
+  } else {
+    gameStats.draws++;
+  }
+  
+  updateChoiceDisplay(playerChoice, computerChoice);
+  displayResult(result, playerChoice, computerChoice);
+  updateStats();
+}`,
+          },
+          {
+            title: "Шаг 29. Кнопка сброса статистики",
+            desc: "Добавьте кнопку для сброса счёта игры.",
+            hints: [
+              "Создайте &lt;button class='reset-btn' onclick='resetGame()'&gt;🔄 Сбросить счёт&lt;/button&gt;.",
+              "Разместите после result-display.",
+              "onclick вызовет функцию resetGame().",
+            ],
+            answer: `
+<button class="reset-btn" onclick="resetGame()">🔄 Сбросить счёт</button>`,
+          },
+          {
+            title: "Шаг 30. Функция сброса игры",
+            desc: "Создайте функцию resetGame() для обнуления всей статистики.",
+            hints: [
+              "Обнулите все поля объекта gameStats.",
+              "Сбросьте отображение выборов на ❓.",
+              "Сбросьте текст результата.",
+              "Обновите статистику.",
+            ],
+            answer: `
+function resetGame() {
+  gameStats.wins = 0;
+  gameStats.losses = 0;
+  gameStats.draws = 0;
+  gameStats.streak = 0;
+  
+  document.getElementById('playerChoice').textContent = '❓';
+  document.getElementById('computerChoice').textContent = '❓';
+  document.getElementById('resultText').textContent = 'Сделайте свой выбор!';
+  document.getElementById('resultText').className = 'result-text';
+  
+  updateStats();
+}`,
+          },
+          {
+            title: "Шаг 31. Инициализация игры",
+            desc: "Создайте начальную инициализацию при загрузке страницы.",
+            hints: [
+              "Вызовите updateStats() для отображения начальных значений.",
+              "Это гарантирует, что счётчики показывают 0 при загрузке.",
+            ],
+            answer: `
+// Инициализация при загрузке страницы
+updateStats();`,
+          },
+          {
+            title: 'Шаг 32. Добавление режима "До 3 побед"',
+            desc: "Создайте переменную для отслеживания режима игры.",
+            hints: [
+              "Добавьте переменную let gameMode = 'normal'.",
+              "Возможные значения: 'normal' или 'firstTo3'.",
+              "Это позволит переключать режимы игры.",
+            ],
+            answer: `
+let gameMode = 'normal';`,
+          },
+          {
+            title: 'Шаг 33. Функция проверки победы в режиме "До 3 побед"',
+            desc: "Создайте функцию checkFirstTo3Victory() для проверки условий победы.",
+            hints: [
+              "Проверяйте, только если gameMode === 'firstTo3'.",
+              "Если wins >= 3 или losses >= 3 — игра окончена.",
+              "Покажите сообщение с результатом.",
+              "Можно использовать alert или создать попап.",
+            ],
+            answer: `
+function checkFirstTo3Victory() {
+  if (gameMode !== 'firstTo3') return;
+  
+  if (gameStats.wins >= 3) {
+    alert('🎉 Поздравляем! Вы победили со счётом 3 раунда!');
+    resetGame();
+  } else if (gameStats.losses >= 3) {
+    alert('😢 Компьютер победил со счётом 3 раунда. Попробуйте ещё раз!');
+    resetGame();
+  }
+}`,
+          },
+          {
+            title: "Шаг 34. Обновление функции play() для режимов",
+            desc: "Добавьте вызов checkFirstTo3Victory() в конец функции play().",
+            hints: [
+              "Добавьте checkFirstTo3Victory() в конце функции play().",
+              "Это будет проверять условия победы после каждого раунда.",
+              "Работает только в режиме 'firstTo3'.",
+            ],
+            answer: `
+function play(playerChoice) {
+  const computerChoice = getComputerChoice();
+  const result = determineWinner(playerChoice, computerChoice);
+  
+  if (result === 'win') {
+    gameStats.wins++;
+    gameStats.streak++;
+  } else if (result === 'lose') {
+    gameStats.losses++;
+    gameStats.streak = 0;
+  } else {
+    gameStats.draws++;
+  }
+  
+  updateChoiceDisplay(playerChoice, computerChoice);
+  displayResult(result, playerChoice, computerChoice);
+  updateStats();
+  checkFirstTo3Victory();
+}`,
+          },
+          {
+            title: "Шаг 35. HTML для переключателя режимов",
+            desc: "Добавьте переключатель режимов игры в HTML.",
+            hints: [
+              "Создайте &lt;div class='game-mode-selector'&gt; перед battle-arena.",
+              "Добавьте две кнопки: 'Обычный режим' и 'До 3 побед'.",
+              "Используйте класс mode-btn.",
+              "onclick вызывает функцию setGameMode().",
+            ],
+            answer: `
+<div class="game-mode-selector">
+  <button class="mode-btn active" onclick="setGameMode('normal')">
+    🎮 Обычный режим
+  </button>
+  <button class="mode-btn" onclick="setGameMode('firstTo3')">
+    🏆 До 3 побед
+  </button>
+</div>`,
+          },
+          {
+            title: "Шаг 36. Функция переключения режима",
+            desc: "Создайте функцию setGameMode(mode) для переключения режимов.",
+            hints: [
+              "Установите gameMode = mode.",
+              "Обновите классы кнопок (добавьте/уберите active).",
+              "Сбросьте статистику через resetGame().",
+              "Покажите сообщение о смене режима.",
+            ],
+            answer: `
+function setGameMode(mode) {
+  gameMode = mode;
+  
+  // Обновляем активную кнопку
+  const buttons = document.querySelectorAll('.mode-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  resetGame();
+  
+  if (mode === 'firstTo3') {
+    document.getElementById('resultText').textContent = 'Режим "До 3 побед"! Первый до 3 раундов выигрывает!';
+  } else {
+    document.getElementById('resultText').textContent = 'Обычный режим. Сделайте свой выбор!';
+  }
+}`,
+          },
+          {
+            title: "Шаг 37. Сохранение статистики в localStorage",
+            desc: "Создайте функцию saveStats() для сохранения статистики.",
+            hints: [
+              "Используйте JSON.stringify() для преобразования объекта в строку.",
+              "localStorage.setItem('rpsStats', ...).",
+              "Сохраняйте gameStats.",
+            ],
+            answer: `
+function saveStats() {
+  localStorage.setItem('rpsStats', JSON.stringify(gameStats));
+}`,
+          },
+          {
+            title: "Шаг 38. Загрузка статистики из localStorage",
+            desc: "Создайте функцию loadStats() для загрузки сохранённой статистики.",
+            hints: [
+              "Используйте localStorage.getItem('rpsStats').",
+              "Проверьте, существует ли сохранение.",
+              "Используйте JSON.parse() для преобразования строки в объект.",
+              "Обновите gameStats и дисплей.",
+            ],
+            answer: `
+function loadStats() {
+  const saved = localStorage.getItem('rpsStats');
+  if (saved) {
+    gameStats = JSON.parse(saved);
+    updateStats();
+  }
+}`,
+          },
+          {
+            title: "Шаг 39. Автосохранение при изменении статистики",
+            desc: "Добавьте вызов saveStats() в функцию play().",
+            hints: [
+              "Добавьте saveStats() в конец функции play().",
+              "Это будет автоматически сохранять статистику после каждого раунда.",
+              "Данные сохранятся даже после закрытия браузера.",
+            ],
+            answer: `
+function play(playerChoice) {
+  const computerChoice = getComputerChoice();
+  const result = determineWinner(playerChoice, computerChoice);
+  
+  if (result === 'win') {
+    gameStats.wins++;
+    gameStats.streak++;
+  } else if (result === 'lose') {
+    gameStats.losses++;
+    gameStats.streak = 0;
+  } else {
+    gameStats.draws++;
+  }
+  
+  updateChoiceDisplay(playerChoice, computerChoice);
+  displayResult(result, playerChoice, computerChoice);
+  updateStats();
+  checkFirstTo3Victory();
+  saveStats();
+}`,
+          },
+          {
+            title: "Шаг 40. Загрузка статистики при старте",
+            desc: "Добавьте вызов loadStats() в инициализацию.",
+            hints: [
+              "Добавьте loadStats() в начало скрипта или в конце.",
+              "Это загрузит сохранённую статистику при открытии страницы.",
+              "Игрок сможет продолжить с того места, где остановился.",
+            ],
+            answer: `
+// Инициализация при загрузке страницы
+loadStats();
+updateStats();`,
+          },
+          {
+            title: "Шаг 41. Добавление звуковых эффектов (опционально)",
+            desc: "Создайте функцию для воспроизведения звуков.",
+            hints: [
+              "Создайте функцию playSound(result).",
+              "Используйте new Audio() для создания звука.",
+              "Разные звуки для win, lose, draw.",
+              "Вызывайте в функции play().",
+            ],
+            answer: `
+function playSound(result) {
+  const sounds = {
+    win: 'https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3',
+    lose: 'https://assets.mixkit.co/sfx/preview/mixkit-lose-2042.mp3',
+    draw: 'https://assets.mixkit.co/sfx/preview/mixkit-neutral-click-1544.mp3'
+  };
+  
+  const audio = new Audio(sounds[result]);
+  audio.play();
+}`,
+          },
+          {
+            title: "Шаг 42. Анимация выбора",
+            desc: "Добавьте CSS свойство для кнопок при наведении (используйте внешний файл style.css).",
+            hints: [
+              "Используйте свойство transform для увеличения.",
+              "scale(1.1) увеличивает кнопку на 10%.",
+              "transition делает изменение плавным.",
+              "Добавьте box-shadow для эффекта глубины.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.choice-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}`,
+          },
+          {
+            title: "Шаг 43. Анимация при клике",
+            desc: "Добавьте CSS для эффекта нажатия (используйте внешний файл style.css).",
+            hints: [
+              ":active срабатывает при клике.",
+              "scale(0.95) немного уменьшает кнопку.",
+              "Создаёт эффект 'вдавливания'.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.choice-btn:active {
+  transform: scale(0.95);
+}`,
+          },
+          {
+            title: "Шаг 44. Анимация тряски для выборов",
+            desc: "Создайте keyframes анимацию тряски (используйте внешний файл style.css).",
+            hints: [
+              "Используйте @keyframes shake.",
+              "translateX перемещает элемент влево-вправо.",
+              "Примените к .player-choice и .computer-choice.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.player-choice.animate,
+.computer-choice.animate {
+  animation: shake 0.5s;
+}`,
+          },
+          {
+            title: "Шаг 45. Применение анимации к выборам",
+            desc: "Добавьте код для применения анимации при выборе.",
+            hints: [
+              "Добавьте класс 'animate' к элементам.",
+              "Используйте setTimeout для удаления класса.",
+              "Добавьте в функцию updateChoiceDisplay().",
+            ],
+            answer: `
+function updateChoiceDisplay(playerChoice, computerChoice) {
+  const playerDisplay = document.getElementById('playerChoice');
+  const computerDisplay = document.getElementById('computerChoice');
+  
+  playerDisplay.textContent = choices[playerChoice];
+  computerDisplay.textContent = choices[computerChoice];
+  
+  // Добавляем анимацию
+  playerDisplay.classList.add('animate');
+  computerDisplay.classList.add('animate');
+  
+  // Убираем класс анимации через полсекунды
+  setTimeout(() => {
+    playerDisplay.classList.remove('animate');
+    computerDisplay.classList.remove('animate');
+  }, 500);
+}`,
+          },
+          {
+            title: "Шаг 46. Градиентный фон для body",
+            desc: "Создайте красивый градиентный фон (используйте внешний файл style.css).",
+            hints: [
+              "Используйте linear-gradient.",
+              "Укажите несколько цветов.",
+              "135deg — угол наклона.",
+              "Используйте фиолетово-синюю палитру.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6b73ff 100%);
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}`,
+          },
+          {
+            title: "Шаг 47. Стилизация контейнера игры",
+            desc: "Оформите главный контейнер (используйте внешний файл style.css).",
+            hints: [
+              "background: белый с прозрачностью.",
+              "border-radius для закругления.",
+              "box-shadow для тени.",
+              "padding для внутренних отступов.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.game-container {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 25px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
+}`,
+          },
+          {
+            title: "Шаг 48. Стилизация статистических карточек",
+            desc: "Оформите карточки статистики (используйте внешний файл style.css).",
+            hints: [
+              "display: grid для сетки.",
+              "grid-template-columns: repeat(4, 1fr) — 4 равные колонки.",
+              "gap для расстояния между карточками.",
+              "Градиент для каждой карточки.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  padding: 15px;
+  border-radius: 15px;
+  color: white;
+  font-weight: bold;
+}`,
+          },
+          {
+            title: "Шаг 49. Стилизация игрового поля",
+            desc: "Оформите зону battle-arena (используйте внешний файл style.css).",
+            hints: [
+              "Используйте тёплый градиент (оранжево-розовый).",
+              "border для рамки.",
+              "padding для внутренних отступов.",
+              "border-radius для закругления.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.battle-arena {
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+  border-radius: 25px;
+  padding: 25px;
+  margin: 20px 0;
+  border: 3px solid #ff8a65;
+}
+
+.vs-section {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+}`,
+          },
+          {
+            title: "Шаг 50. Стилизация кнопок выбора",
+            desc: "Оформите кнопки камень-ножницы-бумага (используйте внешний файл style.css).",
+            hints: [
+              "display: grid с 3 колонками.",
+              "Градиентный фон кнопок.",
+              "Большой размер эмодзи (font-size: 3rem).",
+              "transition для плавных переходов.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.choice-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.choice-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 20px;
+  font-size: 3rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}`,
+          },
+          {
+            title: "Шаг 51. Стилизация блока результата",
+            desc: "Оформите область отображения результата (используйте внешний файл style.css).",
+            hints: [
+              "Белый фон с рамкой.",
+              "min-height для постоянной высоты.",
+              "Разные цвета для win, lose, draw.",
+              ".win — зелёный, .lose — красный, .draw — жёлтый.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.result-display {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 3px solid #4ecdc4;
+  min-height: 80px;
+}
+
+.result-text.win { color: #27ae60; }
+.result-text.lose { color: #e74c3c; }
+.result-text.draw { color: #f39c12; }`,
+          },
+          {
+            title: "Шаг 52. Стилизация кнопок управления",
+            desc: "Оформите кнопку сброса и переключатель режимов (используйте внешний файл style.css).",
+            hints: [
+              "Отдельные стили для reset-btn.",
+              "mode-btn для переключателя режимов.",
+              ".active для активного режима.",
+              "Разные цвета и эффекты.",
+            ],
+            answer: `
+Добавьте в файл style.css:
+
+.reset-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mode-btn {
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+  color: #333;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #ff9a9e, #fecfef);
+}`,
+          },
+        ];
+
+        const answerTimers = {};
+        const timerElements = {};
+
+        const tabsDiv = document.getElementById("tabs");
+        const tabContentsDiv = document.getElementById("tab-contents");
+
+        steps.forEach((step, idx) => {
+          const tab = document.createElement("button");
+          tab.className = "tab" + (idx === 0 ? " active" : "");
+          tab.textContent = `${idx + 1}`;
+          tab.dataset.idx = idx;
+          tabsDiv.appendChild(tab);
+
+          const content = document.createElement("div");
+          content.className = "tab-content" + (idx === 0 ? " active" : "");
+          content.id = `tab-content-${idx}`;
+          content.innerHTML = `
+          <div class="task-title">${step.title}</div>
+          <div class="task-desc">${step.desc}</div>
+          <button class="show-btn" onclick="toggleHints(${idx})" id="hints-btn-${idx}">Показать подсказки</button>
+          <button class="show-btn" onclick="toggleAnswer(${idx})" id="answer-btn-${idx}" disabled>Показать ответ</button>
+          <div class="timer-text" id="timer-${idx}"></div>
+          <div class="hints-block" id="hints-${idx}">${step.hints.map((h) => "<div>• " + h + "</div>").join("")}</div>
+          <div class="answer-block" id="answer-${idx}"><pre></pre></div>
+        `;
+          tabContentsDiv.appendChild(content);
+
+          const pre = content.querySelector(`#answer-${idx} pre`);
+          if (pre) pre.textContent = step.answer;
+
+          timerElements[idx] = document.getElementById(`timer-${idx}`);
+        });
+
+        tabsDiv.addEventListener("click", (e) => {
+          if (!e.target.classList.contains("tab")) return;
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-content")
+            .forEach((c) => c.classList.remove("active"));
+          e.target.classList.add("active");
+          document
+            .getElementById("tab-content-" + e.target.dataset.idx)
+            .classList.add("active");
+        });
+
+        window.toggleHints = (idx) => {
+          const hintsBlock = document.getElementById("hints-" + idx);
+          const hintsBtn = document.getElementById("hints-btn-" + idx);
+          const answerBtn = document.getElementById("answer-btn-" + idx);
+          const timerElement = timerElements[idx];
+
+          if (hintsBlock.style.display === "block") {
+            hintsBlock.style.display = "none";
+            hintsBtn.textContent = "Показать подсказки";
+            timerElement.classList.remove("timer-active");
+            timerElement.textContent = "";
+
+            answerBtn.disabled = true;
+            answerBtn.textContent = "Показать ответ";
+
+            if (answerTimers[idx]) {
+              clearInterval(answerTimers[idx].interval);
+              clearTimeout(answerTimers[idx].timeout);
+              delete answerTimers[idx];
+            }
+          } else {
+            hintsBlock.style.display = "block";
+            hintsBtn.textContent = "Скрыть подсказки";
+
+            const answerBlock = document.getElementById("answer-" + idx);
+            answerBlock.style.display = "none";
+
+            let timeLeft = 30;
+            timerElement.textContent = `Ответ будет доступен через: ${timeLeft} секунд`;
+            timerElement.classList.add("timer-active");
+
+            answerTimers[idx] = {
+              interval: setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Ответ будет доступен через: ${timeLeft} секунд`;
+
+                if (timeLeft <= 0) {
+                  clearInterval(answerTimers[idx].interval);
+                  timerElement.textContent = "Ответ теперь доступен!";
+                  answerBtn.disabled = false;
+                }
+              }, 1000),
+
+              timeout: setTimeout(() => {
+                clearInterval(answerTimers[idx].interval);
+                timerElement.textContent = "Ответ теперь доступен!";
+                answerBtn.disabled = false;
+              }, 30000),
+            };
+          }
+        };
+
+        window.toggleAnswer = (idx) => {
+          const answerBlock = document.getElementById("answer-" + idx);
+          const answerBtn = document.getElementById("answer-btn-" + idx);
+
+          if (answerBlock.style.display === "block") {
+            answerBlock.style.display = "none";
+            answerBtn.textContent = "Показать ответ";
+          } else {
+            answerBlock.style.display = "block";
+            answerBtn.textContent = "Скрыть ответ";
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
